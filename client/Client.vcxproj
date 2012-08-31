@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{13734D1B-202B-4AAA-9013-6A485436B035}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Client</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>C:\openssl;C:\v8\include;C:\Program Files\boost\boost_1_51;C:\DxLib_VC\src;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\openssl;C:\v8\build\Debug\lib;C:\Program Files\boost\boost_1_51\lib;C:\DxLib_VC\src;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\openssl;C:\v8\include;C:\Program Files\boost\boost_1_51;C:\DxLib_VC\src;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\openssl;C:\v8\build\Release\lib;C:\Program Files\boost\boost_1_51\lib;C:\DxLib_VC\src;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_WIN32_WINNT=0x0501;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4482;4800;4996</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_WIN32_WINNT=0x0501;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DisableSpecificWarnings>4482;4800;4996</DisableSpecificWarnings>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Common\Network\Command.cpp" />
+    <ClCompile Include="..\Common\Network\Encrypter.cpp" />
+    <ClCompile Include="..\Common\Network\Session.cpp" />
+    <ClCompile Include="..\Common\Network\Signature.cpp" />
+    <ClCompile Include="..\Common\Network\Utils.cpp" />
+    <ClCompile Include="..\Common\unicode.cpp" />
+    <ClCompile Include="3D\CharacterManager.cpp" />
+    <ClCompile Include="3D\FieldPlayer.cpp" />
+    <ClCompile Include="3D\model.cpp" />
+    <ClCompile Include="3D\MotionPlayer.cpp" />
+    <ClCompile Include="3D\PlayerCharacter.cpp" />
+    <ClCompile Include="3D\PMDLoader.cpp" />
+    <ClCompile Include="3D\Stage.cpp" />
+    <ClCompile Include="3D\Timer.cpp" />
+    <ClCompile Include="AccountManager.cpp" />
+    <ClCompile Include="Card.cpp" />
+    <ClCompile Include="CardManager.cpp" />
+    <ClCompile Include="Client.cpp" />
+    <ClCompile Include="CommandManager.cpp" />
+    <ClCompile Include="ConfigManager.cpp" />
+    <ClCompile Include="Core.cpp" />
+    <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="ManagerAccessor.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="PlayerManager.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
+    <ClCompile Include="Scene\Base.cpp" />
+    <ClCompile Include="Scene\Init.cpp" />
+    <ClCompile Include="Scene\MainLoop.cpp" />
+    <ClCompile Include="Scene\Title.cpp" />
+    <ClCompile Include="ScriptEnvironment.cpp" />
+    <ClCompile Include="ServerLauncher.cpp" />
+    <ClCompile Include="UI\Input.cpp" />
+    <ClCompile Include="UI\InputBox.cpp" />
+    <ClCompile Include="UI\UIBase.cpp" />
+    <ClCompile Include="UI\UIBoard.cpp" />
+    <ClCompile Include="UI\UIButton.cpp" />
+    <ClCompile Include="UI\UIGroup.cpp" />
+    <ClCompile Include="UI\UILabel.cpp" />
+    <ClCompile Include="UI\UIList.cpp" />
+    <ClCompile Include="WorldManager.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\Logger.hpp" />
+    <ClInclude Include="..\Common\Network\Command.hpp" />
+    <ClInclude Include="..\Common\Network\CommandHeader.hpp" />
+    <ClInclude Include="..\Common\Network\Encrypter.hpp" />
+    <ClInclude Include="..\Common\Network\Session.hpp" />
+    <ClInclude Include="..\Common\Network\Signature.hpp" />
+    <ClInclude Include="..\Common\Network\Utils.hpp" />
+    <ClInclude Include="..\Common\unicode.hpp" />
+    <ClInclude Include="3D\BasicMotion.hpp" />
+    <ClInclude Include="3D\Character.hpp" />
+    <ClInclude Include="3D\CharacterDataProvider.hpp" />
+    <ClInclude Include="3D\CharacterManager.hpp" />
+    <ClInclude Include="3D\dx_vector.hpp" />
+    <ClInclude Include="3D\FieldPlayer.hpp" />
+    <ClInclude Include="3D\model.hpp" />
+    <ClInclude Include="3D\MotionPlayer.hpp" />
+    <ClInclude Include="3D\PlayerCharacter.hpp" />
+    <ClInclude Include="3D\PMDLoader.hpp" />
+    <ClInclude Include="3D\Stage.hpp" />
+    <ClInclude Include="3D\Timer.hpp" />
+    <ClInclude Include="AccountManager.hpp" />
+    <ClInclude Include="Card.hpp" />
+    <ClInclude Include="CardManager.hpp" />
+    <ClInclude Include="Client.hpp" />
+    <ClInclude Include="CommandManager.hpp" />
+    <ClInclude Include="ConfigManager.hpp" />
+    <ClInclude Include="Core.hpp" />
+    <ClInclude Include="InputManager.hpp" />
+    <ClInclude Include="ManagerAccessor.hpp" />
+    <ClInclude Include="ManagerHeader.hpp" />
+    <ClInclude Include="Player.hpp" />
+    <ClInclude Include="PlayerManager.hpp" />
+    <ClInclude Include="ResourceManager.hpp" />
+    <ClInclude Include="Scene\Base.hpp" />
+    <ClInclude Include="Scene\Include.hpp" />
+    <ClInclude Include="Scene\Init.hpp" />
+    <ClInclude Include="scene\MainLoop.hpp" />
+    <ClInclude Include="Scene\Title.hpp" />
+    <ClInclude Include="ScriptEnvironment.hpp" />
+    <ClInclude Include="ServerLauncher.hpp" />
+    <ClInclude Include="UI\include.hpp" />
+    <ClInclude Include="UI\Input.hpp" />
+    <ClInclude Include="UI\InputBox.hpp" />
+    <ClInclude Include="UI\UIBase.hpp" />
+    <ClInclude Include="UI\UIBoard.hpp" />
+    <ClInclude Include="UI\UIButton.hpp" />
+    <ClInclude Include="UI\UIGroup.hpp" />
+    <ClInclude Include="UI\UILabel.hpp" />
+    <ClInclude Include="UI\UIList.hpp" />
+    <ClInclude Include="WorldManager.hpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

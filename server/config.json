@@ -1,0 +1,12 @@
+//
+// MMO Config
+//
+
+{
+    "server_name": "MMO Server",
+    "port": 39390,
+    
+    "max_total_read_average": 5000,
+    "max_session_read_average": 500,
+    "min_session_read_average": 100
+}
