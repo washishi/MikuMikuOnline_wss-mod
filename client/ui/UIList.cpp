@@ -216,10 +216,10 @@ void UIList::Update()
         item_end_ = items_.size() - 1;
     }
 
-    max_scroll_y_ = max(content_height - absolute_height(), 0);
+    max_scroll_y_ = std::max(content_height - absolute_height(), 0);
     if (content_height > absolute_height()) {
         scrollbar_height_ = absolute_height() * absolute_height() / content_height;
-        scrollbar_height_ = max(scrollbar_height_, 0 + SCROLLBAR_MIN_HEIGHT);
+        scrollbar_height_ = std::max(scrollbar_height_, 0 + SCROLLBAR_MIN_HEIGHT);
         scrollbar_y_ = (absolute_height() - scrollbar_height_) * (1.0 * scroll_y_ / max_scroll_y_);
     } else {
         scrollbar_height_ = scrollbar_y_ = 0;
@@ -284,5 +284,5 @@ void UIList::Draw()
 
 void UIList::NormalizeScrollY()
 {
-    scroll_y_ = min(max(scroll_y_, 0), max_scroll_y_);
+    scroll_y_ = std::min(std::max(scroll_y_, 0), max_scroll_y_);
 }

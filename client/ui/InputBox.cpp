@@ -75,7 +75,7 @@ InputBox::InputBox(const ManagerAccessorPtr& manager_accessor) :
 
     int screen_width, screen_height;
     GetScreenState(&screen_width, &screen_height, nullptr);
-    width_ = min(DEFAULT_MAX_WIDTH + 0, (int)(screen_width * 0.4));
+    width_ = std::min(DEFAULT_MAX_WIDTH + 0, (int)(screen_width * 0.4));
     height_ = input_height_ + BOX_TOP_MARGIN + BOX_BOTTOM_MARGIN;
     x_ = (screen_width - width_) / 2;
     y_ = screen_height - height_ - BOX_BOTTOM_MARGIN;
@@ -374,7 +374,7 @@ void InputBox::DrawCandidates()
 
         int start_index = (selecting_candidate_ / IME_MAX_PAGE_SIZE)
                 * IME_MAX_PAGE_SIZE;
-        int end_index = min(start_index + IME_MAX_PAGE_SIZE,
+        int end_index = std::min(start_index + IME_MAX_PAGE_SIZE,
                 static_cast<int>(candidates_.size() - 1));
 
         int x = candidate_x_;
@@ -384,7 +384,7 @@ void InputBox::DrawCandidates()
 
         for (int i = start_index; i < end_index; i++) {
             auto candidate = unicode::ToTString(candidates_[i]);
-            width = max(width,
+            width = std::max(width,
                     GetDrawStringWidthToHandle(candidate.c_str(),
                             candidate.size(), font_handle_));
         }
@@ -844,11 +844,11 @@ void InputBox::ProcessInput(InputManager* input)
             if (select_start < char_count && char_count <= select_end) {
                 selecting_lines_.resize(static_cast<int>(lines_.size() + message_lines_.size()) + 1,
                         std::pair<int, int>(99999, 0));
-                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = min(
+                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = std::min(
                         selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first, line_width);
-                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = max(
+                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = std::max(
                         selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second,
-                        line_width + max(width, 3));
+                        line_width + std::max(width, 3));
             }
 
             if (line_width - width / 2 <= cursor_moveto_x_
@@ -919,18 +919,18 @@ void InputBox::ProcessInput(InputManager* input)
 
                 clause_lines_.resize(static_cast<int>(lines_.size() + message_lines_.size()) + 1,
                         std::pair<int, int>(99999, 0));
-                clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = min(
+                clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = std::min(
                         clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first, line_width);
-                clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = max(
+                clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = std::max(
                         clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second, line_width + width);
 
                 if (index == static_cast<uint32_t>(selecting_clause_)) {
                     selecting_clause_lines_.resize(static_cast<int>(lines_.size() + message_lines_.size()) + 1,
                             std::pair<int, int>(99999, 0));
-                    selecting_clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = min(
+                    selecting_clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = std::min(
                             selecting_clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first,
                             line_width);
-                    selecting_clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = max(
+                    selecting_clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = std::max(
                             selecting_clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second,
                             line_width + width);
                 }
@@ -981,11 +981,11 @@ void InputBox::ProcessInput(InputManager* input)
             if (select_start < char_count && char_count <= select_end) {
                 selecting_lines_.resize(static_cast<int>(lines_.size() + message_lines_.size()) + 1,
                         std::pair<int, int>(99999, 0));
-                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = min(
+                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = std::min(
                         selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first, line_width);
-                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = max(
+                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = std::max(
                         selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second,
-                        line_width + max(width, 3));
+                        line_width + std::max(width, 3));
             }
 
             if (line_width - width / 2 <= cursor_moveto_x_
@@ -1031,7 +1031,7 @@ void InputBox::ProcessInput(InputManager* input)
         }
 
         input_height_ = static_cast<int>(lines_.size() + message_lines_.size()) * font_height_ + INPUT_MARGIN_Y * 2;
-        input_height_ = max(input_height_, min_input_height_);
+        input_height_ = std::max(input_height_, min_input_height_);
 
         int new_height = input_height_ + BOX_TOP_MARGIN + BOX_BOTTOM_MARGIN;
 
@@ -1202,13 +1202,13 @@ void InputBox::UpdateBase(InputManager* input)
     if (drag_offset_x_ >= 0) {
         x_ = input->GetMouseX() - drag_offset_x_;
         y_ = input->GetMouseY() - drag_offset_y_;
-        x_ = max(0, x_); x_ = min(screen_width - width_, x_);
-        y_ = max(0, y_); y_ = min(screen_height - height_, y_);
+        x_ = std::max(0, x_); x_ = std::min(screen_width - width_, x_);
+        y_ = std::max(0, y_); y_ = std::min(screen_height - height_, y_);
         input->CancelMouseLeft();
     } else if (drag_resize_offset_x_ >= 0) {
         int new_width = input->GetMouseX() - x_ + drag_resize_offset_x_;
-        new_width = max(new_width, (BOX_MIN_WIDTH + 0));
-        new_width = min(new_width, screen_width - x_);
+        new_width = std::max(new_width, (BOX_MIN_WIDTH + 0));
+        new_width = std::min(new_width, screen_width - x_);
         width_ = new_width;
         input->CancelMouseLeft();
     }

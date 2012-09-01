@@ -52,7 +52,7 @@ public:
 
         if (distance_to_target < 200) {
 
-            current_speed_ = min(80.0, distance_to_target * 3.0);
+            current_speed_ = std::min(80.0, distance_to_target * 3.0);
             // Logger::Debug("current_speed_: %d", current_speed_);
 
             /*

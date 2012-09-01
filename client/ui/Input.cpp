@@ -181,7 +181,7 @@ void Input::Draw()
 
             int start_index = (selecting_candidate_ / IME_MAX_PAGE_SIZE)
                     * IME_MAX_PAGE_SIZE;
-            int end_index = min(start_index + IME_MAX_PAGE_SIZE,
+            int end_index = std::min(start_index + IME_MAX_PAGE_SIZE,
                     static_cast<int>(candidates_.size() - 1));
 
             int x = candidate_x_;
@@ -191,7 +191,7 @@ void Input::Draw()
 
             for (int i = start_index; i < end_index; i++) {
                 auto candidate = unicode::ToTString(candidates_[i]);
-                width = max(width,
+                width = std::max(width,
                         GetDrawStringWidthToHandle(candidate.c_str(),
                                 candidate.size(), font_handle_));
             }
@@ -550,11 +550,11 @@ void Input::ProcessInput(InputManager* input)
             if (select_start < char_count && char_count <= select_end) {
                 selecting_lines_.resize(static_cast<int>(lines_.size() + message_lines_.size()) + 1,
                         std::pair<int, int>(99999, 0));
-                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = min(
+                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = std::min(
                         selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first, line_width);
-                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = max(
+                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = std::max(
                         selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second,
-                        line_width + max(width, 3));
+                        line_width + std::max(width, 3));
             }
 
             if (line_width - width / 2 <= cursor_moveto_x_
@@ -625,18 +625,18 @@ void Input::ProcessInput(InputManager* input)
 
                 clause_lines_.resize(static_cast<int>(lines_.size() + message_lines_.size()) + 1,
                         std::pair<int, int>(99999, 0));
-                clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = min(
+                clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = std::min(
                         clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first, line_width);
-                clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = max(
+                clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = std::max(
                         clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second, line_width + width);
 
                 if (index == static_cast<uint32_t>(selecting_clause_)) {
                     selecting_clause_lines_.resize(static_cast<int>(lines_.size() + message_lines_.size()) + 1,
                             std::pair<int, int>(99999, 0));
-                    selecting_clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = min(
+                    selecting_clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = std::min(
                             selecting_clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first,
                             line_width);
-                    selecting_clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = max(
+                    selecting_clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = std::max(
                             selecting_clause_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second,
                             line_width + width);
                 }
@@ -686,11 +686,11 @@ void Input::ProcessInput(InputManager* input)
             if (select_start < char_count && char_count <= select_end) {
                 selecting_lines_.resize(static_cast<int>(lines_.size() + message_lines_.size()) + 1,
                         std::pair<int, int>(99999, 0));
-                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = min(
+                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = std::min(
                         selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first, line_width);
-                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = max(
+                selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second = std::max(
                         selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].second,
-                        line_width + max(width, 3));
+                        line_width + std::max(width, 3));
             }
 
             if (line_width - width / 2 <= cursor_moveto_x_
