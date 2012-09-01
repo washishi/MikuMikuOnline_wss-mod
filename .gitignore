@@ -3,6 +3,7 @@
 *.opensdf
 *.sln
 *.vcxproj
+*.vcxproj.filters
 /ipch
 /Release
 /Debug
