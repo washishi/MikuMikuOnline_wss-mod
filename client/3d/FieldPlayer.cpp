@@ -145,14 +145,14 @@ void FieldPlayer::Move()
     // std::cout << "MovePlayer: " << timer.current_time() << std::endl;
 
     // myself_.prev_statを元にしてmyself_.current_statを計算する
-    //current_stat_.pos = prev_stat_.pos + prev_stat_.vel * timer_->DeltaSec();
-	current_stat_.pos = [&]()->VECTOR
+    current_stat_.pos = prev_stat_.pos + prev_stat_.vel * timer_->DeltaSec();
+    //current_stat_.vel = prev_stat_.vel + prev_stat_.acc * timer_->DeltaSec();
+	current_stat_.vel = [&]()->VECTOR
 	{
-		VECTOR tmp_vel_ = prev_stat_.vel * timer_->DeltaSec();
-		tmp_vel_.y *= 1.0f / flight_duration_ideal_;
-		return prev_stat_.pos + tmp_vel_;
+		VECTOR tmp_acc_ = prev_stat_.acc * timer_->DeltaSec();
+		tmp_acc_.y *= 1.0f / flight_duration_ideal_;
+		return prev_stat_.vel + tmp_acc_;
 	}();
-    current_stat_.vel = prev_stat_.vel + prev_stat_.acc * timer_->DeltaSec();
     current_stat_.acc = prev_stat_.acc;
     current_stat_.roty = prev_stat_.roty + prev_stat_.roty_speed * timer_->DeltaSec();
 
