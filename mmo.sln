@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual C++ Express 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "Client\Client.vcxproj", "{13734D1B-202B-4AAA-9013-6A485436B035}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Client", "client\Client.vcxproj", "{13734D1B-202B-4AAA-9013-6A485436B035}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "Server\Server.vcxproj", "{7A65FFB1-D41C-69DA-011E-8565B9BCF0E1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Server", "server\Server.vcxproj", "{583E45DE-0ADA-C193-4FA6-082ACB132CA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,10 +15,10 @@ Global
 		{13734D1B-202B-4AAA-9013-6A485436B035}.Debug|Win32.Build.0 = Debug|Win32
 		{13734D1B-202B-4AAA-9013-6A485436B035}.Release|Win32.ActiveCfg = Release|Win32
 		{13734D1B-202B-4AAA-9013-6A485436B035}.Release|Win32.Build.0 = Release|Win32
-		{7A65FFB1-D41C-69DA-011E-8565B9BCF0E1}.Debug|Win32.ActiveCfg = Debug|Win32
-		{7A65FFB1-D41C-69DA-011E-8565B9BCF0E1}.Debug|Win32.Build.0 = Debug|Win32
-		{7A65FFB1-D41C-69DA-011E-8565B9BCF0E1}.Release|Win32.ActiveCfg = Release|Win32
-		{7A65FFB1-D41C-69DA-011E-8565B9BCF0E1}.Release|Win32.Build.0 = Release|Win32
+		{583E45DE-0ADA-C193-4FA6-082ACB132CA4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{583E45DE-0ADA-C193-4FA6-082ACB132CA4}.Debug|Win32.Build.0 = Debug|Win32
+		{583E45DE-0ADA-C193-4FA6-082ACB132CA4}.Release|Win32.ActiveCfg = Release|Win32
+		{583E45DE-0ADA-C193-4FA6-082ACB132CA4}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

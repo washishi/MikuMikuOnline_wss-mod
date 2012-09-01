@@ -31,6 +31,7 @@ FieldPlayer::FieldPlayer(CharacterDataProvider& data_provider, const StagePtr& s
         current_stat_(PlayerStatus( VGet(0, 0, 0), VGet(0, 0, 0), VGet(0, 0, 0),
                 0.0f, 0.0f, 0, 0, 1.0f, false)),
         model_height_(0),
+		flight_duration_ideal_(1.0f),
         motion_player_(),
         timer_(timer),
         model_handle_(),
@@ -94,7 +95,8 @@ void FieldPlayer::SetModel(const tstring& name)
 {
     model_handle_ = ResourceManager::LoadModelFromName(name);
     model_height_ = model_handle_.property().get<float>("character.height", 1.58f);
-
+	flight_duration_ideal_ = sqrt((2.0f*0.4f)/9.8f) + sqrt((model_height_*0.8f)/9.8);
+	
     motion.stand_ = MV1GetAnimIndex(model_handle_.handle(), _T("stand"));
     motion.walk_ = MV1GetAnimIndex(model_handle_.handle(), _T("walk"));
     motion.run_ = MV1GetAnimIndex(model_handle_.handle(), _T("run"));
@@ -143,7 +145,13 @@ void FieldPlayer::Move()
     // std::cout << "MovePlayer: " << timer.current_time() << std::endl;
 
     // myself_.prev_statを元にしてmyself_.current_statを計算する
-    current_stat_.pos = prev_stat_.pos + prev_stat_.vel * timer_->DeltaSec();
+    //current_stat_.pos = prev_stat_.pos + prev_stat_.vel * timer_->DeltaSec();
+	current_stat_.pos = [&]()->VECTOR
+	{
+		VECTOR tmp_vel_ = prev_stat_.vel * timer_->DeltaSec();
+		tmp_vel_.y *= 1.0f / flight_duration_ideal_;
+		return prev_stat_.pos + tmp_vel_;
+	}();
     current_stat_.vel = prev_stat_.vel + prev_stat_.acc * timer_->DeltaSec();
     current_stat_.acc = prev_stat_.acc;
     current_stat_.roty = prev_stat_.roty + prev_stat_.roty_speed * timer_->DeltaSec();
@@ -364,7 +372,7 @@ void FieldPlayer::InputFromUser()
         // 空中にいる
         any_move_ = true;
         auto acc = 10.0f;
-        auto vel = current_stat_.vel + VGet(sin(roty), 0, cos(roty)) * (-move_dir * acc * stage_->map_scale() * timer_->DeltaSec());
+		auto vel = current_stat_.vel + VGet(sin(roty), 0, cos(roty)) * (-move_dir * acc * stage_->map_scale() * timer_->DeltaSec() * ((6.0f-current_stat_.vel.y)/(stage_->map_scale()*12.0f)));
         vel.y = 0;
 
         if (VSize(vel) > std::max(move_speed, 1.0f) * stage_->map_scale())
