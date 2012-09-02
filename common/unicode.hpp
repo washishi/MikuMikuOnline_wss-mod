@@ -45,15 +45,6 @@ inline std::wstring ToWString(const std::wstring& s)
     return s;
 }
 
-inline tstring ToTString(const std::string& s)
-{
-#ifdef UNICODE
-    return ToWString(s);
-#else
-    return s;
-#endif
-}
-
 inline tstring ToTString(const std::wstring& s)
 {
 #ifdef UNICODE
@@ -64,5 +55,14 @@ inline tstring ToTString(const std::wstring& s)
 }
 
 #endif
+
+inline tstring ToTString(const std::string& s)
+{
+#ifdef UNICODE
+    return ToWString(s);
+#else
+    return s;
+#endif
+}
 
 } // unicode
