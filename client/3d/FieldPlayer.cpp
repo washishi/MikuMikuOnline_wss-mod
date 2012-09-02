@@ -32,6 +32,8 @@ FieldPlayer::FieldPlayer(CharacterDataProvider& data_provider, const StagePtr& s
                 0.0f, 0.0f, 0, 0, 1.0f, false)),
         model_height_(0),
 		flight_duration_ideal_(1.0f),
+		jump_height_(1.0f),
+		prev_mouse_pos_y_(0.0f),
         motion_player_(),
         timer_(timer),
         model_handle_(),
@@ -95,8 +97,8 @@ void FieldPlayer::SetModel(const tstring& name)
 {
     model_handle_ = ResourceManager::LoadModelFromName(name);
     model_height_ = model_handle_.property().get<float>("character.height", 1.58f);
-	flight_duration_ideal_ = sqrt((2.0f*0.4f)/9.8f) + sqrt((model_height_*0.8f)/9.8);
-	
+	flight_duration_ideal_ = sqrt((model_height_*2.5f)/9.8f) + sqrt((model_height_*0.8f)/9.8);
+	jump_height_ = sqrt(20.0f)*2.0f;
     motion.stand_ = MV1GetAnimIndex(model_handle_.handle(), _T("stand"));
     motion.walk_ = MV1GetAnimIndex(model_handle_.handle(), _T("walk"));
     motion.run_ = MV1GetAnimIndex(model_handle_.handle(), _T("run"));
@@ -145,12 +147,18 @@ void FieldPlayer::Move()
     // std::cout << "MovePlayer: " << timer.current_time() << std::endl;
 
     // myself_.prev_statを元にしてmyself_.current_statを計算する
-    current_stat_.pos = prev_stat_.pos + prev_stat_.vel * timer_->DeltaSec();
+    //current_stat_.pos = prev_stat_.pos + prev_stat_.vel * timer_->DeltaSec();
+	current_stat_.pos = [&]()->VECTOR
+	{
+		VECTOR tmp_vel_ = prev_stat_.vel * timer_->DeltaSec();
+		tmp_vel_.y *= (jump_height_ / 5.0f) ; // 5を基準として倍数を求める
+		return prev_stat_.pos + tmp_vel_;
+	}();
     //current_stat_.vel = prev_stat_.vel + prev_stat_.acc * timer_->DeltaSec();
 	current_stat_.vel = [&]()->VECTOR
 	{
 		VECTOR tmp_acc_ = prev_stat_.acc * timer_->DeltaSec();
-		tmp_acc_.y *= 1.0f / flight_duration_ideal_;
+		tmp_acc_.y *= (1.0f / flight_duration_ideal_) * (jump_height_ / 5.0f) ; // 5を基準として倍数を求める
 		return prev_stat_.vel + tmp_acc_;
 	}();
     current_stat_.acc = prev_stat_.acc;
@@ -351,6 +359,21 @@ void FieldPlayer::InputFromUser()
     } else if (input.GetGamepadAnalogY() < 0) {
         ++move_dir;
     }
+	// 空中にいるとき、上下の移動で着地地点を操作できるようにする
+	int chg_acc = 0;
+	if (current_stat_.acc.y != 0 && prev_stat_.acc.y == 0)
+	{
+		prev_mouse_pos_y_ = input.GetMouseY();
+	}
+	if (current_stat_.acc.y != 0 && input.GetMouseLeft() && input.GetPrevMouseLeft())
+	{
+		if(prev_mouse_pos_y_ < input.GetMouseY())
+		{
+			++chg_acc;
+		}else if(prev_mouse_pos_y_ > input.GetMouseY()){
+			--chg_acc;
+		}
+	}
 
     // Shiftで歩きと走りの切り替え
 //    if (input.GetKeyCount(InputManager::KEYBIND_CHANGE_SPEED) == 1 ||
@@ -371,8 +394,8 @@ void FieldPlayer::InputFromUser()
     {
         // 空中にいる
         any_move_ = true;
-        auto acc = 10.0f;
-		auto vel = current_stat_.vel + VGet(sin(roty), 0, cos(roty)) * (-move_dir * acc * stage_->map_scale() * timer_->DeltaSec() * ((6.0f-current_stat_.vel.y)/(stage_->map_scale()*12.0f)));
+        auto acc = 5.0f;
+		auto vel = current_stat_.vel + VGet(sin(roty), 0, cos(roty)) * (-move_dir * acc * stage_->map_scale());// * timer_->DeltaSec());// * ((6.0f-current_stat_.vel.y)/(stage_->map_scale()*12.0f))
         vel.y = 0;
 
         if (VSize(vel) > std::max(move_speed, 1.0f) * stage_->map_scale())
@@ -381,6 +404,7 @@ void FieldPlayer::InputFromUser()
         }
         vel.y = current_stat_.vel.y;
         current_stat_.vel = vel;
+		prev_stat_.acc.y = prev_stat_.acc.y - chg_acc > -4.0f * stage_->map_scale() ? -4.0f * stage_->map_scale() : prev_stat_.acc.y + (chg_acc * stage_->map_scale());
     }
     else
     {
@@ -422,7 +446,7 @@ void FieldPlayer::InputFromUser()
     {
         any_move_ = true;
         current_stat_.acc.y = -9.8 * stage_->map_scale();
-        current_stat_.vel += VGet(0, 5.0 * stage_->map_scale(), 0);
+        current_stat_.vel += VGet(0, jump_height_ * stage_->map_scale(), 0);
     }
 }
 

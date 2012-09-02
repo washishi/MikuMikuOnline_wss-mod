@@ -14,6 +14,8 @@
 #include "Stage.hpp"
 #include "../../common/Logger.hpp"
 
+#define TORADIAN(DEGREE)	((DEGREE*PHI_F)/180.0f)
+
 int KeyChecker::Check()
 {
     std::array<char, 256> key_state;
@@ -105,27 +107,36 @@ void GameLoop::FixCameraPosition()
     const auto target_pos = myself_->current_stat().pos +
         VGet(0, myself_->model_height() * camera.target_height + 0.2f, 0) * stage_->map_scale();
     auto camera_pos = target_pos +
-        VGet(cos(camera.phi) * sin(camera.theta),
-             sin(camera.phi),
-             cos(camera.phi) * cos(camera.theta)) * (camera.radius * stage_->map_scale());
+		VGet(cos(camera.phi) * sin(camera.theta),
+			sin(camera.phi >= TORADIAN(180.0f) ? camera.phi + TORADIAN(90.0f) : camera.phi ),
+			cos(camera.phi) * cos(camera.theta)) * (camera.radius * stage_->map_scale());	
 
     const auto coll_info = MV1CollCheck_Line(stage_->map_handle().handle(), -1, target_pos, camera_pos);
     static int wallcamera_cnt = 0;
     if (coll_info.HitFlag && VSize(coll_info.HitPosition - myself_->current_stat().pos) > CAMERA_MIN_RADIUS + 2.0)
     {
         wallcamera_cnt++;
-        if (wallcamera_cnt > 45) {
-            camera_pos = coll_info.HitPosition;
-        }
+        if (wallcamera_cnt > 15) {
+			if(VSize(coll_info.HitPosition - myself_->current_stat().pos) < CAMERA_MIN_RADIUS + 4.0f + 2.0f)
+			{
+				camera_pos.x = coll_info.HitPosition.x;
+				camera_pos.z = coll_info.HitPosition.z;
+			}else{
+				camera_pos = coll_info.HitPosition;
+			}
+        }else{
+			camera_pos.y = coll_info.HitPosition.y + 0.4 * stage_->map_scale();
+		}
     } else {
         wallcamera_cnt = 0;
     }
 
-    auto camera_pos_delta = VScale(camera_pos - GetCameraPosition(), (float)0.3);
+	auto camera_pos_delta = VScale(camera_pos - GetCameraPosition(),(float)0.3);
     if (VSize(camera_pos_delta) > 10) {
         camera_pos_delta = VNorm(camera_pos_delta) * 10;
     }
-    SetCameraPositionAndTarget_UpVecY(GetCameraPosition() + camera_pos_delta, target_pos);
+    SetCameraPositionAndTarget_UpVecY(
+		GetCameraPosition() + camera_pos_delta, target_pos);
 }
 
 void GameLoop::MoveCamera(InputManager* input)
@@ -162,8 +173,22 @@ void GameLoop::MoveCamera(InputManager* input)
         diff_x = current_pos.first - camera.manual_control_startpos.first;
         diff_y = current_pos.second - camera.manual_control_startpos.second;
 
-        camera.theta += diff_x * 0.005f;
-        camera.phi += diff_y * 0.005f;
+		// ジャンプ時のみカメラ回転速度 x 3/5 y 2/5
+		if(myself_->current_stat().acc.y != 0)
+		{
+			camera.theta += diff_x * 0.003f;
+			camera.phi += diff_y * 0.0005f;
+		}else{
+			camera.theta += diff_x * 0.005f;
+			camera.phi += diff_y * 0.005f;
+		}
+		if(camera.phi < (-40.0f * PHI_F)/180.0f)
+		{
+			camera.phi = (-39.9f * PHI_F)/180.0f;
+		}else if(camera.phi > (220.0f * PHI_F)/180.0f)
+		{
+			camera.phi = (219.0f * PHI_F)/180.0f;
+		}
     }
     else
     {
