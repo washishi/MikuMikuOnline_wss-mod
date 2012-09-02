@@ -97,8 +97,8 @@ void FieldPlayer::SetModel(const tstring& name)
 {
     model_handle_ = ResourceManager::LoadModelFromName(name);
     model_height_ = model_handle_.property().get<float>("character.height", 1.58f);
-	flight_duration_ideal_ = sqrt((model_height_*2.5f)/9.8f) + sqrt((model_height_*0.8f)/9.8);
-	jump_height_ = sqrt(20.0f)*2.0f;
+	flight_duration_ideal_ = sqrt((model_height_*2.0f)/9.8f) + sqrt((model_height_*0.8f)/9.8);
+	jump_height_ = sqrt(15.0f)*2.0f;
     motion.stand_ = MV1GetAnimIndex(model_handle_.handle(), _T("stand"));
     motion.walk_ = MV1GetAnimIndex(model_handle_.handle(), _T("walk"));
     motion.run_ = MV1GetAnimIndex(model_handle_.handle(), _T("run"));
@@ -361,7 +361,7 @@ void FieldPlayer::InputFromUser()
     }
 	// 空中にいるとき、上下の移動で着地地点を操作できるようにする
 	int chg_acc = 0;
-	if (current_stat_.acc.y != 0 && prev_stat_.acc.y == 0)
+	if (current_stat_.acc.y == 0)
 	{
 		prev_mouse_pos_y_ = input.GetMouseY();
 	}
@@ -369,9 +369,9 @@ void FieldPlayer::InputFromUser()
 	{
 		if(prev_mouse_pos_y_ < input.GetMouseY())
 		{
-			++chg_acc;
-		}else if(prev_mouse_pos_y_ > input.GetMouseY()){
 			--chg_acc;
+		}else if(prev_mouse_pos_y_ > input.GetMouseY()){
+			++chg_acc;
 		}
 	}
 
@@ -404,7 +404,10 @@ void FieldPlayer::InputFromUser()
         }
         vel.y = current_stat_.vel.y;
         current_stat_.vel = vel;
-		prev_stat_.acc.y = prev_stat_.acc.y - chg_acc > -4.0f * stage_->map_scale() ? -4.0f * stage_->map_scale() : prev_stat_.acc.y + (chg_acc * stage_->map_scale());
+		current_stat_.acc.y = 
+			(current_stat_.acc.y + (0.2f * chg_acc * stage_->map_scale())) > -6.5f * stage_->map_scale() ? -6.5f * stage_->map_scale() :
+			current_stat_.acc.y + (0.2f * chg_acc * stage_->map_scale()) < -11.0f * stage_->map_scale() ? -11.0f * stage_->map_scale() :
+			current_stat_.acc.y + (0.2f * chg_acc * stage_->map_scale());
     }
     else
     {
