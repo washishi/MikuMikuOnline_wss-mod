@@ -32,25 +32,30 @@ UILabel::~UILabel()
 
 void UILabel::set_text(const tstring& text)
 {
-    text_ = unicode::ToString(text);
+    text_ = text;
 
     // 文字幅を計算
     char_width_list_.clear();
     for (auto it = text_.begin(); it != text_.end(); ++it) {
-        unsigned char c = *it;
-        TCHAR string[2] = {0, 0};
+        #ifdef UNICODE
+            TCHAR c = *it;
+            int width = GetDrawStringWidthToHandle(&c, 1, font_handle_);
+        #else
+            unsigned char c = *it;
+            TCHAR string[2] = {0, 0};
 
-        int width;
-        if (((c>=0x81 && c<=0x9f) || (c>=0xe0 && c<=0xfc)) && (it + 1) != text_.end()) {
-            string[0] = c;
-            string[1] = *(it + 1);
-            ++it;
-            width = GetDrawStringWidthToHandle(string, 2, font_handle_);
-        } else {
-            string[0] = c;
-            width = GetDrawStringWidthToHandle(string, 1, font_handle_);
-        }
-        char_width_list_.push_back(width);
+            int width;
+            if (((c>=0x81 && c<=0x9f) || (c>=0xe0 && c<=0xfc)) && (it + 1) != text_.end()) {
+                string[0] = c;
+                string[1] = *(it + 1);
+                ++it;
+                width = GetDrawStringWidthToHandle(string, 2, font_handle_);
+            } else {
+                string[0] = c;
+                width = GetDrawStringWidthToHandle(string, 1, font_handle_);
+            }
+        #endif
+            char_width_list_.push_back(width);
     }
 }
 
@@ -220,7 +225,7 @@ void UILabel::UpdatePosition()
     auto text_cursor = 0;
 
     for (auto it = char_width_list_.begin(); it != char_width_list_.end(); ++it) {
-        if ( text_[text_cursor] == '\n') {
+        if ( text_[text_cursor] == _T('\n')) {
             line_num++;
             substr_list_.push_back(text_cursor);
             substr_list_.push_back(text_cursor + 1);
@@ -233,12 +238,7 @@ void UILabel::UpdatePosition()
             line_width += *it;
         }
 
-        unsigned char c = text_[text_cursor];
-        if ((c>=0x81 && c<=0x9f) || (c>=0xe0 && c<=0xfc)) {
-            text_cursor += 2;
-        } else {
-            text_cursor++;
-        }
+        text_cursor++;
     }
 
 //    if (!stable_width) {

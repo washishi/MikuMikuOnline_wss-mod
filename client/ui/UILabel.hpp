@@ -41,7 +41,7 @@ class UILabel : public UIBase {
         void UpdatePosition();
 
     private:
-        std::string text_;
+        tstring text_;
         std::vector<int> substr_list_;
         std::vector<int> char_width_list_;
         int font_handle_;

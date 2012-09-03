@@ -57,8 +57,8 @@ class Input {
 
         int input_handle_, font_handle_, font_height_;
 
-        std::vector<std::string> message_lines_;
-        std::vector<std::string> lines_;
+        std::vector<tstring> message_lines_;
+        std::vector<tstring> lines_;
         std::vector<tstring> candidates_;
 
         int candidate_x_, candidate_y_;

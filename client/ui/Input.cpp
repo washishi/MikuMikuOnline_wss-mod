@@ -150,7 +150,7 @@ void Input::Draw()
                 auto line = *it;
                 SetDrawBlendMode(DX_BLENDMODE_ALPHA, 140);
                 DrawStringToHandle(internal_x,
-                    internal_y + current_line * font_height_ - 3, unicode::ToTString(line).c_str(),
+                    internal_y + current_line * font_height_ - 3, line.c_str(),
                         text_color, font_handle_);
                 SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
                 current_line++;
@@ -160,7 +160,7 @@ void Input::Draw()
         for (auto it = lines_.begin(); it != lines_.end(); ++it) {
             auto line = *it;
             DrawStringToHandle(internal_x, internal_y + current_line * font_height_,
-                    unicode::ToTString(line).c_str(), text_color, font_handle_);
+                    line.c_str(), text_color, font_handle_);
             current_line++;
         }
 
@@ -190,7 +190,7 @@ void Input::Draw()
             int height = (end_index - start_index) * font_height_;
 
             for (int i = start_index; i < end_index; i++) {
-                auto candidate = unicode::ToTString(candidates_[i]);
+                auto candidate = candidates_[i];
                 width = std::max(width,
                         GetDrawStringWidthToHandle(candidate.c_str(),
                                 candidate.size(), font_handle_));
@@ -250,7 +250,7 @@ void Input::Draw()
                 }
                 DrawStringToHandle(internal_x + x,
                         internal_y + line_top + y,
-                        unicode::ToTString(candidates_[i]).c_str(), GetColor(0, 0, 0),
+                        candidates_[i].c_str(), GetColor(0, 0, 0),
                         font_handle_);
                 line_top += font_height_;
             }
@@ -327,7 +327,7 @@ void Input::ProcessInput(InputManager* input)
         tstring cursor_back_str = buffer.substr(pos);           // カーソル後の文字列
         auto new_string = cursor_front_str + _T('\n') + cursor_back_str;
 
-        SetKeyInputString(unicode::ToTString(new_string).c_str(), input_handle_);
+        SetKeyInputString(new_string.c_str(), input_handle_);
         SetKeyInputCursorPosition(pos + 1, input_handle_);
         CancelSelect();
         cursor_drag_count_ = 0;
@@ -355,7 +355,7 @@ void Input::ProcessInput(InputManager* input)
 
     if (message_.size() > 0) {
         int current_line = 0;
-        std::string line_buffer;
+        tstring line_buffer;
         int line_width = 0;
         int char_count = 0;
         for (auto it = message_.begin(); it != message_.end(); ++it) {
@@ -363,7 +363,7 @@ void Input::ProcessInput(InputManager* input)
         #ifdef UNICODE
             TCHAR c = *it;
             int width = GetDrawStringWidthToHandle(&c, 1, font_handle_);
-            line_buffer += unicode::ToString(tstring(&c, 1));
+            line_buffer += c;
         #else
             unsigned char c = *it;
             TCHAR string[2] = { 0, 0 };
@@ -390,6 +390,9 @@ void Input::ProcessInput(InputManager* input)
             line_width += width;
             if (c == _T('\n')
                     || line_width > internal_width - font_height_ / 2) {
+                if (!line_buffer.empty() && line_buffer.back() == _T('\n')) {
+                    line_buffer.pop_back();
+                }
                 message_lines_.push_back(line_buffer);
                 current_line++;
                 line_buffer.clear();
@@ -454,7 +457,7 @@ void Input::ProcessInput(InputManager* input)
             std::swap(select_start, select_end);
         }
 
-        std::string line_buffer;
+        tstring line_buffer;
         int line_width = 0;
         int char_count = 0;
 
@@ -467,7 +470,7 @@ void Input::ProcessInput(InputManager* input)
         #ifdef UNICODE
             TCHAR c = *it;
             int width = GetDrawStringWidthToHandle(&c, 1, font_handle_);
-            line_buffer += unicode::ToString(tstring(&c, 1));
+            line_buffer += c;
         #else
             unsigned char c = *it;
             TCHAR string[2] = { 0, 0 };
@@ -513,6 +516,10 @@ void Input::ProcessInput(InputManager* input)
 
             line_width += width;
             if (c == _T('\n') || line_width > internal_width - font_height_ / 2) {
+                if (!line_buffer.empty() && line_buffer.back() == _T('\n')) {
+                    line_buffer.pop_back();
+                }
+
                 lines_.push_back(line_buffer);
 
                 if (cursor_moveto_x_ >= line_width
@@ -544,7 +551,7 @@ void Input::ProcessInput(InputManager* input)
         #ifdef UNICODE
             TCHAR c = *it;
             int width = GetDrawStringWidthToHandle(&c, 1, font_handle_);
-            line_buffer += unicode::ToString(tstring(&c, 1));
+            line_buffer += tstring(&c, 1);
         #else
             unsigned char c = *it;
             TCHAR string[2] = { 0, 0 };
@@ -603,7 +610,7 @@ void Input::ProcessInput(InputManager* input)
         #ifdef UNICODE
             TCHAR c = *it;
             int width = GetDrawStringWidthToHandle(&c, 1, font_handle_);
-            line_buffer += unicode::ToString(tstring(&c, 1));
+            line_buffer += tstring(&c, 1);
         #else
             unsigned char c = *it;
             TCHAR string[2] = { 0, 0 };
@@ -649,6 +656,9 @@ void Input::ProcessInput(InputManager* input)
 
             line_width += width;
             if (c == _T('\n') || line_width > internal_width - font_height_ / 2) {
+                if (!line_buffer.empty() && line_buffer.back() == _T('\n')) {
+                    line_buffer.pop_back();
+                }
                 lines_.push_back(line_buffer);
 
                 if (cursor_moveto_x_ >= line_width
