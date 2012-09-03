@@ -104,30 +104,68 @@ bool Stage::IsFlatFloor(const VECTOR& foot_pos, const VECTOR& direction) const
 }
 
 // 移動方向に障害物があるかどうか（当たり判定）
-bool Stage::FrontCollides(float collision_length, const VECTOR& current_pos, const VECTOR& prev_pos,
+std::pair<bool,VECTOR> Stage::FrontCollides(float collision_length, const VECTOR& current_pos, const VECTOR& prev_pos,
         float height_begin, float height_end, size_t num_division) const
 {
-    const auto height_diff = (height_end - height_begin) / num_division;
+	auto direction = current_pos - prev_pos;
+	direction.y = 0; // 水平な進行方向を求める
+	const auto collision_vector =
+		//VNorm(direction) * (collision_length * map_scale_); // 体中心から15cm前方までの線分で当たり判定
+		VAdjustLength(direction, collision_length * map_scale_);
 
-    auto direction = current_pos - prev_pos;
-    direction.y = 0; // 水平な進行方向を求める
-    const auto collision_vector =
-        //VNorm(direction) * (collision_length * map_scale_); // 体中心から15cm前方までの線分で当たり判定
-        VAdjustLength(direction, collision_length * map_scale_);
+	auto tmp_pos = prev_pos + VGet(0,height_begin,0);
+	auto coll_info = MV1CollCheck_Capsule(map_handle_.handle(), -1,
+		tmp_pos + collision_vector,
+		prev_pos + collision_vector + VGet(0,height_end,0),VSize(collision_vector));
 
-    for (size_t i = 0; i <= num_division; ++i)
-    {
-        auto collision_vector_pos = prev_pos + VGet(0, height_begin + height_diff * i, 0);
-        auto coll_info = MV1CollCheck_Line(map_handle_.handle(), -1,
-                collision_vector_pos,
-                collision_vector_pos + collision_vector);
-        if (coll_info.HitFlag)
-        {
-            return true;
-        }
-    }
+	auto NowPos = prev_pos;
 
-    return false;
+	if (coll_info.HitNum)
+	{
+		int i = 0;
+		for(i = 0;i < coll_info.HitNum; ++i)
+		{
+			if( coll_info.Dim[i].Normal.y > 0.000002f && coll_info.Dim[i].Normal.y < -0.000002f && 
+				coll_info.Dim[i].Position[0].y < tmp_pos.y &&
+				coll_info.Dim[i].Position[1].y < tmp_pos.y &&
+				coll_info.Dim[i].Position[2].y < tmp_pos.y )continue;
+			auto SlideVec = VCross( coll_info.Dim[i].Normal, VCross( current_pos - prev_pos ,coll_info.Dim[i].Normal));
+			NowPos += SlideVec;
+
+			const auto slide_collision_vector =
+				//VNorm(direction) * (collision_length * map_scale_); // 体中心から15cm前方までの線分で当たり判定
+				VAdjustLength(NowPos - prev_pos, collision_length * map_scale_);
+			auto flag = false;
+			auto slide_coll_info = MV1CollCheck_Capsule(map_handle_.handle(), -1,
+				NowPos + VGet(0,height_begin,0),
+				NowPos + VGet(0,height_end,0),VSize(collision_vector));
+			if(slide_coll_info.HitNum)
+			{
+				for(int j = 0; j < slide_coll_info.HitNum; ++j)
+				{
+					auto angle = (acos(VDot(slide_coll_info.Dim[j].Normal,current_pos - prev_pos) / (VSize(slide_coll_info.Dim[j].Normal) * VSize(current_pos - prev_pos)))*180.0f)/PHI_F;
+					if(angle < 90.0f || angle > 270.0f)
+					{
+						NowPos += VScale(slide_coll_info.Dim[j].Normal, 0.1f * map_scale_);
+						flag = true;
+						break;
+					}else{
+						continue;
+					}
+				}
+				if(!flag)NowPos = prev_pos;
+			}
+			// 当たり判定情報の後始末
+			MV1CollResultPolyDimTerminate(slide_coll_info);
+			break;
+		}
+		// 当たり判定情報の後始末
+		MV1CollResultPolyDimTerminate(coll_info);
+		return std::make_pair(true,NowPos);;
+	}
+	// 当たり判定情報の後始末
+	MV1CollResultPolyDimTerminate(coll_info);
+	return std::make_pair(false,prev_pos);
 }
 
 bool Stage::IsVisiblePoint(const VECTOR& point) const

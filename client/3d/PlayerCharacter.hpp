@@ -17,6 +17,7 @@ public:
     void Update();
 
     void SetModel();
+	void PlayMotion(const tstring& name);
 
 private:
     class Impl;

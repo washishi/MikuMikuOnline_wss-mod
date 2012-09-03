@@ -22,6 +22,7 @@ public:
           prev_motion_(-1),
           current_speed_(0),
           motion_player_(),
+		  additional_motion_(false, -1),
           timer_(timer),
           stage_(stage)
     {
@@ -85,7 +86,11 @@ public:
             {
                 motion_player_->Play(current_motion_, false, 200, -1, false);
                 prev_motion_ = current_motion_;
-            }
+			}else if(additional_motion_.first)
+			{
+				bool connect_prev = true;
+				motion_player_->Play(additional_motion_.second, connect_prev, 200, -1, false);
+			}
 
             // TODO: Y下方向については重力加速度
             if (distance_to_target > 2.0){
@@ -122,6 +127,12 @@ public:
         motion_player_->Next(timer_->Delta());
     }
 
+	void Impl::PlayMotion(const tstring& name)
+	{
+		additional_motion_.second = MV1GetAnimIndex(model_handle_,name.c_str());
+		additional_motion_.first = true;
+	}
+
 private:
     CharacterDataProvider& data_provider_;
     int model_handle_;
@@ -133,6 +144,7 @@ private:
     int prev_motion_;
     float current_speed_;
     std::unique_ptr<MotionPlayer> motion_player_;
+	std::pair<bool, int> additional_motion_;
     TimerPtr timer_;
     StagePtr stage_;
 
@@ -156,4 +168,9 @@ void PlayerCharacter::Draw() const
 void PlayerCharacter::Update()
 {
     impl_->Update();
+}
+
+void PlayerCharacter::PlayMotion(const tstring& name)
+{
+	impl_->PlayMotion(name);
 }

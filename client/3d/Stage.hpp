@@ -21,8 +21,8 @@ class Stage {
 
         std::pair<bool, VECTOR> FloorExists(const VECTOR& foot_pos, float model_height, float collision_depth_limit) const;
         bool IsFlatFloor(const VECTOR& foot_pos, const VECTOR& direction) const;
-        bool FrontCollides(float collision_length, const VECTOR& current_pos, const VECTOR& prev_pos,
-                float height_begin, float height_end, size_t num_division) const;
+        std::pair<bool,VECTOR> FrontCollides(float collision_length, const VECTOR& current_pos, const VECTOR& prev_pos,
+        float height_begin, float height_end, size_t num_division) const;
 
         bool IsVisiblePoint(const VECTOR& point) const;
 

@@ -35,6 +35,7 @@ FieldPlayer::FieldPlayer(CharacterDataProvider& data_provider, const StagePtr& s
 		jump_height_(1.0f),
 		prev_mouse_pos_y_(0.0f),
         motion_player_(),
+		additional_motion_(false,-1),
         timer_(timer),
         model_handle_(),
         stage_(stage),
@@ -131,7 +132,11 @@ void FieldPlayer::Update()
         }
 
         motion_player_->Play(current_stat_.motion, connect_prev, 200, -1, false);
-    }
+	}else if(additional_motion_.first)
+	{
+		bool connect_prev = true;
+		motion_player_->Play(additional_motion_.second, connect_prev, 200, -1, false);
+	}
     // モーション再生時刻更新
     motion_player_->Next(timer_->Delta());
 
@@ -176,20 +181,24 @@ void FieldPlayer::Move()
         }
     }
 
-    // 50mの深さまで床検出
-    auto floor_exists = stage_->FloorExists(current_stat_.pos, model_height_, 50);
 
     // 移動方向に障害物があるか、または床がない場合は移動不可能
-    bool front_collides = stage_->FrontCollides(
-            0.2, current_stat_.pos, prev_stat_.pos, 0.4 * stage_->map_scale(), (model_height_ - 0.1) * stage_->map_scale(), 128) ||
-        !floor_exists.first;
+	auto front_collides = stage_->FrontCollides(
+            0.4, current_stat_.pos, prev_stat_.pos,1.0 * stage_->map_scale(), (model_height_ - 0.1) * stage_->map_scale() ,128);
 
-    if (front_collides)
-    {
-        current_stat_.pos.x = prev_stat_.pos.x;
-        current_stat_.pos.z = prev_stat_.pos.z;
+	if(front_collides.first)
+	{
+		current_stat_.pos = front_collides.second;
         current_stat_.vel.x = current_stat_.vel.z = 0;
-    }
+	}
+    // 50mの深さまで床検出
+    auto floor_exists = stage_->FloorExists(current_stat_.pos, model_height_, 50);
+	if(!floor_exists.first)
+	{
+		current_stat_.pos.x = front_collides.second.x;
+        current_stat_.pos.z = front_collides.second.z;
+        current_stat_.vel.x = current_stat_.vel.z = 0;
+	}
 
     // 足が地面にめり込んでいるか
     auto foot_floor_exists = stage_->FloorExists(current_stat_.pos, model_height_, 0);
@@ -206,74 +215,69 @@ void FieldPlayer::Move()
             // 前回接地していた
             // std::cout << "  previous on the ground" << std::endl;
 
-            if (!front_collides)
-            {
+			// 登ったり下ったりできる段差の大きさの制限を求める
+			static const float y_max_limit_factor = sin(45 * PHI_F / 180);
+			static const float y_min_limit_factor = sin(-45 * PHI_F / 180);
+			const float y_max_limit = y_max_limit_factor * pos_diff_length;
+			const float y_min_limit = y_min_limit_factor * pos_diff_length;
 
-                // 登ったり下ったりできる段差の大きさの制限を求める
-                static const float y_max_limit_factor = sin(45 * PHI_F / 180);
-                static const float y_min_limit_factor = sin(-45 * PHI_F / 180);
-                const float y_max_limit = y_max_limit_factor * pos_diff_length;
-                const float y_min_limit = y_min_limit_factor * pos_diff_length;
+			// 接地点計算
+			//std::cout << "  ground collision check: current pos = " << current_stat_.pos << std::endl;
 
-                // 接地点計算
-                //std::cout << "  ground collision check: current pos = " << current_stat_.pos << std::endl;
+			auto coll_info = MV1CollCheck_Line(stage_->map_handle().handle(), -1,
+				current_stat_.pos + VGet(0, y_max_limit, 0),
+				current_stat_.pos + VGet(0, y_min_limit, 0));
+			if (coll_info.HitFlag && NearlyEqualRelative(coll_info.HitPosition.y, floor_exists.second.y, 0.001))
+			{
+				// 今回も接地できる
+				//std::cout << "    current on the ground" << std::endl;
+				auto diff = coll_info.HitPosition - prev_stat_.pos;
 
-                auto coll_info = MV1CollCheck_Line(stage_->map_handle().handle(), -1,
-                        current_stat_.pos + VGet(0, y_max_limit, 0),
-                        current_stat_.pos + VGet(0, y_min_limit, 0));
-                if (coll_info.HitFlag && NearlyEqualRelative(coll_info.HitPosition.y, floor_exists.second.y, 0.001))
-                {
-                    // 今回も接地できる
-                    //std::cout << "    current on the ground" << std::endl;
-                    auto diff = coll_info.HitPosition - prev_stat_.pos;
+				// 角度が急になるほどdiffの長さが大きくなるから、補正する
+				if (VSize(diff) > 0)
+				{
+					current_stat_.pos = prev_stat_.pos + pos_diff_length * VNorm(diff);
+				}
+			}
+			else if (floor_exists.first)
+			{
+				if (floor_exists.second.y < current_stat_.pos.y)
+				{
+					// 床はあるし、自分より低い位置なので落ちる
+					current_stat_.acc.y = -9.8 * stage_->map_scale();
+				}
+				else if (floor_exists.second.y < current_stat_.pos.y + 0.6 * stage_->map_scale())
+				{
+					// 床があり、平らなので登る
+					auto delta = prev_stat_.pos - current_stat_.pos;
+					delta.y = floor_exists.second.y - current_stat_.pos.y;
+					float xz_size = VSize(VGet(delta.x, 0, delta.z));
 
-                    // 角度が急になるほどdiffの長さが大きくなるから、補正する
-                    if (VSize(diff) > 0)
-                    {
-                        current_stat_.pos = prev_stat_.pos + pos_diff_length * VNorm(diff);
-                    }
-                }
-                else if (floor_exists.first)
-                {
-                    if (floor_exists.second.y < current_stat_.pos.y)
-                    {
-                        // 床はあるし、自分より低い位置なので落ちる
-                        current_stat_.acc.y = -9.8 * stage_->map_scale();
-                    }
-                    else if (floor_exists.second.y < current_stat_.pos.y + 0.6 * stage_->map_scale())
-                    {
-                        // 床があり、平らなので登る
-                        auto delta = prev_stat_.pos - current_stat_.pos;
-                        delta.y = floor_exists.second.y - current_stat_.pos.y;
-                        float xz_size = VSize(VGet(delta.x, 0, delta.z));
-
-                        if (xz_size > 0)
-                        {
-                            // 床の傾斜
-                            double angle = delta.y / xz_size;
-                            if (angle < 1.0)
-                            {
-                                current_stat_.pos.y = floor_exists.second.y;
-                                // current_stat_.pos = prev_stat_.pos + (current_stat_.pos - prev_stat_.pos) * (1.0 - angle);
-                            } else
-                            {
-                                current_stat_.pos = prev_stat_.pos;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // 床があるが、高すぎるので移動不可能
-                        current_stat_.pos = prev_stat_.pos;
-                    }
-                }
-                else
-                {
-                    // 接地できない（移動可能範囲に地面が見つからない）
-                    current_stat_.pos = prev_stat_.pos;
-                }
-
-            }
+					if (xz_size > 0)
+					{
+						// 床の傾斜
+						double angle = delta.y / xz_size;
+						if (angle < 1.0)
+						{
+							current_stat_.pos.y = floor_exists.second.y;
+							// current_stat_.pos = prev_stat_.pos + (current_stat_.pos - prev_stat_.pos) * (1.0 - angle);
+						} else
+						{
+							current_stat_.pos = prev_stat_.pos;
+						}
+					}
+				}
+				else
+				{
+					// 床があるが、高すぎるので移動不可能
+					current_stat_.pos = prev_stat_.pos;
+				}
+			}
+			else
+			{
+				// 接地できない（移動可能範囲に地面が見つからない）
+				current_stat_.pos = prev_stat_.pos;
+			}
         }
         else if (prev_stat_.acc.y < 0)
         {
@@ -389,6 +393,7 @@ void FieldPlayer::InputFromUser()
         current_stat_.vel = VGet(sin(roty), 0, cos(roty)) * (-move_dir * move_speed * stage_->map_scale());
         current_stat_.motion =
             current_stat_.is_walking ? motion.walk_ : motion.run_;
+		additional_motion_.first = false;
     }
     else if (current_stat_.acc.y != 0)
     {
@@ -451,6 +456,12 @@ void FieldPlayer::InputFromUser()
         current_stat_.acc.y = -9.8 * stage_->map_scale();
         current_stat_.vel += VGet(0, jump_height_ * stage_->map_scale(), 0);
     }
+}
+
+void FieldPlayer::PlayMotion(const tstring& name)
+{
+	additional_motion_.second = MV1GetAnimIndex(model_handle_.handle(),name.c_str());
+	additional_motion_.first = true;
 }
 
 const ModelHandle& FieldPlayer::model_handle() const

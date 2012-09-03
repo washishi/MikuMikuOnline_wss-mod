@@ -14,8 +14,6 @@
 #include "Stage.hpp"
 #include "../../common/Logger.hpp"
 
-#define TORADIAN(DEGREE)	((DEGREE*PHI_F)/180.0f)
-
 int KeyChecker::Check()
 {
     std::array<char, 256> key_state;

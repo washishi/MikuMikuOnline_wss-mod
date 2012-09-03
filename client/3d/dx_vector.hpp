@@ -3,6 +3,8 @@
 
 #include <ostream>
 
+#define TORADIAN(DEGREE)	((DEGREE*PHI_F)/180.0f)
+
 inline VECTOR operator +(const VECTOR& lhs, const VECTOR& rhs)
 {
     return VAdd(lhs, rhs);
