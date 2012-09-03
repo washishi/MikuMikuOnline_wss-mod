@@ -1,4 +1,4 @@
-//
+﻿//
 // Encrypter.hpp
 //
 

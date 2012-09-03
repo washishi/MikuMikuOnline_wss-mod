@@ -19,8 +19,6 @@ class Input {
         void Update();
         void ProcessInput(InputManager* input);
 
-        std::string GetInputString();
-
         bool active();
         void set_active(bool flag);
 
@@ -39,11 +37,16 @@ class Input {
         tstring message() const;
         void set_message(const tstring& message);
 
+        bool reverse_color() const;
+        void set_reverse_color(bool flag);
+
         void set_on_enter(const CallbackFunc& func);
+
+    public:    
+        void CancelSelect();
 
     private:
         void ResetCursorCount();
-        void CancelSelect();
 
     private:
         int x_, y_, width_, height_;
@@ -71,18 +74,12 @@ class Input {
         CallbackFunc on_enter_;
         tstring message_;
 
+        bool reverse_color_;
         int blink_count_;
 
     private:
+        const static size_t TEXT_BUFFER_SIZE;
         const static size_t HISTORY_MAX_SIZE;
-
-        const static int DEFAULT_MAX_WIDTH;
-
-        const static int BOX_MIN_WIDTH;
-        const static int BOX_TOP_MARGIN;
-        const static int BOX_BOTTOM_MARGIN;
-        const static int BOX_SIDE_MARGIN;
-
         const static int KEY_REPEAT_FRAME;
 
         const static int INPUT_MARGIN_X;

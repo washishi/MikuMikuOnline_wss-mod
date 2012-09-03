@@ -299,7 +299,7 @@ int main(int argc, char* argv[])
             shm(boost::interprocess::open_read_only, "MMO_SERVER_WITH_CLIENT");
         execute_with_client = true;
     } catch(std::exception& e) {
-        Logger::Info("Standalone Mode");
+        Logger::Info("Stand-alone Mode");
         execute_with_client = false;
     }
 

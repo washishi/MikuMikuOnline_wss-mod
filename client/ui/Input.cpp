@@ -6,15 +6,8 @@
 #include <DxLib.h>
 #include <stdint.h>
 
+const size_t Input::TEXT_BUFFER_SIZE = 1024;
 const size_t Input::HISTORY_MAX_SIZE = 50;
-
-const int Input::DEFAULT_MAX_WIDTH = 600;
-
-const int Input::BOX_MIN_WIDTH = 200;
-const int Input::BOX_TOP_MARGIN = 36;
-const int Input::BOX_BOTTOM_MARGIN = 24;
-const int Input::BOX_SIDE_MARGIN = 24;
-
 const int Input::KEY_REPEAT_FRAME = 6;
 
 const int Input::INPUT_MARGIN_X = 8;
@@ -26,7 +19,8 @@ const int Input::IME_MARGIN_Y = 16;
 const int Input::IME_MAX_PAGE_SIZE = 6;
 const int Input::IME_MIN_WIDTH = 120;
 
-Input::Input()
+Input::Input() :
+    reverse_color_(false)
 {
     input_bg_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
             _T("resources/images/gui/gui_inputbox_input_bg.png"), 2, 2, 12, 12);
@@ -54,7 +48,13 @@ Input::Input()
 void Input::Draw()
 {
     {
-        SetDrawBlendMode(DX_BLENDMODE_ALPHA, 200);
+        int alpha = active() ? 255 : 150;
+
+        if (reverse_color_) {
+            SetDrawBlendMode(DX_BLENDMODE_INVSRC, alpha);
+        } else {
+            SetDrawBlendMode(DX_BLENDMODE_ALPHA, alpha);
+        }
 
         DrawGraph(x_, y_, *input_bg_image_handle_[0], TRUE);
         DrawGraph(x_ + width_ - 12, y_, *input_bg_image_handle_[1], TRUE);
@@ -142,7 +142,7 @@ void Input::Draw()
             current_line++;
         }
 
-        int text_color = GetColor(0, 0, 0);
+        int text_color = reverse_color_ ? GetColor(255, 255, 255) : GetColor(0, 0, 0);
         current_line = 0;
 
         if (message_lines_.size() > 0) {
@@ -292,20 +292,16 @@ void Input::ProcessInput(InputManager* input)
             + KEY_REPEAT_FRAME) % (KEY_REPEAT_FRAME + 1) == 0;
     // bool push_long_backspace = (input->GetKeyCount(KEY_INPUT_BACK) > 60 * 1.5);
 
-    auto input_text = GetInputString();
-    if (!active() && first_key_return && CheckKeyInput(input_handle_) == 0) {
-        set_active(true);
-    } else if (!active() && push_key_v && push_key_ctrl) {
+    auto input_text = text();
+    if (!active() && push_key_v && push_key_ctrl) {
         set_active(true);
     } else {
         if (push_key_shift && first_key_return) {
             SetActiveKeyInput(input_handle_);
         } else if (first_key_return) {
-            if (input_text.size() == 0) {
-                set_active(false);
-            } else if (CheckKeyInput(input_handle_) == 1) {
+            if (CheckKeyInput(input_handle_) == 1) {
                 if (on_enter_) {
-                    if (on_enter_(input_text)) {
+                    if (on_enter_(unicode::ToString(input_text))) {
                         SetKeyInputString(_T(""), input_handle_);
                     }
                 }
@@ -313,57 +309,6 @@ void Input::ProcessInput(InputManager* input)
             }
         }
     }
-
-//    if (active() && push_long_backspace && GetKeyInputCursorPosition(input_handle_) == 0) {
-//        if (selecting_tab_index_ == -1) {
-//            script_tab_.message.clear();
-//        } else {
-//            tabs_.at(selecting_tab_index_).message.clear();
-//        }
-//    }
-//
-//    ProcessInputTabs(input);
-//    UpdateBase(input);
-//    UpdateTabs();
-//
-//    if (push_mouse_left) {
-//        if (cursor_drag_count == 1) {
-//            prev_cursor_pos_ = GetKeyInputCursorPosition(input_handle_);
-//        }
-//        cursor_drag_count++;
-//        input->CancelMouseLeft();
-//    } else {
-//        cursor_drag_count = 0;
-//    }
-//
-//    if (first_key_shift) {
-//        prev_cursor_pos_ = GetKeyInputCursorPosition(input_handle_);
-//    }
-//
-//    x_ = x_ + BOX_SIDE_MARGIN;
-//    y_ = y_ + BOX_TOP_MARGIN;
-//    width_ = width_ - BOX_SIDE_MARGIN * 2;
-//
-//    if (push_mouse_left) {
-//        auto pos = input->GetMousePos();
-//        int internal_x = x_ + INPUT_MARGIN_X;
-//        int internal_y = y_ + INPUT_MARGIN_Y;
-//        cursor_moveto_x_ = pos.first - internal_x;
-//        cursor_moveto_y_ = pos.second - internal_y;
-//        ResetCursorCount();
-//    }
-//
-//    if (cursor_drag_count > 1) {
-//        SetKeyInputSelectArea(GetKeyInputCursorPosition(input_handle_),
-//                prev_cursor_pos_, input_handle_);
-//    }
-//
-//    // カーソル移動中は強制表示
-//    if (input->GetKeyCount(KEY_INPUT_RIGHT) > 0
-//            || input->GetKeyCount(KEY_INPUT_LEFT) > 0) {
-//
-//        ResetCursorCount();
-//    }
 
     if (push_repeat_key_up) {
         cursor_moveto_y_ = cursor_y_ - font_height_ / 2;
@@ -375,12 +320,12 @@ void Input::ProcessInput(InputManager* input)
 
     if (push_key_shift && push_repeat_key_return && multiline_) {
 
-        auto buffer = GetInputString();
+        auto buffer = text();
         uint32_t pos = GetKeyInputCursorPosition(input_handle_);
 
-        std::string cursor_front_str = buffer.substr(0, pos);       // カーソル前の文字列
-        std::string cursor_back_str = buffer.substr(pos);           // カーソル後の文字列
-        auto new_string = cursor_front_str + '\n' + cursor_back_str;
+        tstring cursor_front_str = buffer.substr(0, pos);       // カーソル前の文字列
+        tstring cursor_back_str = buffer.substr(pos);           // カーソル後の文字列
+        auto new_string = cursor_front_str + _T('\n') + cursor_back_str;
 
         SetKeyInputString(unicode::ToTString(new_string).c_str(), input_handle_);
         SetKeyInputCursorPosition(pos + 1, input_handle_);
@@ -391,14 +336,14 @@ void Input::ProcessInput(InputManager* input)
     int cursor_byte_pos, cursor_dot_pos;
     int draw_dot_pos = 0;
 
-    TCHAR String[1024];
+    TCHAR String[TEXT_BUFFER_SIZE];
     GetKeyInputString(String, input_handle_);
 
     // 単一行設定の時、最初の行だけを表示
     if (!multiline_) {
         tstring buffer(String, _tcslen(String));
         size_t pos;
-        if ((pos = buffer.find('\n')) != std::string::npos) {
+        if ((pos = buffer.find(_T('\n'))) != std::string::npos) {
             SetKeyInputString(buffer.substr(0, pos).c_str(), input_handle_);
         }
     }
@@ -443,7 +388,7 @@ void Input::ProcessInput(InputManager* input)
         #endif
 
             line_width += width;
-            if (c == '\n'
+            if (c == _T('\n')
                     || line_width > internal_width - font_height_ / 2) {
                 message_lines_.push_back(line_buffer);
                 current_line++;
@@ -567,14 +512,14 @@ void Input::ProcessInput(InputManager* input)
             }
 
             line_width += width;
-            if (c == '\n' || line_width > internal_width - font_height_ / 2) {
+            if (c == _T('\n') || line_width > internal_width - font_height_ / 2) {
                 lines_.push_back(line_buffer);
 
                 if (cursor_moveto_x_ >= line_width
                         && static_cast<int>(lines_.size() + message_lines_.size()) * font_height_ <= cursor_moveto_y_
                         && cursor_moveto_y_
                                 <= (static_cast<int>(lines_.size() + message_lines_.size()) + 1) * font_height_) {
-                    if (c == '\n') {
+                    if (c == _T('\n')) {
                         SetKeyInputCursorPosition(char_count - 1,
                                 input_handle_);
                     } else {
@@ -703,14 +648,14 @@ void Input::ProcessInput(InputManager* input)
             }
 
             line_width += width;
-            if (c == '\n' || line_width > internal_width - font_height_ / 2) {
+            if (c == _T('\n') || line_width > internal_width - font_height_ / 2) {
                 lines_.push_back(line_buffer);
 
                 if (cursor_moveto_x_ >= line_width
                         && static_cast<int>(lines_.size() + message_lines_.size()) * font_height_ <= cursor_moveto_y_
                         && cursor_moveto_y_
                                 <= (static_cast<int>(lines_.size() + message_lines_.size()) + 1) * font_height_) {
-                    if (c == '\n') {
+                    if (c == _T('\n')) {
                         SetKeyInputCursorPosition(char_count - 1,
                                 input_handle_);
                     } else {
@@ -751,13 +696,6 @@ void Input::ProcessInput(InputManager* input)
     if (active()) {
         input->CancelKeyCountAll();
     }
-}
-
-std::string Input::GetInputString()
-{
-    TCHAR String[1024];
-    GetKeyInputString(String, input_handle_);
-    return unicode::ToString(tstring(String, _tcslen(String)));
 }
 
 bool Input::active()
@@ -830,7 +768,7 @@ void Input::set_height(int height)
 
 tstring Input::text() const
 {
-    TCHAR String[1024];
+    TCHAR String[TEXT_BUFFER_SIZE];
     GetKeyInputString(String, input_handle_);
     return tstring(String, _tcslen(String));
 }
@@ -853,4 +791,14 @@ void Input::set_message(const tstring& message)
 void Input::set_on_enter(const CallbackFunc& func)
 {
     on_enter_ = func;
+}
+
+bool Input::reverse_color() const
+{
+    return reverse_color_;
+}
+
+void Input::set_reverse_color(bool flag)
+{
+    reverse_color_ = flag;
 }
