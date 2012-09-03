@@ -65,12 +65,12 @@ void MainLoop::Update()
 
     player_manager_->ProcessInput(&input);
     player_manager_->Update();
-
-    world_manager_->ProcessInput(&input);
-    world_manager_->Update();
     
     card_manager_->ProcessInput(&input);
     card_manager_->Update();
+
+    world_manager_->ProcessInput(&input);
+    world_manager_->Update();
 }
 
 void MainLoop::Draw()
