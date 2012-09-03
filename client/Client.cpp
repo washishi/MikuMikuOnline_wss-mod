@@ -58,9 +58,12 @@ Client::Client(const std::string& host,
     std::stringstream port_str;
     port_str << remote_tcp_port;
 
-    {
+    try {
         tcp::resolver::query query(host, port_str.str());
         iterator_ = resolver_.resolve(query);
+    } catch (const std::exception& e) {
+        Logger::Error(_T("%s"), unicode::ToTString(e.what()));
+        return;
     }
 
     udp::resolver resolver(io_service_);
