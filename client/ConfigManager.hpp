@@ -28,6 +28,11 @@ class ConfigManager
         bool upnp_;
         int udp_port_;
 
+		bool shader_blur_;
+		bool shader_bloom_;
+		bool shader_shadow_;
+		bool shader_depth_field_;
+
     public:
         bool fullscreen() const;
         int screen_width() const;
@@ -39,6 +44,11 @@ class ConfigManager
         int max_local_storage_size() const;
         bool upnp() const;
         int udp_port() const;
+
+		bool shader_blur() const;
+		bool shader_bloom() const;
+		bool shader_shadow() const;
+		bool shader_depth_field() const;
 
     private:
         ManagerAccessorPtr manager_accessor_;

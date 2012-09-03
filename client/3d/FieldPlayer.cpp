@@ -135,7 +135,8 @@ void FieldPlayer::Update()
 	}else if(additional_motion_.first)
 	{
 		bool connect_prev = true;
-		motion_player_->Play(additional_motion_.second, connect_prev, 200, -1, false);
+		motion_player_->Play(additional_motion_.second, connect_prev, 400, -1, false);
+		additional_motion_.first = false;
 	}
     // モーション再生時刻更新
     motion_player_->Next(timer_->Delta());
@@ -393,7 +394,6 @@ void FieldPlayer::InputFromUser()
         current_stat_.vel = VGet(sin(roty), 0, cos(roty)) * (-move_dir * move_speed * stage_->map_scale());
         current_stat_.motion =
             current_stat_.is_walking ? motion.walk_ : motion.run_;
-		additional_motion_.first = false;
     }
     else if (current_stat_.acc.y != 0)
     {

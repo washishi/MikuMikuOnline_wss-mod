@@ -90,6 +90,7 @@ public:
 			{
 				bool connect_prev = true;
 				motion_player_->Play(additional_motion_.second, connect_prev, 200, -1, false);
+				additional_motion_.first = false;
 			}
 
             // TODO: Y下方向については重力加速度

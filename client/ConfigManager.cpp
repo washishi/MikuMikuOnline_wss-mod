@@ -80,3 +80,21 @@ int ConfigManager::udp_port() const
 {
     return udp_port_;
 }
+
+bool  ConfigManager::shader_blur() const
+{
+	return shader_blur_;
+}
+bool  ConfigManager::shader_bloom() const
+{
+	return shader_bloom_;
+}
+bool  ConfigManager::shader_shadow() const
+{
+	return shader_shadow_;
+}
+
+bool  ConfigManager::shader_depth_field() const
+{
+	return shader_depth_field_;
+}
