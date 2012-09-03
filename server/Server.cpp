@@ -184,15 +184,18 @@ namespace network {
         }
     }
 
-    void Server::DoWriteUDP(std::string data, const udp::endpoint& endpoint)
+    void Server::DoWriteUDP(const std::string& msg, const udp::endpoint& endpoint)
     {
+        boost::shared_ptr<std::string> s = 
+              boost::make_shared<std::string>(msg.data(), msg.size());
+
         socket_udp_.async_send_to(
-            boost::asio::buffer(data), endpoint,
+            boost::asio::buffer(s->data(), s->size()), endpoint,
             boost::bind(&Server::WriteUDP, this,
-              boost::asio::placeholders::error));
+              boost::asio::placeholders::error, s));
     }
 
-    void Server::WriteUDP(const boost::system::error_code& error)
+    void Server::WriteUDP(const boost::system::error_code& error, boost::shared_ptr<std::string> holder)
     {
 //        if (!error) {
 //            if (!send_queue_.empty()) {

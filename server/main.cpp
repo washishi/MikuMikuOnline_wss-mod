@@ -115,7 +115,7 @@ int main(int argc, char* argv[])
                 Logger::Info("UDP destination is %s:%d", session->global_ip(), session->udp_port());
 
                 // テスト送信
-                // server.SendUDPTestPacket(session->global_ip(), session->udp_port());
+                server.SendUDPTestPacket(session->global_ip(), session->udp_port());
 
                 long id = account.GetUserIdFromFingerPrint(finger_print);
                 if (id < 1) {

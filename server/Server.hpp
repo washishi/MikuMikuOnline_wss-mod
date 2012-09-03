@@ -48,8 +48,8 @@ class Server {
         void ReceiveSession(const SessionPtr&, const boost::system::error_code&);
 
         void ReceiveUDP(const boost::system::error_code& error, size_t bytes_recvd);
-        void DoWriteUDP(std::string data, const udp::endpoint& endpoint);
-        void WriteUDP(const boost::system::error_code& error);
+        void DoWriteUDP(const std::string& msg, const udp::endpoint& endpoint);
+        void WriteUDP(const boost::system::error_code& error, boost::shared_ptr<std::string> holder);
 
         Command FetchUDP(const std::string& buffer);
 
