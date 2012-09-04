@@ -92,7 +92,7 @@ class Player : public std::enable_shared_from_this<Player> {
         unsigned int revision_;
         PlayerPosition pos_;
 
-        Persistent<Value> ballon_content_;
+        UIBasePtr ballon_content_;
 
         Point balloon_root_point_, balloon_root_point_current_;
         Rect name_tip_rect_, name_tip_rect_current_;

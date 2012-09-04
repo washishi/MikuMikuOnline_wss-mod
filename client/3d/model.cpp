@@ -140,6 +140,11 @@ void GameLoop::FixCameraPosition()
 		GetCameraPosition() + camera_pos_delta, target_pos);
 }
 
+void GameLoop::ResetCameraPosition()
+{
+    camera = camera_default_stat;
+}
+
 void GameLoop::MoveCamera(InputManager* input)
 {
     const bool prev_right = input->GetPrevMouseRight();

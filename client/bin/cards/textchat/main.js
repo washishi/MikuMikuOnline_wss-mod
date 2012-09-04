@@ -10,10 +10,9 @@
 // ==/MetaData==
 
 // 吹き出しの表示時間（ミリ秒）
-var BALLOON_EXPIRATION = 60000
+var BALLOON_EXPIRATION = 40000
 
 var list;
-var baloon_timer;
 
 // チャットメッセージ受信
 var even_line = false;
@@ -26,7 +25,7 @@ Network.onReceive = function(info, msg) {
 		})
 	);
 	list.scroll_y = 999999;
-	/*
+	
 	if (info.player) {
 	
 		// 吹き出しを表示
@@ -37,12 +36,12 @@ Network.onReceive = function(info, msg) {
 		);
 		
 		// 一定時間経過後に吹き出しを消す
-		clearTimeout(baloon_timer)
-		baloon_timer = setTimeout(function(){
+		clearTimeout(info.player.baloon_timer)
+		info.player.baloon_timer = setTimeout(function(){
 			info.player.setBalloonContent(null)
 		},BALLOON_EXPIRATION);
 	}
-	*/
+	
 }
 
 Player.onLogin = function(player) {

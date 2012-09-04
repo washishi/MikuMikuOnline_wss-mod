@@ -194,6 +194,7 @@ template<class T>
 Handle<Value> Construct(const Arguments& args) {
     UIBasePtr* instance = new UIBasePtr(new T());
     Local<v8::Object> thisObject = args.This();
+    assert(thisObject->InternalFieldCount() > 0);
     thisObject->SetInternalField(0, External::New(instance));
     Persistent<v8::Object> holder = Persistent<v8::Object>::New(thisObject);
     holder.MakeWeak(instance, Destruct);
