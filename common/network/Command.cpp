@@ -23,19 +23,6 @@ SessionWeakPtr Command::session()
     return session_;
 }
 
-// コネクションの確立に成功
-ConnectionSucceeded::ConnectionSucceeded() :
-        Command(header::ConnectionSucceeded, "")
-{
-
-}
-
-ConnectionFailed::ConnectionFailed() :
-        Command(header::ConnectionFailed, "")
-{
-
-}
-
 FatalConnectionError::FatalConnectionError() :
         Command(header::FatalConnectionError, "")
 {
@@ -46,19 +33,6 @@ FatalConnectionError::FatalConnectionError(unsigned int user_id) :
         Command(header::FatalConnectionError, "")
 {
     body_ = Utils::Serialize(user_id);
-}
-
-ClientReceiveChatMessage::ClientReceiveChatMessage(unsigned int user_id,
-        const std::string& time_string,
-        const std::string& msg) :
-        Command(header::ClientReceiveChatMessage, Utils::Serialize<unsigned int, std::string, std::string>(user_id, time_string, msg))
-{
-}
-
-ServerReceiveChatMessage::ServerReceiveChatMessage(const std::string& msg) :
-        Command(header::ServerReceiveChatMessage, msg)
-{
-
 }
 
 ServerStartEncryptedSession::ServerStartEncryptedSession() :
@@ -84,24 +58,6 @@ ClientReceiveCommonKey::ClientReceiveCommonKey(const std::string& key,
         unsigned int user_id) :
         Command(header::ClientReceiveCommonKey, Utils::Serialize(key, sign, user_id))
 {
-}
-
-ServerRequestedChatLog::ServerRequestedChatLog() :
-        Command(header::ServerRequestedChatLog, "")
-{
-
-}
-
-ClientJoinPlayer::ClientJoinPlayer() :
-        Command(header::ClientJoinPlayer, "")
-{
-
-}
-
-ClientLeavePlayer::ClientLeavePlayer() :
-        Command(header::ClientLeavePlayer, "")
-{
-
 }
 
 ClientUpdatePlayerPosition::ClientUpdatePlayerPosition
@@ -134,45 +90,9 @@ ClientRequestedClientInfo::ClientRequestedClientInfo() :
 
 }
 
-ClientUpdateChannelUserList::ClientUpdateChannelUserList() :
-        Command(header::ClientUpdateChannelUserList, "")
-{
-
-}
-
-ServerCloseSession::ServerCloseSession() :
-        Command(header::ServerCloseSession, "")
-{
-
-}
-
-ServerReceiveNewCard::ServerReceiveNewCard(const std::string& name,
-                                           const std::string& note,
-                                           const std::string& url) :
-                                           Command(header::ServerReceiveNewCard, Utils::Serialize(name, note, url))
-{
-}
-
-ServerRequestedCardRevisionPatch::ServerRequestedCardRevisionPatch(int revision) :
-                                           Command(header::ServerRequestedCardRevisionPatch, Utils::Serialize(revision))
-{
-}
-
 ServerRequestedAccountRevisionPatch::ServerRequestedAccountRevisionPatch(unsigned int user_id, int revision) :
                                            Command(header::ServerRequestedAccountRevisionPatch,
                                                    Utils::Serialize(user_id, revision))
-{
-}
-
-
-ClientReceiveCardRevisionPatch::ClientReceiveCardRevisionPatch(const std::string& patch) :
-    Command(header::ClientReceiveCardRevisionPatch, patch)
-{
-
-}
-
-ClientReceiveCardRevisionUpdateNotify::ClientReceiveCardRevisionUpdateNotify(int revision) :
-        Command(header::ClientReceiveCardRevisionUpdateNotify, Utils::Serialize(revision))
 {
 }
 
@@ -199,33 +119,19 @@ ClientReceiveServerCrowdedError::ClientReceiveServerCrowdedError() :
 
 }
 
-PlayerLogoutNotify::PlayerLogoutNotify(unsigned int user_id) :
-        Command(header::PlayerLogoutNotify, Utils::Serialize(user_id))
-{
-}
-
-ServerUpdatePlayerName::ServerUpdatePlayerName(const std::string& name) :
-        Command(header::ServerUpdatePlayerName, name)
-{
-}
-
-ServerUpdatePlayerTrip::ServerUpdatePlayerTrip(const std::string& trip) :
-        Command(header::ServerUpdatePlayerTrip, trip)
-{
-}
-
-ServerUpdatePlayerModelName::ServerUpdatePlayerModelName(const std::string& name) :
-        Command(header::ServerUpdatePlayerModelName, name)
-{
-}
-
 ClientReceiveUnsupportVersionError::ClientReceiveUnsupportVersionError(uint32_t require_version) :
         Command(header::ClientReceiveUnsupportVersionError, Utils::Serialize(require_version))
 {
 }
 
 ServerReceiveAccountInitializeData::ServerReceiveAccountInitializeData(const std::string& data):
-                Command(header::ServerReceiveAccountInitializeData, data)
+        Command(header::ServerReceiveAccountInitializeData, data)
+{
+
+}
+
+ServerUpdateAccountProperty::ServerUpdateAccountProperty(AccountProperty property, const std::string& value) :
+Command(header::ServerUpdateAccountProperty, Utils::Serialize(property, value))
 {
 
 }
@@ -239,6 +145,5 @@ ClientReceiveJSON::ClientReceiveJSON(const std::string& info_json, const std::st
         Command(header::ClientReceiveJSON, Utils::Serialize(info_json, message_json))
 {
 }
-
 
 }

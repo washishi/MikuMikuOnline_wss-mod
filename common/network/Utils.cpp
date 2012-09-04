@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <cctype>
 #include <boost/asio/ip/address.hpp>
+#include <boost/foreach.hpp>
 
 namespace network {
     namespace Utils {
@@ -27,8 +28,7 @@ namespace network {
         {
             std::string out;
 
-			for (auto it = in.begin(); it != in.end(); ++it) {
-				const char& c = *it;
+			BOOST_FOREACH(const char& c, in) {
 				if (c == 0x7e || c == 0x7d) {
                     out += 0x7d;
                     out += c ^ 0x20;
@@ -46,8 +46,7 @@ namespace network {
 
             bool escape = false;
 
-			for (auto it = in.begin(); it != in.end(); ++it) {
-				const char& c = *it;
+			BOOST_FOREACH(const char& c, in) {
 				if (escape) {
                     out += c ^ 0x20;
                     escape = false;
@@ -63,8 +62,7 @@ namespace network {
         {
             std::string out;
 
-			for (auto it = in.begin(); it != in.end(); ++it) {
-				const char& c = *it;
+			BOOST_FOREACH(const char& c, in) {
 				out += (boost::format("%X ") % (int)c).str();
 			}
 
@@ -148,8 +146,7 @@ namespace network {
            int bits_collected = 0;
            unsigned int accumulator = 0;
 
-           for (string::const_iterator i = ascdata.begin(); i != last; ++i) {
-              const int c = *i;
+           BOOST_FOREACH(const int c, ascdata) {
               if (::std::isspace(c) || c == '=') {
                  // Skip whitespace and padding. Be liberal in what you accept.
                  continue;

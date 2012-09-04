@@ -8,7 +8,7 @@ namespace unicode {
 
 #ifdef _WIN32
 
-    std::string sjis2utf8(std::string in) {
+    std::string sjis2utf8(const std::string& in) {
 
         int wchar_size = ::MultiByteToWideChar(CP_ACP,0,in.data(),in.size(),nullptr,0);
 		auto wchar_buf = new wchar_t [wchar_size];
@@ -25,7 +25,7 @@ namespace unicode {
         return out;
     }
 
-    std::string utf82sjis(std::string in) {
+    std::string utf82sjis(const std::string& in) {
 
         int wchar_size = ::MultiByteToWideChar(CP_UTF8,0,in.data(),in.size(),nullptr,0);
 		auto wchar_buf = new wchar_t[wchar_size];

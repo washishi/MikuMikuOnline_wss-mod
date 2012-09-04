@@ -12,6 +12,7 @@
 #include "Server.hpp"
 #include "../common/network/Encrypter.hpp"
 #include "../common/network/Signature.hpp"
+#include "../common/database/AccountProperty.hpp"
 #include "../common/Logger.hpp"
 #include "Config.hpp"
 #include "Account.hpp"
@@ -214,78 +215,65 @@ int main(int argc, char* argv[])
         }
         break;
 
-        // ユーザー名の更新
-        case network::header::ServerUpdatePlayerName:
+        case network::header::ServerUpdateAccountProperty:
         {
             if (auto session = c.session().lock()) {
-                std::string name = c.body();
-                if (name.size() > 0 && name.size() <= 64) {
-                    account.SetUserName(session->id(), name);
-                    server.SendAll(
-                            network::ClientReceiveAccountRevisionUpdateNotify(session->id(),
-                                    account.GetUserRevision(session->id())));
+                AccountProperty property;
+                std::string value;
+                network::Utils::Deserialize(c.body(), &property, &value);
+
+                auto old_revision = account.GetUserRevision(session->id());
+
+                switch (property) {
+
+                case NAME:
+                    {
+                        account.SetUserName(session->id(), value);
+                    }
+                    break;
+                case TRIP:
+                    {
+                        account.SetUserTrip(session->id(), value);
+                    }
+                    break;
+                case MODEL_NAME:
+                    {
+                        account.SetUserModelName(session->id(), value);
+                    }
+                    break;
+                default:
+                    ;
                 }
+
+                auto new_revison = account.GetUserRevision(session->id());
+                if (new_revison > old_revision) {
+                    server.SendAll(
+                            network::ClientReceiveAccountRevisionUpdateNotify(
+                            session->id(),new_revison));
+                }
+
                 Logger::Info(msg);
             }
         }
         break;
 
-        // トリップの更新
-        case network::header::ServerUpdatePlayerTrip:
+        // エラー
+        case network::header::FatalConnectionError:
         {
-            if (auto session = c.session().lock()) {
-                std::string trip = c.body();
-                if (trip.size() > 0 && trip.size() <= 64) {
-                    account.SetUserTrip(session->id(), trip);
-                    server.SendAll(
-                            network::ClientReceiveAccountRevisionUpdateNotify(session->id(),
-                                    account.GetUserRevision(session->id())));
-                }
-                Logger::Info(msg);
+            if (c.body().size() > 0) {
+                int user_id;
+                network::Utils::Deserialize(c.body(), &user_id);
+                account.LogOut(user_id);
+
+                server.SendAll(
+                        network::ClientReceiveAccountRevisionUpdateNotify(user_id,
+                                account.GetUserRevision(user_id)));
+
+                Logger::Info("Logout User: %d", user_id);
             }
         }
+        Logger::Info(msg);
         break;
-
-        // モデル名の更新
-        case network::header::ServerUpdatePlayerModelName:
-        {
-            if (auto session = c.session().lock()) {
-                std::string name = c.body();
-                if (name.size() > 0 && name.size() <= 64) {
-                    account.SetUserModelName(session->id(), name);
-                    server.SendAll(
-                            network::ClientReceiveAccountRevisionUpdateNotify(session->id(),
-                                    account.GetUserRevision(session->id())));
-                }
-                Logger::Info(msg);
-            }
-        }
-        break;
-
-       // ログアウト
-       case network::header::PlayerLogoutNotify:
-       {
-           Logger::Info(msg);
-       }
-       break;
-
-       // エラー
-       case network::header::FatalConnectionError:
-       {
-           if (c.body().size() > 0) {
-               int user_id;
-               network::Utils::Deserialize(c.body(), &user_id);
-               account.LogOut(user_id);
-
-               server.SendAll(
-                       network::ClientReceiveAccountRevisionUpdateNotify(user_id,
-                               account.GetUserRevision(user_id)));
-
-               Logger::Info("Logout User: %d", user_id);
-           }
-       }
-       Logger::Info(msg);
-       break;
 
         default:
             break;

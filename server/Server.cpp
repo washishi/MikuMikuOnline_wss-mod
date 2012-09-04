@@ -43,12 +43,6 @@ namespace network {
             // 通信量制限を越えていた場合、強制的に切断
             else if (auto session = c.session().lock()) {
                 if (session->GetReadByteAverage() > session_read_average_) {
-                    if (auto session = c.session().lock()) {
-                        if (callback) {
-                            (*callback)(network::PlayerLogoutNotify(session->id()));
-                        }
-                        return;
-                    }
                     session->Close();
                 }
             }
@@ -127,8 +121,7 @@ namespace network {
 
     void Server::SendAll(const Command& command)
     {
-        for (auto it = sessions_.begin(); it != sessions_.end(); ++it) {
-            SessionWeakPtr& ptr = *it;
+        BOOST_FOREACH(SessionWeakPtr& ptr, sessions_) {
             if (auto session = ptr.lock()) {
                 session->Send(command);
             }
@@ -137,8 +130,7 @@ namespace network {
 
     void Server::SendOthers(const Command& command, SessionWeakPtr self_ptr)
     {
-        for (auto it = sessions_.begin(); it != sessions_.end(); ++it) {
-            SessionWeakPtr& ptr = *it;
+        BOOST_FOREACH(SessionWeakPtr& ptr, sessions_) {
             if (auto session = ptr.lock()) {
                 if (auto self = self_ptr.lock()) {
                     if (*session != *self) {

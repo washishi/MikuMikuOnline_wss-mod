@@ -180,7 +180,9 @@ std::string Account::GetUserName(UserID user_id) const
 
 void Account::SetUserName(UserID user_id, const std::string& name)
 {
-    Set(user_id, NAME, name);
+    if (name.size() > 0 && name.size() <= 32) {
+        Set(user_id, NAME, name);
+    }
 }
 
 std::string Account::GetUserTrip(UserID user_id) const
@@ -192,8 +194,10 @@ std::string Account::GetUserTrip(UserID user_id) const
 
 void Account::SetUserTrip(UserID user_id, const std::string& trip)
 {
-    std::string crypted_trip = network::Encrypter::GetTrip(trip);
-    Set(user_id, TRIP, crypted_trip);
+    if (trip.size() > 0 && trip.size() <= 64) {
+        std::string crypted_trip = network::Encrypter::GetTrip(trip);
+        Set(user_id, TRIP, crypted_trip);
+    }
 }
 
 std::string Account::GetUserModelName(UserID user_id) const
@@ -205,7 +209,9 @@ std::string Account::GetUserModelName(UserID user_id) const
 
 void Account::SetUserModelName(UserID user_id, const std::string& name)
 {
-    Set(user_id, MODEL_NAME, name);
+    if (name.size() > 0 && name.size() <= 64) {
+        Set(user_id, MODEL_NAME, name);
+    }
 }
 
 std::string Account::GetUserIPAddress(UserID user_id) const

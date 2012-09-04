@@ -331,11 +331,11 @@ void Client::ClientSession::Connect(const boost::system::error_code& error)
                         boost::asio::placeholders::error));
 
         if (on_receive_) {
-            (*on_receive_)(ConnectionSucceeded());
+            // (*on_receive_)(ConnectionSucceeded());
         }
     } else {
         if (on_receive_) {
-            (*on_receive_)(ConnectionFailed());
+            // (*on_receive_)(ConnectionFailed());
         }
     }
 }
