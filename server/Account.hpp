@@ -90,6 +90,7 @@ class Account {
         }
 
         struct PropertyValue {
+            PropertyValue() : revision(0) {}
             uint32_t revision;
             std::string value;
         };

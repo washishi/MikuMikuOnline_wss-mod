@@ -5,11 +5,14 @@
 
 #pragma once
 
+#ifdef _WIN32
+#include <tchar.h>
+#endif
+
 // C ランタイム ヘッダー ファイル
 #include <stdlib.h>
 #include <malloc.h>
 #include <memory.h>
-#include <tchar.h>
 #include <stdint.h>
 #include <assert.h>
 #include <cmath>
