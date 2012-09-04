@@ -3,6 +3,7 @@
 //
 
 #include "Command.hpp"
+#include "CommandHeader.hpp"
 #include "Session.hpp"
 #include "Utils.hpp"
 #include "../Logger.hpp"
@@ -161,26 +162,27 @@ namespace network {
 
     std::string Session::Serialize(const Command& command)
     {
-        unsigned int header = command.header();
+        assert(command.header() < 0xFF);
+        auto header = static_cast<unsigned char>(command.header());
         std::string body = command.body();
 
-        serialized_byte_sum_ += body.size();
+        std::string msg = Utils::Serialize(header) + body;
 
         // 圧縮
-        if (!static_cast<bool>(header & COMPRESSED_FLAG) &&
-                body.size() >= COMPRESS_MIN_LENGTH) {
-            body = Utils::SnappyCompress(body);
-            header |= COMPRESSED_FLAG;
+        if (body.size() >= COMPRESS_MIN_LENGTH) {
+            auto compressed = Utils::LZ4Compress(msg);
+            if (msg.size() > compressed.size()) {
+                assert(msg.size() < 65535);
+                msg = Utils::Serialize(static_cast<unsigned char>(header::LZ4_COMPRESS_HEADER),
+                    static_cast<unsigned short>(msg.size()))
+                    + compressed;
+            }
         }
-
-        compressed_byte_sum_ += body.size();
-
-        std::string msg(reinterpret_cast<char*>(&header), sizeof(int));
-        msg += body;
 
         // 暗号化
         if (encryption_) {
-            msg = encrypter_.Encrypt(msg);
+            msg = Utils::Serialize(static_cast<unsigned char>(header::ENCRYPT_HEADER))
+                + encrypter_.Encrypt(msg);
         }
 
         return Utils::Encode(msg);
@@ -190,21 +192,28 @@ namespace network {
     {
         std::string decoded_msg = Utils::Decode(msg);
 
-        // 復号化
-        if (encryption_) {
-            decoded_msg = encrypter_.Decrypt(decoded_msg);
-        }
+        unsigned char header;
+        Utils::Deserialize(decoded_msg, &header);
 
-        header::CommandHeader header = *reinterpret_cast<const header::CommandHeader*>(decoded_msg.data());
-        std::string body = decoded_msg.substr(sizeof(uint32_t));
+        // 復号
+        if (header == header::ENCRYPT_HEADER) {
+            decoded_msg.erase(0, sizeof(header));
+            decoded_msg = encrypter_.Decrypt(decoded_msg);
+            Utils::Deserialize(decoded_msg, &header);
+        }
 
         // 伸長
-        if (static_cast<bool>(header & COMPRESSED_FLAG)) {
-            body = Utils::SnappyUncompress(body);
-            header = static_cast<header::CommandHeader>(header & ~(COMPRESSED_FLAG));
+        if (header == header::LZ4_COMPRESS_HEADER) {
+            unsigned short original_size;
+            Utils::Deserialize(decoded_msg, &header, &original_size);
+            decoded_msg.erase(0, sizeof(header) + sizeof(original_size));
+            decoded_msg = Utils::LZ4Uncompress(decoded_msg, original_size);
+            Utils::Deserialize(decoded_msg, &header);
         }
 
-        return Command(header, body, shared_from_this());
+        std::string body = decoded_msg.substr(sizeof(header));
+
+        return Command(static_cast<header::CommandHeader>(header), body, shared_from_this());
     }
 
     void Session::ReceiveTCP(const boost::system::error_code& error)
@@ -288,10 +297,12 @@ namespace network {
 
     void Session::FetchTCP(const std::string& msg)
     {
-        if (msg.size() >= sizeof(int)) {
+        if (msg.size() >= sizeof(unsigned char)) {
             if (on_receive_) {
                 (*on_receive_)(Deserialize(msg));
             }
+        } else {
+            Logger::Error(_T("Too short data"));
         }
     }
 

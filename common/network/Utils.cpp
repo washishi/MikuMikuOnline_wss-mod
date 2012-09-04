@@ -3,6 +3,7 @@
 //
 
 #include "Utils.hpp"
+#include "lz4/lz4.h"
 #include <string>
 #include <cassert>
 #include <limits>
@@ -164,16 +165,18 @@ namespace network {
            return retval;
         }
 
-        std::string SnappyCompress(const std::string& in)
+        std::string LZ4Compress(const std::string& in)
         {
-			// TODO: VSに移行するため圧縮機能は無効
-            return in;
+            std::unique_ptr<char[]> outbuf(new char [LZ4_compressBound(in.size())]);
+            size_t out_size = LZ4_compress(in.data(), outbuf.get(), in.size());
+            return std::string(outbuf.get(), out_size);
         }
 
-        std::string SnappyUncompress(const std::string& in)
+        std::string LZ4Uncompress(const std::string& in, size_t size)
         {
-			// TODO: VSに移行するため圧縮機能は無効
-            return in;
+            std::unique_ptr<char[]> outbuf(new char [size]);
+            LZ4_uncompress(in.data(), outbuf.get(), size);
+            return std::string(outbuf.get(), size);
         }
 
     }

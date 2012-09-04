@@ -60,20 +60,19 @@ Encrypter::~Encrypter()
 std::string Encrypter::Encrypt(const std::string& in)
 {
     // TODO: 適切なバッファ長を計算する
-     unsigned char* outbuf = new unsigned char[2048];
+     std::unique_ptr<char[]> outbuf(new char [2048]);
      int outlen, tmplen;
 
      EVP_EncryptInit_ex(&ctx_encrypt_, NULL, NULL, NULL, NULL);
-     if(!EVP_EncryptUpdate(&ctx_encrypt_, outbuf, &outlen, (unsigned char*)in.data(), in.size()) ||
-             !EVP_EncryptFinal_ex(&ctx_encrypt_, outbuf + outlen, &tmplen)) {
+     if(!EVP_EncryptUpdate(&ctx_encrypt_, (unsigned char*)outbuf.get(), &outlen, (unsigned char*)in.data(), in.size()) ||
+             !EVP_EncryptFinal_ex(&ctx_encrypt_, (unsigned char*)outbuf.get() + outlen, &tmplen)) {
 
          return std::string();
      }
 
      outlen += tmplen;
 
-     std::string out((const char*)outbuf, outlen);
-     delete[] outbuf;
+     std::string out((const char*)outbuf.get(), outlen);
 
      return out;
 }
@@ -81,20 +80,19 @@ std::string Encrypter::Encrypt(const std::string& in)
 std::string Encrypter::Decrypt(const std::string& in)
 {
     // TODO: 適切なバッファ長を計算する
-     unsigned char* outbuf = new unsigned char[2048];
+     std::unique_ptr<char[]> outbuf(new char [2048]);
      int outlen, tmplen;
 
      EVP_DecryptInit_ex(&ctx_decrypt_, NULL, NULL, NULL, NULL);
-     if(!EVP_DecryptUpdate(&ctx_decrypt_, outbuf, &outlen, (unsigned char*)in.data(), in.size()) ||
-             !EVP_DecryptFinal_ex(&ctx_decrypt_, outbuf + outlen, &tmplen)) {
+     if(!EVP_DecryptUpdate(&ctx_decrypt_, (unsigned char*)outbuf.get(), &outlen, (unsigned char*)in.data(), in.size()) ||
+             !EVP_DecryptFinal_ex(&ctx_decrypt_, (unsigned char*)outbuf.get() + outlen, &tmplen)) {
 
          return std::string();
      }
 
      outlen += tmplen;
 
-     std::string out((const char*)outbuf, outlen);
-     delete[] outbuf;
+     std::string out((const char*)outbuf.get(), outlen);
 
      return out;
 }
@@ -150,29 +148,24 @@ void Encrypter::SetCryptedCommonKey(const std::string& in)
 std::string Encrypter::PublicEncrypt(const std::string& in)
 {
     int outlen = RSA_size(rsa_key_);
-    unsigned char* outbuf = new unsigned char[outlen];
+    std::unique_ptr<char[]> outbuf(new char [outlen]);
 
     RSA_public_encrypt(in.size(), (unsigned char *)in.data(),
-            outbuf, rsa_key_, RSA_PKCS1_OAEP_PADDING);
+            (unsigned char*)outbuf.get(), rsa_key_, RSA_PKCS1_OAEP_PADDING);
 
-    std::string out((const char*)outbuf, outlen);
-    delete[] outbuf;
-
-    return out;
+    return std::string((const char*)outbuf.get(), outlen);
 }
 
 std::string Encrypter::PublicDecrypt(const std::string& in)
 {
     int outlen = RSA_size(rsa_key_);
-    unsigned char* outbuf = new unsigned char[outlen];
+    std::unique_ptr<char[]> outbuf(new char [outlen]);
 
     RSA_private_decrypt(in.size(), (unsigned char *)in.data(),
-            outbuf, rsa_key_, RSA_PKCS1_OAEP_PADDING);
+            (unsigned char*)outbuf.get(), rsa_key_, RSA_PKCS1_OAEP_PADDING);
 
-    std::string out((const char*)outbuf, outlen);
-    delete[] outbuf;
-
-    return out;
+    
+    return std::string ((const char*)outbuf.get(), outlen);
 }
 
 std::string Encrypter::GetPublicKeyFingerPrint()
@@ -183,15 +176,12 @@ std::string Encrypter::GetPublicKeyFingerPrint()
 std::string Encrypter::GetHash(const std::string& in)
 {
     int outlen = SHA_LENGTH;
-    unsigned char* outbuf = new unsigned char[outlen];
+    std::unique_ptr<char[]> outbuf(new char [outlen]);
 
     static const std::string key = Utils::Base64Decode(SHA_HMAC_KEY).data();
-    HMAC(EVP_sha512(), key.data(), key.size(), (unsigned char*)in.data(), in.size(), outbuf, NULL);
+    HMAC(EVP_sha512(), key.data(), key.size(), (unsigned char*)in.data(), in.size(), (unsigned char*)outbuf.get(), NULL);
 
-    std::string out((char*)outbuf, outlen);
-    delete[] outbuf;
-
-    return out;
+    return std::string((char*)outbuf.get(), outlen);
 }
 
 std::string Encrypter::GetTrip(const std::string& in)
@@ -217,15 +207,12 @@ std::string Encrypter::GetTrip(const std::string& in)
 std::string Encrypter::GetTripHash(const std::string& in)
 {
     int outlen = SHA_LENGTH;
-    unsigned char* outbuf = new unsigned char[outlen];
+    std::unique_ptr<char[]> outbuf(new char [outlen]);
 
     static const std::string key = Utils::Base64Decode(TRIP_SHA_HMAC_KEY).data();
-    HMAC(EVP_sha512(), key.data(), key.size(), (unsigned char*)in.data(), in.size(), outbuf, NULL);
+    HMAC(EVP_sha512(), key.data(), key.size(), (unsigned char*)in.data(), in.size(), (unsigned char*)outbuf.get(), NULL);
 
-    std::string out((char*)outbuf, outlen);
-    delete[] outbuf;
-
-    return out;
+    return std::string((char*)outbuf.get(), outlen);
 }
 
 bool Encrypter::CheckKeyPair()

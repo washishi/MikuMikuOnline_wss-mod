@@ -20,8 +20,8 @@ namespace network {
         std::string Base64Encode(const std::string&);
         std::string Base64Decode(const std::string&);
 
-        std::string SnappyCompress(const std::string&);
-        std::string SnappyUncompress(const std::string&);
+        std::string LZ4Compress(const std::string& in);
+        std::string LZ4Uncompress(const std::string& in, size_t size);
 
         std::string ToHexString(const std::string&);
 

@@ -7,28 +7,30 @@
 namespace network {
 namespace header {
     enum CommandHeader {
-        FatalConnectionError =                      0xD0000003,
-        ServerStartEncryptedSession =               0x00000006,
-        ClientStartEncryptedSession =               0x80000007,
-        ServerReceivePublicKey =                    0x00000008,
-        ClientReceiveCommonKey =                    0x80000009,
-        ClientUpdatePlayerPosition =                0x8000000E,
-        ServerUpdatePlayerPosition =                0x0000000F,
-        ServerReceiveClientInfo =                   0x00000010,
-        ClientRequestedPublicKey =                  0xA0000011,
-        ClientRequestedClientInfo =                 0xA0000012,
-        ClientReceiveAccountRevisionPatch =         0x8000001B,
-        ServerRequestedAccountRevisionPatch =       0x2000001C,
-        ClientReceiveAccountRevisionUpdateNotify =  0x8000001D,
-        ClientReceiveWriteAverageLimitUpdate =      0x8000001E,
-        ClientReceiveServerCrowdedError =           0xC000001F,
-        ClientReceiveUnsupportVersionError =        0xC0000023,
-        ServerReceiveAccountInitializeData =        0x00000024,
-        ClientReceiveServerInfo =                   0x80000026,
-        ServerUpdateAccountProperty =               0x00000027,
+        FatalConnectionError =                      0x01,
+        ServerStartEncryptedSession =               0x02,
+        ClientStartEncryptedSession =               0x03,
+        ServerReceivePublicKey =                    0x04,
+        ClientReceiveCommonKey =                    0x05,
+        ClientUpdatePlayerPosition =                0x06,
+        ServerUpdatePlayerPosition =                0x07,
+        ServerReceiveClientInfo =                   0x08,
+        ClientRequestedPublicKey =                  0x09,
+        ClientRequestedClientInfo =                 0x0A,
+        ClientReceiveAccountRevisionPatch =         0x0B,
+        ServerRequestedAccountRevisionPatch =       0x0C,
+        ClientReceiveAccountRevisionUpdateNotify =  0x0D,
+        ClientReceiveWriteAverageLimitUpdate =      0x0E,
+        ClientReceiveServerCrowdedError =           0x0F,
+        ClientReceiveUnsupportVersionError =        0x10,
+        ServerReceiveAccountInitializeData =        0x11,
+        ClientReceiveServerInfo =                   0x12,
+        ServerUpdateAccountProperty =               0x13,
+        ServerReceiveJSON =                         0x14,
+        ClientReceiveJSON =                         0x15,
 
-        ServerReceiveJSON =                         0x00000040,
-        ClientReceiveJSON =                         0x80000080
+        LZ4_COMPRESS_HEADER =                       0xF0,
+        ENCRYPT_HEADER =                            0xF1
     };
 
 }
