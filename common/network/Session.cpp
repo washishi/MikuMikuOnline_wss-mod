@@ -171,7 +171,7 @@ namespace network {
         // 圧縮
         if (body.size() >= COMPRESS_MIN_LENGTH) {
             auto compressed = Utils::LZ4Compress(msg);
-            if (msg.size() > compressed.size()) {
+            if (msg.size() > compressed.size() + sizeof(unsigned char)) {
                 assert(msg.size() < 65535);
                 msg = Utils::Serialize(static_cast<unsigned char>(header::LZ4_COMPRESS_HEADER),
                     static_cast<unsigned short>(msg.size()))

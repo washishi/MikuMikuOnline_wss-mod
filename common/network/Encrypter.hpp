@@ -5,11 +5,10 @@
 #pragma once
 
 #include <string>
-#include <openssl/ecdsa.h>
-#include <openssl/obj_mac.h>
-#include <openssl/evp.h>
-#include <openssl/rsa.h>
-#include <openssl/hmac.h>
+
+#include <modes.h>
+#include <aes.h>
+#include <rsa.h>
 
 namespace network {
 
@@ -46,19 +45,16 @@ class Encrypter {
         static std::string GetTripHash(const std::string&);
 
     private:
-        const static int COMMON_KEY_LENGTH;
-        const static int COMMON_KEY_IV_LENGTH;
-        const static int RSA_KEY_LENGTH;
-        const static int SHA_LENGTH;
         const static int TRIP_LENGTH;
 
-        // TODO: あとで直す
         std::string common_key_;
         std::string common_key_iv_;
 
-        EVP_CIPHER_CTX ctx_encrypt_,
-                       ctx_decrypt_;
-        RSA *rsa_key_;
+        CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption aes_encrypt_;
+        CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption aes_decrypt_;
+
+        CryptoPP::RSA::PrivateKey private_key_;
+        CryptoPP::RSA::PublicKey public_key_;
 };
 
 }

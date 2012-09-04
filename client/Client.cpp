@@ -140,12 +140,15 @@ Client::Client(const std::string& host,
 
                             session->set_id(user_id);
 
+                            /*
                             Logger::Info(_T("Checking server signature..."));
                             if (signature_.Verify(key, sign)) {
                                 Logger::Info(_T("Valid server signature"));
                             } else {
                                 Logger::Error(_T("Invalid server signature"));
                             }
+                            */
+
                             session->encrypter().SetCryptedCommonKey(key);
                             session->Send(ServerStartEncryptedSession());
 

@@ -2,10 +2,10 @@
 // Signature.cpp
 //
 
-#include <openssl/rand.h>
 #include <boost/format.hpp>
 #include <boost/filesystem.hpp>
-#include <openssl/pem.h>
+#include <pssr.h>
+#include <osrng.h>
 #include <fstream>
 #include "Signature.hpp"
 #include "Utils.hpp"
@@ -13,108 +13,82 @@
 #include "../Logger.hpp"
 
 namespace network {
+    
+using namespace CryptoPP;
 
-const int Signature::RSA_KEY_LENGTH = 256;
 
 Signature::Signature(const std::string& filename)
 {
-    rsa_key_ = RSA_generate_key(RSA_KEY_LENGTH * 8, RSA_F4, nullptr, nullptr);
+    AutoSeededRandomPool rnd;
+    InvertibleRSAFunction params;
+    params.GenerateRandomWithKeySize(rnd, 3072);
 
-    using namespace boost::filesystem;
-    path key_file(filename);
-
-    if (key_file.extension() == ".pub") {
-        if (exists(key_file)) {
-            if (FILE *f = fopen(filename.c_str(), "r")) {
-                PEM_read_RSAPublicKey(f, &rsa_key_, nullptr, nullptr);
-                fclose(f);
-            } else {
-                Logger::Error(_T("Cannot open key file: %s"), unicode::ToTString(filename));
-            }
-        }
-    } else {
-        if (!exists(filename)) {
-            {
-                if (FILE* f = fopen(filename.c_str(), "w")) {
-                    PEM_write_RSAPrivateKey(f, rsa_key_, nullptr, nullptr, 0, nullptr, nullptr);
-                    fclose(f);
-                } else {
-                    Logger::Error(_T("Cannot write key file: %s"), unicode::ToTString(filename));
-                }
-            }
-
-            {
-                if (FILE* f = fopen((filename + ".pub").c_str(), "w")) {
-                    PEM_write_RSAPublicKey(f, rsa_key_);
-                    fclose(f);
-                } else {
-                    Logger::Error(_T("Cannot write key file: %s"), unicode::ToTString(filename));
-                }
-            }
-        } else {
-            if (FILE* f = fopen(filename.c_str(), "r")) {
-                PEM_read_RSAPrivateKey(f, &rsa_key_, nullptr, nullptr);
-                fclose(f);
-            } else {
-                Logger::Error(_T("Cannot open key file: %s"), unicode::ToTString(filename));
-            }
-        }
-    }
+    private_key_ = RSA::PrivateKey(params);
+    public_key_ = RSA::PublicKey(params);
 }
 
 Signature::~Signature()
 {
-    if (rsa_key_) {
-        RSA_free(rsa_key_);
-    }
+
 }
 
 std::string Signature::Sign(const std::string& in)
 {
-    char buffer[RSA_KEY_LENGTH];
-    unsigned int length;
-    auto hash = Encrypter::GetHash(in);
-    int result = RSA_sign_ASN1_OCTET_STRING(0,
-            (const unsigned char*)hash.data(), hash.size(),
-            (unsigned char*)buffer, &length, rsa_key_);
+    AutoSeededRandomPool rng;
+    RSASS<PSSR, SHA1>::Signer signer(private_key_);
+ 
+    size_t length = signer.MaxSignatureLength();
+    SecByteBlock signature(length);
 
-    if (result) {
-        return std::string(buffer, length);
-    } else {
-        Logger::Error(_T("Signature Failed"));
-        return std::string();
-    }
+    signer.SignMessage(rng, (const byte*)in.data(), in.size(), signature);
+    return std::string(signature.begin(), signature.end());
 }
 
 bool Signature::Verify(const std::string& in, const std::string& sign)
 {
-    auto hash = Encrypter::GetHash(in);
-    return RSA_verify_ASN1_OCTET_STRING(0, (const unsigned char*)hash.data(), hash.size(),
-            (unsigned char*)sign.data(), sign.size(), rsa_key_);
+    RSASS<PSS, SHA1>::Verifier verifier(public_key_);
+    return verifier.VerifyMessage((const byte*)in.data(), in.size(),
+        (const byte*)sign.data(), sign.size());
 }
 
 std::string Signature::GetPublicKey()
 {
-    unsigned char key[RSA_KEY_LENGTH];
-    BN_bn2bin(rsa_key_->n, key);
-    return std::string((const char*)key, sizeof(key));
+    ByteQueue queue;
+    public_key_.Save(queue);
+
+    size_t length = queue.CurrentSize();
+    std::unique_ptr<char[]> outbuf(new char [length]);
+    queue.Get((byte*)outbuf.get(), length);
+
+    return std::string((const char*)outbuf.get(), length);
 }
 
 void Signature::SetPublicKey(const std::string& in)
 {
-    BN_bin2bn((unsigned char*)in.data(), in.size(), rsa_key_->n);
+    if (in.empty()) return;
+    ByteQueue queue;
+    queue.Put((const byte*)in.data(), in.size());
+    public_key_.Load(queue);
 }
 
 std::string Signature::GetPrivateKey()
 {
-    unsigned char key[RSA_KEY_LENGTH];
-    BN_bn2bin(rsa_key_->d, key);
-    return std::string((const char*)key, sizeof(key));
+    ByteQueue queue;
+    private_key_.Save(queue);
+
+    size_t length = queue.CurrentSize();
+    std::unique_ptr<char[]> outbuf(new char [length]);
+    queue.Get((byte*)outbuf.get(), length);
+
+    return std::string((const char*)outbuf.get(), length);
 }
 
 void Signature::SetPrivateKey(const std::string& in)
 {
-    BN_bin2bn((unsigned char*)in.data(), in.size(), rsa_key_->d);
+    if (in.empty()) return;
+    ByteQueue queue;
+    queue.Put((const byte*)in.data(), in.size());
+    private_key_.Load(queue);
 }
 
 }

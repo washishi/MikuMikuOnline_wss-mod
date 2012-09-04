@@ -5,9 +5,7 @@
 #pragma once
 
 #include <string>
-#include <openssl/evp.h>
-#include <openssl/rsa.h>
-#include <openssl/hmac.h>
+#include <rsa.h>
 
 namespace network {
 
@@ -26,8 +24,8 @@ class Signature {
         void SetPrivateKey(const std::string&);
 
     public:
-        const static int RSA_KEY_LENGTH;
-        RSA *rsa_key_;
+        CryptoPP::RSA::PrivateKey private_key_;
+        CryptoPP::RSA::PublicKey public_key_;
 };
 
 }

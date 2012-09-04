@@ -2,129 +2,108 @@
 // Encrypter.cpp
 //
 
-#include <openssl/rand.h>
 #include <boost/format.hpp>
+#include <sha.h>
+#include <osrng.h>
 #include "Encrypter.hpp"
 #include "Utils.hpp"
 
 #ifdef _WIN32
-#include <openssl/applink.c>
-#pragma comment(lib, "libeay32.lib")
-#pragma comment(lib, "ssleay32.lib")
+#pragma comment(lib, "cryptlib.lib")
 #endif
 
 namespace network {
 
-// フィンガープリント用ハッシュで用いるHMACパスワード
-// ** 警告 ** この値を変更すると、変更以前に登録したフィンガープリントが全て無効になります。
-const std::string SHA_HMAC_KEY("TXpnM01XVTJNemRrTlRSa1pqUXlZVEUxWm1Rd1lqVmhNelkxTWpFMVpHTQ==");
-
-// トリップ用ハッシュで用いるHMACパスワード
-// ** 警告 ** この値を変更すると、サーバーで生成されるトリップが変更されます。
-const std::string TRIP_SHA_HMAC_KEY("RfNmIE9QCk7CiNlbmDAodmRpZgojaWRU5TU0xf9pZZuZGVTk9fSURFQpjs==");
-
-const int Encrypter::COMMON_KEY_LENGTH = 16;
-const int Encrypter::COMMON_KEY_IV_LENGTH = 16;
-const int Encrypter::RSA_KEY_LENGTH = 256;
-const int Encrypter::SHA_LENGTH = 64;
 const int Encrypter::TRIP_LENGTH = 20;
+
+using namespace CryptoPP;
 
 Encrypter::Encrypter()
 {
-    unsigned char common_key[COMMON_KEY_LENGTH];
-    unsigned char common_key_iv[COMMON_KEY_IV_LENGTH];
-    RAND_bytes(common_key, sizeof(common_key));
-    RAND_bytes(common_key_iv, sizeof(common_key_iv));
+    AutoSeededRandomPool rnd;
+    
+    byte common_key[AES::DEFAULT_KEYLENGTH];
+    byte common_key_iv[AES::BLOCKSIZE];
+    rnd.GenerateBlock(common_key, sizeof(common_key));
+    rnd.GenerateBlock(common_key_iv, sizeof(common_key_iv));
 
-    common_key_ = std::string((char*)common_key, sizeof(common_key));
-    common_key_iv_ = std::string((char*)common_key_iv, sizeof(common_key_iv));
+    common_key_ = std::string((const char*)common_key, sizeof(common_key));
+    common_key_iv_ = std::string((const char*)common_key_iv, sizeof(common_key_iv));
 
-    EVP_CIPHER_CTX_init(&ctx_encrypt_);
-    EVP_CIPHER_CTX_init(&ctx_decrypt_);
-    EVP_EncryptInit_ex(&ctx_encrypt_, EVP_aes_128_cbc(),
-        NULL, (const unsigned char*)common_key_.data(), (const unsigned char*)common_key_iv_.data());
+    aes_encrypt_.SetKeyWithIV(common_key, sizeof(common_key), common_key_iv);
+    aes_decrypt_.SetKeyWithIV(common_key, sizeof(common_key), common_key_iv);
 
-    EVP_DecryptInit_ex(&ctx_decrypt_, EVP_aes_128_cbc(),
-        NULL, (const unsigned char*)common_key_.data(), (const unsigned char*)common_key_iv_.data());
+    InvertibleRSAFunction params;
+    params.GenerateRandomWithKeySize(rnd, 3072);
 
-    rsa_key_ = RSA_generate_key(RSA_KEY_LENGTH * 8, RSA_F4, NULL, NULL);
+    private_key_ = RSA::PrivateKey(params);
+    public_key_ = RSA::PublicKey(params);
 }
 
 Encrypter::~Encrypter()
 {
-    EVP_CIPHER_CTX_cleanup(&ctx_encrypt_);
-    EVP_CIPHER_CTX_cleanup(&ctx_decrypt_);
-    RSA_free(rsa_key_);
 }
 
 std::string Encrypter::Encrypt(const std::string& in)
 {
-    // TODO: 適切なバッファ長を計算する
-     std::unique_ptr<char[]> outbuf(new char [2048]);
-     int outlen, tmplen;
-
-     EVP_EncryptInit_ex(&ctx_encrypt_, NULL, NULL, NULL, NULL);
-     if(!EVP_EncryptUpdate(&ctx_encrypt_, (unsigned char*)outbuf.get(), &outlen, (unsigned char*)in.data(), in.size()) ||
-             !EVP_EncryptFinal_ex(&ctx_encrypt_, (unsigned char*)outbuf.get() + outlen, &tmplen)) {
-
-         return std::string();
-     }
-
-     outlen += tmplen;
-
-     std::string out((const char*)outbuf.get(), outlen);
-
+     std::unique_ptr<char[]> outbuf(new char [in.size()]);
+     aes_encrypt_.ProcessData((byte*)outbuf.get(), (const byte*)in.data(), in.size());
+     std::string out((const char*)outbuf.get(), in.size());
      return out;
 }
 
 std::string Encrypter::Decrypt(const std::string& in)
 {
-    // TODO: 適切なバッファ長を計算する
-     std::unique_ptr<char[]> outbuf(new char [2048]);
-     int outlen, tmplen;
-
-     EVP_DecryptInit_ex(&ctx_decrypt_, NULL, NULL, NULL, NULL);
-     if(!EVP_DecryptUpdate(&ctx_decrypt_, (unsigned char*)outbuf.get(), &outlen, (unsigned char*)in.data(), in.size()) ||
-             !EVP_DecryptFinal_ex(&ctx_decrypt_, (unsigned char*)outbuf.get() + outlen, &tmplen)) {
-
-         return std::string();
-     }
-
-     outlen += tmplen;
-
-     std::string out((const char*)outbuf.get(), outlen);
-
+     std::unique_ptr<char[]> outbuf(new char [in.size()]);
+     aes_decrypt_.ProcessData((byte*)outbuf.get(), (const byte*)in.data(), in.size());
+     std::string out((const char*)outbuf.get(), in.size());
      return out;
 }
 
 std::string Encrypter::GetPublicKey()
 {
-    unsigned char key[RSA_KEY_LENGTH];
-    BN_bn2bin(rsa_key_->n, key);
-    return std::string((const char*)key, sizeof(key));
+    ByteQueue queue;
+    public_key_.Save(queue);
+
+    size_t length = queue.CurrentSize();
+    std::unique_ptr<char[]> outbuf(new char [length]);
+    queue.Get((byte*)outbuf.get(), length);
+
+    return std::string((const char*)outbuf.get(), length);
 }
 
 void Encrypter::SetPublicKey(const std::string& in)
 {
-    BN_bin2bn((unsigned char*)in.data(), in.size(), rsa_key_->n);
+    if (in.empty()) return;
+    ByteQueue queue;
+    queue.Put((const byte*)in.data(), in.size());
+    public_key_.Load(queue);
 }
 
 std::string Encrypter::GetPrivateKey()
 {
-    unsigned char key[RSA_KEY_LENGTH];
-    BN_bn2bin(rsa_key_->d, key);
-    return std::string((const char*)key, sizeof(key));
+    ByteQueue queue;
+    private_key_.Save(queue);
+
+    size_t length = queue.CurrentSize();
+    std::unique_ptr<char[]> outbuf(new char [length]);
+    queue.Get((byte*)outbuf.get(), length);
+
+    return std::string((const char*)outbuf.get(), length);
 }
 
 void Encrypter::SetPrivateKey(const std::string& in)
 {
-    BN_bin2bn((unsigned char*)in.data(), in.size(), rsa_key_->d);
+    if (in.empty()) return;
+    ByteQueue queue;
+    queue.Put((const byte*)in.data(), in.size());
+    private_key_.Load(queue);
 }
 
 void Encrypter::SetPairKey(const std::string& pub, const std::string& pri)
 {
-    BN_bin2bn((unsigned char*)pub.data(), pub.size(), rsa_key_->n);
-    BN_bin2bn((unsigned char*)pri.data(), pri.size(), rsa_key_->d);
+    SetPublicKey(pub);
+    SetPrivateKey(pri);
 }
 
 std::string Encrypter::GetCryptedCommonKey()
@@ -135,37 +114,49 @@ std::string Encrypter::GetCryptedCommonKey()
 void Encrypter::SetCryptedCommonKey(const std::string& in)
 {
     std::string key = PublicDecrypt(in);
-    common_key_ = key.substr(0, COMMON_KEY_LENGTH);
-    common_key_iv_ = key.substr(COMMON_KEY_LENGTH, COMMON_KEY_IV_LENGTH);
+    common_key_ = key.substr(0, AES::DEFAULT_KEYLENGTH);
+    common_key_iv_ = key.substr(AES::DEFAULT_KEYLENGTH, AES::BLOCKSIZE);
 
-    EVP_EncryptInit_ex(&ctx_encrypt_, EVP_aes_128_cbc(), NULL,
-        (const unsigned char*)common_key_.data(), (const unsigned char*)common_key_iv_.data());
-
-    EVP_DecryptInit_ex(&ctx_decrypt_, EVP_aes_128_cbc(), NULL,
-        (const unsigned char*)common_key_.data(), (const unsigned char*)common_key_iv_.data());
+    aes_encrypt_.SetKeyWithIV((const byte*)common_key_.data(), common_key_.size(), (const byte*)common_key_iv_.data());
+    aes_decrypt_.SetKeyWithIV((const byte*)common_key_.data(), common_key_.size(), (const byte*)common_key_iv_.data());
 }
 
 std::string Encrypter::PublicEncrypt(const std::string& in)
 {
-    int outlen = RSA_size(rsa_key_);
-    std::unique_ptr<char[]> outbuf(new char [outlen]);
+    AutoSeededRandomPool rng;
+    RSAES_OAEP_SHA_Encryptor encryptor(public_key_);
 
-    RSA_public_encrypt(in.size(), (unsigned char *)in.data(),
-            (unsigned char*)outbuf.get(), rsa_key_, RSA_PKCS1_OAEP_PADDING);
+    // Now that there is a concrete object, we can validate
+    assert(0 != encryptor.FixedMaxPlaintextLength());
+    assert(in.size() <= encryptor.FixedMaxPlaintextLength());
 
-    return std::string((const char*)outbuf.get(), outlen);
+    // Create cipher text space
+    size_t ecl = encryptor.CiphertextLength(in.size());
+    assert(0 != ecl);
+    SecByteBlock ciphertext(ecl);
+
+    encryptor.Encrypt(rng, (const byte*)in.data(), in.size(), ciphertext);
+
+    return std::string(ciphertext.begin(), ciphertext.end());
 }
 
 std::string Encrypter::PublicDecrypt(const std::string& in)
 {
-    int outlen = RSA_size(rsa_key_);
-    std::unique_ptr<char[]> outbuf(new char [outlen]);
+    AutoSeededRandomPool rng;
+    RSAES_OAEP_SHA_Decryptor decryptor(private_key_);
 
-    RSA_private_decrypt(in.size(), (unsigned char *)in.data(),
-            (unsigned char*)outbuf.get(), rsa_key_, RSA_PKCS1_OAEP_PADDING);
+    // Now that there is a concrete object, we can check sizes
+    assert(0 != decryptor.FixedCiphertextLength());
+    assert(in.size() <= decryptor.FixedCiphertextLength());
 
-    
-    return std::string ((const char*)outbuf.get(), outlen);
+    // Create recovered text space
+    size_t dpl = decryptor.MaxPlaintextLength(in.size());
+    assert(0 != dpl);
+    SecByteBlock recovered(dpl);
+
+    DecodingResult result = decryptor.Decrypt(rng, (const byte*)in.data(), in.size(), recovered);
+
+    return std::string(recovered.begin(), recovered.end());
 }
 
 std::string Encrypter::GetPublicKeyFingerPrint()
@@ -175,13 +166,10 @@ std::string Encrypter::GetPublicKeyFingerPrint()
 
 std::string Encrypter::GetHash(const std::string& in)
 {
-    int outlen = SHA_LENGTH;
-    std::unique_ptr<char[]> outbuf(new char [outlen]);
+    std::unique_ptr<byte[]> outbuf(new byte [CryptoPP::SHA512().DIGESTSIZE]);
+    CryptoPP::SHA512().CalculateDigest(outbuf.get(), (const byte*)in.data(), in.size());
 
-    static const std::string key = Utils::Base64Decode(SHA_HMAC_KEY).data();
-    HMAC(EVP_sha512(), key.data(), key.size(), (unsigned char*)in.data(), in.size(), (unsigned char*)outbuf.get(), NULL);
-
-    return std::string((char*)outbuf.get(), outlen);
+    return std::string((char*)outbuf.get(), CryptoPP::SHA512().DIGESTSIZE);
 }
 
 std::string Encrypter::GetTrip(const std::string& in)
@@ -206,13 +194,7 @@ std::string Encrypter::GetTrip(const std::string& in)
 
 std::string Encrypter::GetTripHash(const std::string& in)
 {
-    int outlen = SHA_LENGTH;
-    std::unique_ptr<char[]> outbuf(new char [outlen]);
-
-    static const std::string key = Utils::Base64Decode(TRIP_SHA_HMAC_KEY).data();
-    HMAC(EVP_sha512(), key.data(), key.size(), (unsigned char*)in.data(), in.size(), (unsigned char*)outbuf.get(), NULL);
-
-    return std::string((char*)outbuf.get(), outlen);
+    return GetHash(in);
 }
 
 bool Encrypter::CheckKeyPair()
