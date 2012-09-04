@@ -111,29 +111,32 @@ void GameLoop::FixCameraPosition()
 
     const auto coll_info = MV1CollCheck_Line(stage_->map_handle().handle(), -1, target_pos, camera_pos);
     static int wallcamera_cnt = 0;
-    if (coll_info.HitFlag && VSize(coll_info.HitPosition - myself_->current_stat().pos) > CAMERA_MIN_RADIUS + 2.0)
+	auto model_coll_size = (myself_->model_height() * (camera.target_height < 0.5f ? 1.0f - camera.target_height : camera.target_height) + 0.25f) * stage_->map_scale();
+
+	if (coll_info.HitFlag &&
+		VSize(camera_pos - myself_->current_stat().pos) > CAMERA_MIN_RADIUS + 2.0)
     {
         wallcamera_cnt++;
-        if (wallcamera_cnt > 15) {
-			if(VSize(coll_info.HitPosition - myself_->current_stat().pos) < CAMERA_MIN_RADIUS + 4.0f + 2.0f)
-			{
-				camera_pos.x = coll_info.HitPosition.x;
-				camera_pos.z = coll_info.HitPosition.z;
-			}else{
-				camera_pos = coll_info.HitPosition;
-			}
+		if (wallcamera_cnt > 15 && VSize(camera_pos - myself_->current_stat().pos) < CAMERA_MIN_RADIUS + 4.0f + 1.0f) {
+			camera_pos.x = coll_info.HitPosition.x;
+			camera_pos.z = coll_info.HitPosition.z;
         }else{
-			camera_pos.y = coll_info.HitPosition.y + 0.4 * stage_->map_scale();
+			camera_pos = coll_info.HitPosition - VScale(coll_info.HitPosition - target_pos,0.2f);
 		}
     } else {
         wallcamera_cnt = 0;
     }
+	if(VSize(camera_pos - target_pos) <= model_coll_size)
+	{
+		camera_pos = target_pos + VScale(camera_pos - target_pos,(model_coll_size)/VSize(camera_pos - target_pos));
+	}
 
 	auto camera_pos_delta = VScale(camera_pos - GetCameraPosition(),(float)0.3);
     if (VSize(camera_pos_delta) > 10) {
         camera_pos_delta = VNorm(camera_pos_delta) * 10;
     }
-    SetCameraPositionAndTarget_UpVecY(
+
+	SetCameraPositionAndTarget_UpVecY(
 		GetCameraPosition() + camera_pos_delta, target_pos);
 }
 
