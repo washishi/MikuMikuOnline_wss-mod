@@ -67,6 +67,7 @@ class ResourceManager {
         static void BuildModelFileTree();
         static void CacheBakedModel();
         static ModelHandle LoadModelFromName(const tstring&);
+		static const std::vector<std::string>& GetModelNameList();
 
     private:
         static int default_font_handle_;
@@ -76,6 +77,7 @@ class ResourceManager {
         static ptree model_name_tree_;
         static std::unordered_map<tstring, tstring> model_names_;
         static std::unordered_map<tstring, ModelHandle> model_handles_;
+		static std::vector<std::string> model_name_list_;
 
 };
 
