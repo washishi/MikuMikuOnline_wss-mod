@@ -7,7 +7,6 @@
 #include <ctime>
 #include <boost/format.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/foreach.hpp>
 #include "version.hpp"
 #include "Server.hpp"
@@ -17,6 +16,11 @@
 #include "../common/Logger.hpp"
 #include "Config.hpp"
 #include "Account.hpp"
+
+#ifdef _WIN32
+#include <boost/interprocess/windows_shared_memory.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+#endif
 
 using namespace boost::posix_time;
 
@@ -285,8 +289,10 @@ int main(int argc, char* argv[])
 
     bool execute_with_client;
     try {
-        boost::interprocess::managed_shared_memory 
-            shm(boost::interprocess::open_read_only, "MMO_SERVER_WITH_CLIENT");
+		#ifdef _WIN32
+		using namespace boost::interprocess;
+        windows_shared_memory shm(open_only, "MMO_SERVER_WITH_CLIENT", read_only);
+		#endif
         execute_with_client = true;
     } catch(std::exception& e) {
         Logger::Info("Stand-alone Mode");
@@ -294,13 +300,14 @@ int main(int argc, char* argv[])
     }
 
     // クライアントから起動している場合、クライアントの状態を監視
+	#ifdef _WIN32
     if (execute_with_client) {
         boost::thread([&server](){
             while (1) {
                 boost::this_thread::sleep(boost::posix_time::milliseconds(4000));
                 try {
-                    boost::interprocess::managed_shared_memory 
-                        shm(boost::interprocess::open_read_only, "MMO_SERVER_WITH_CLIENT");
+					using namespace boost::interprocess;
+					windows_shared_memory shm(open_only, "MMO_SERVER_WITH_CLIENT", read_only);
                 } catch(std::exception& e) {
                     server.Stop();
                     break;
@@ -308,6 +315,7 @@ int main(int argc, char* argv[])
             }
         });
     }
+	#endif
 
     server.Start(callback);
 

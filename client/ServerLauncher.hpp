@@ -3,7 +3,8 @@
 //
 
 #pragma once
-#include <DxLib.h>
+#include <windows.h>
+#include <boost/interprocess/windows_shared_memory.hpp>
 
 class ServerLauncher {
     public:
@@ -12,4 +13,5 @@ class ServerLauncher {
 
     private:
         PROCESS_INFORMATION pi_;
+		boost::interprocess::windows_shared_memory shm_;
 };

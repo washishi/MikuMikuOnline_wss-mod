@@ -1,6 +1,8 @@
 #pragma once
 
+#ifdef NDEBUG
 #include "buildversion.hpp"
+#endif
 
 #define MMO_VERSION_TOSTRING_(val) #val
 #define MMO_VERSION_TOSTRING(val) MMO_VERSION_TOSTRING_(val)
