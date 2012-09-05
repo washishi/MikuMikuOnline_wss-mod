@@ -7,10 +7,20 @@
 #include "ServerLauncher.hpp"
 #include "ConfigManager.hpp"
 #include "../common/Logger.hpp"
+#include "version.hpp"
 
 const TCHAR* Core::CONFIG_PATH = _T("config.json");
-const TCHAR* Core::WINDOW_TITILE = _T("Miku Miku Online");
 const TCHAR* Core::FONT_FILE_PATH = _T("resources/fonts/umeplus-p-gothic.ttf");
+
+#ifdef _DEBUG
+#define EXCEPTION_LOG(e) (e)
+#else
+#define EXCEPTION_LOG(e) try { \
+			(e); \
+		} catch (std::exception& e) { \
+			Logger::Error(_T("%s"), unicode::ToTString(e.what())); \
+		}
+#endif
 
 Core::Core()
 {
@@ -18,6 +28,8 @@ Core::Core()
 
 int Core::Run()
 {
+	Logger::Info(_T("%s"), unicode::ToTString(MMO_VERSION_TEXT));
+
     if (SetUpDxLib() == -1) {
         return -1;
     }
@@ -26,7 +38,8 @@ int Core::Run()
 
     LoadFont();
     SceneInit();
-    MainLoop();
+
+	EXCEPTION_LOG(MainLoop());
 
     if (current_scene_) {
         current_scene_ = scene::BasePtr();
@@ -62,8 +75,7 @@ void Core::MainLoop()
 int Core::SetUpDxLib()
 {
     //TCHAR title[] = WINDOW_TITILE;
-    const TCHAR* title = WINDOW_TITILE;
-    SetMainWindowText(title);
+    SetMainWindowText(unicode::ToTString(MMO_VERSION_TEXT).c_str());
 
     SetWindowIconID(100);
 

@@ -9,6 +9,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
 #include <boost/foreach.hpp>
+#include "version.hpp"
 #include "Server.hpp"
 #include "../common/network/Encrypter.hpp"
 #include "../common/network/Signature.hpp"
@@ -21,6 +22,7 @@ using namespace boost::posix_time;
 
 int main(int argc, char* argv[])
 {
+	Logger::Info(_T("%s"), unicode::ToTString(MMO_VERSION_TEXT));
 
  try {
 

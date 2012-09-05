@@ -13,7 +13,7 @@
 class Logger {
         // Singleton
     private:
-        Logger() {}
+        Logger() : ofs_("mmo_log.txt") {}
         Logger(const Logger& logger) {}
         virtual ~Logger() {}
 
@@ -102,37 +102,38 @@ class Logger {
         }
 
         void Log(const tstring& prefix, const tstring& format) {
-            auto out = prefix + format + _T("\r\n");
-            OutputDebugString(prefix.c_str());
-            OutputDebugString(format.c_str());
-            OutputDebugString(_T("\r\n"));
+            auto out = prefix + format + _T("\n");
+            OutputDebugString(out.c_str());
+			ofs_ << unicode::ToString(out);
         }
 
         template<class T1>
         void Log(const tstring& prefix, const tstring& format, const T1& t1) {
-            OutputDebugString(prefix.c_str());
-            OutputDebugString((tformat(format) % t1).str().c_str());
-            OutputDebugString(_T("\r\n"));
+            auto out = prefix + (tformat(format) % t1).str() + _T("\n");
+            OutputDebugString(out.c_str());
+			ofs_ << unicode::ToString(out);
         }
 
         template<class T1, class T2>
         void Log(const tstring& prefix, const tstring& format, const T1& t1, const T2& t2) {
-            OutputDebugString(prefix.c_str());
-            OutputDebugString((tformat(format) % t1 % t2).str().c_str());
-            OutputDebugString(_T("\r\n"));
+            auto out = prefix + (tformat(format) % t1 % t2).str() + _T("\n");
+            OutputDebugString(out.c_str());
+			ofs_ << unicode::ToString(out);
         }
 
         template<class T1, class T2, class T3>
         void Log(const tstring& prefix, const tstring& format, const T1& t1, const T2& t2, const T3& t3) {
-            OutputDebugString(prefix.c_str());
-            OutputDebugString((tformat(format) % t1 % t2 % t3).str().c_str());
-            OutputDebugString(_T("\r\n"));
+            auto out = prefix + (tformat(format) % t1 % t2 % t3).str() + _T("\n");
+            OutputDebugString(out.c_str());
+			ofs_ << unicode::ToString(out);
         }
 
         template<class T1, class T2, class T3, class T4>
         void Log(const tstring& prefix, const tstring& format, const T1& t1, const T2& t2, const T3& t3, const T4& t4) {
-            OutputDebugString(prefix.c_str());
-            OutputDebugString((tformat(format) % t1 % t2 % t3 % t4).str().c_str());
-            OutputDebugString(_T("\r\n"));
+            auto out = prefix + (tformat(format) % t1 % t2 % t3 % t4).str() + _T("\n");
+            OutputDebugString(out.c_str());
+			ofs_ << unicode::ToString(out);
         }
+
+		std::ofstream ofs_;
 };

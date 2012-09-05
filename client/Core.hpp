@@ -32,7 +32,6 @@ class Core {
 
     private:
         const static TCHAR* CONFIG_PATH;
-        const static TCHAR* WINDOW_TITILE;
         const static TCHAR* FONT_FILE_PATH;
 
 };
