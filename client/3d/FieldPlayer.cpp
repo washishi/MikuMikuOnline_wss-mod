@@ -188,9 +188,14 @@ void FieldPlayer::Move()
 	auto front_collides = stage_->FrontCollides(
             0.4, current_stat_.pos, prev_stat_.pos,1.0 * stage_->map_scale(), (model_height_ - 0.1) * stage_->map_scale() ,128);
 
-	if(front_collides.first)
+	if(front_collides.first && current_stat_.acc.y == 0)
 	{
 		current_stat_.pos = front_collides.second;
+        current_stat_.vel.x = current_stat_.vel.z = 0;
+	}else if(front_collides.first && current_stat_.acc.y != 0)
+	{
+		current_stat_.pos.x = front_collides.second.x;
+		current_stat_.pos.z = front_collides.second.z;
         current_stat_.vel.x = current_stat_.vel.z = 0;
 	}
     // 50mの深さまで床検出
