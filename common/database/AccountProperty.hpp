@@ -16,7 +16,10 @@ enum AccountProperty {
 };
 
 struct PlayerPosition {
-    PlayerPosition() : x(0), y(0), z(0), theta(0) {}
-    PlayerPosition(float x_, float y_, float z_, float theta_) : x(x_), y(y_), z(z_), theta(theta_) {}
-    float x, y, z, theta;
+    PlayerPosition() : x(0), y(0), z(0), theta(0), vy(0) {}
+    PlayerPosition(short x_, short y_, short z_, unsigned char theta_, char vy_)
+		: x(x_), y(y_), z(z_), theta(theta_), vy(vy_) {}
+    short x, y, z;
+	unsigned char theta;
+	char vy;
 };

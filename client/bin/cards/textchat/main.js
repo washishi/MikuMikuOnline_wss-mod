@@ -1,13 +1,13 @@
-//
-// MMO Client GUI Script
-//
 
-// ==MetaData==
-//
-//	@name テキストチャット
-//  @tab チャット
-//
-// ==/MetaData==
+/***MetaData***
+
+{
+	"name": "チャット",
+	"icon": "icon.png",
+	"api_version": 1
+}
+
+***MetaData***/
 
 // 吹き出しの表示時間（ミリ秒）
 var BALLOON_EXPIRATION = 40000
@@ -31,6 +31,7 @@ Network.onReceive = function(info, msg) {
 		// 吹き出しを表示
 		info.player.setBalloonContent(
 			new UI.Label({
+				width: Screen.width() / 6,
 				text: msg.body
 			})
 		);

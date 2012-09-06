@@ -90,10 +90,10 @@ int main(int argc, char* argv[])
         {
             if (auto session = c.session().lock()) {
                 PlayerPosition pos;
-                network::Utils::Deserialize(c.body(), &pos.x, &pos.y, &pos.z, &pos.theta);
+                network::Utils::Deserialize(c.body(), &pos.x, &pos.y, &pos.z, &pos.theta, &pos.vy);
                 account.SetUserPosition(session->id(), pos);
                 server.SendOthers(network::ClientUpdatePlayerPosition(session->id(),
-                        pos.x,pos.y,pos.z,pos.theta), c.session());
+                        pos.x,pos.y,pos.z,pos.theta, pos.vy), c.session());
             }
         }
             break;

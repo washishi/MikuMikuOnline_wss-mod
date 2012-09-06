@@ -72,13 +72,13 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
     // 他のプレイヤーの位置情報が更新された
     class ClientUpdatePlayerPosition : public Command {
     public:
-        ClientUpdatePlayerPosition(unsigned int id, float x, float y, float z, float theta);
+        ClientUpdatePlayerPosition(unsigned int id, short x, short y, short z, unsigned char theta, unsigned char vy);
     };
 
     // プレイヤーの位置情報が更新された
     class ServerUpdatePlayerPosition : public Command {
     public:
-        ServerUpdatePlayerPosition(float x, float y, float z, float theta);
+        ServerUpdatePlayerPosition(short x, short y, short z, unsigned char theta, unsigned char vy);
     };
 
     // クライアントの情報を受信した　（公開鍵のフィンガープリント, UDPポート）

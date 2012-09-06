@@ -144,6 +144,7 @@ void FieldPlayer::Update()
     data_provider_.set_position(current_stat_.pos);
     data_provider_.set_theta(current_stat_.roty);
     data_provider_.set_motion(current_stat_.motion);
+    data_provider_.set_vy(current_stat_.vel.y);
 
     stage_->UpdateSkymapPosition(GetCameraTarget());
 }

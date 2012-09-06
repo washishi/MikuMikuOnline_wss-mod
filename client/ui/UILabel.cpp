@@ -183,7 +183,14 @@ void UILabel::DefineInstanceTemplate(Handle<ObjectTemplate>* object)
 
 void UILabel::ProcessInput(InputManager* input)
 {
+	bool hover = (absolute_x()<= input->GetMouseX() && input->GetMouseX() <= absolute_x()+ absolute_width()
+            && absolute_y() <= input->GetMouseY() && input->GetMouseY() <= absolute_y() + absolute_height());
 
+	if (input->GetMouseLeftCount() == 1 && hover) {  
+		if (!on_click_.IsEmpty() && on_click_->IsFunction()) {
+			on_click_.As<Function>()->CallAsFunction(Context::GetCurrent()->Global(), 0, nullptr);
+		}
+	}
 }
 
 void UILabel::UpdatePosition()
@@ -213,7 +220,11 @@ void UILabel::UpdatePosition()
         int right = parent_x + parent_width - right_;
         absolute_rect_.width = right - left;
     } else {
-        absolute_rect_.width = std::accumulate(char_width_list_.begin(), char_width_list_.end(), 0);
+		if (width_ > 0) { 
+			absolute_rect_.width = width_;
+		} else {
+			absolute_rect_.width = std::accumulate(char_width_list_.begin(), char_width_list_.end(), 0);
+		}
     }
 
     // 行の折り返しを計算

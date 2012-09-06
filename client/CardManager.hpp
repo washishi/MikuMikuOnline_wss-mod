@@ -54,12 +54,13 @@ class CardManager : public std::enable_shared_from_this<CardManager> {
         int icon_base_handle_;
 
     private:
-        void ParseInfoFile(const std::string&);
+        void ParseScriptFile(const std::string&);
         static void Error(const v8::Handle<v8::Value>& error);
 
     private:
         static char CARDS_DIR[];
-        static char INFO_FILE[];
+        static char START_METADATA[];
+        static char END_METADATA[];
 };
 
 typedef std::shared_ptr<CardManager> CardManagerPtr;

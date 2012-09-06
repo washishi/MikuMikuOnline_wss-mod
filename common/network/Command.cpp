@@ -61,14 +61,14 @@ ClientReceiveCommonKey::ClientReceiveCommonKey(const std::string& key,
 }
 
 ClientUpdatePlayerPosition::ClientUpdatePlayerPosition
-(unsigned int id, float x, float y, float z, float theta) :
-Command(header::ClientUpdatePlayerPosition, Utils::Serialize(id, x, y, z, theta))
+(unsigned int id, short x, short y, short z, unsigned char theta, unsigned char vy) :
+Command(header::ClientUpdatePlayerPosition, Utils::Serialize(id, x, y, z, theta, vy))
 {
 
 }
 
-ServerUpdatePlayerPosition::ServerUpdatePlayerPosition(float x, float y, float z, float theta) :
-        Command(header::ServerUpdatePlayerPosition, Utils::Serialize(x, y, z, theta))
+ServerUpdatePlayerPosition::ServerUpdatePlayerPosition(short x, short y, short z, unsigned char theta, unsigned char vy) :
+        Command(header::ServerUpdatePlayerPosition, Utils::Serialize(x, y, z, theta, vy))
 {
 }
 

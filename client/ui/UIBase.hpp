@@ -84,8 +84,8 @@ class UIBase : public std::enable_shared_from_this<UIBase> {
         static void Property_set_docking(Local<String> property, Local<Value> value, const AccessorInfo& info);
 
         /* event */
-        static Handle<Value> on_click(Local<String> property, const AccessorInfo &info);
-        static void set_on_click(Local<String> property, Local<Value> value, const AccessorInfo& info);
+        static Handle<Value> Property_on_click(Local<String> property, const AccessorInfo &info);
+        static void Property_set_on_click(Local<String> property, Local<Value> value, const AccessorInfo& info);
 
         int height() const;
         void set_height(int height);

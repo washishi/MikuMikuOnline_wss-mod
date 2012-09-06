@@ -339,6 +339,22 @@ void UIBase::Property_set_docking(Local<String> property, Local<Value> value, co
     self->docking_ = value->ToInteger()->IntegerValue();
 }
 
+Handle<Value> UIBase::Property_on_click(Local<String> property, const AccessorInfo &info)
+{
+    assert(info.This()->InternalFieldCount() > 0);
+    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+	return self->on_click_;
+}
+
+void UIBase::Property_set_on_click(Local<String> property, Local<Value> value, const AccessorInfo& info)
+{
+    assert(info.This()->InternalFieldCount() > 0);
+    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+	if (value->IsFunction()) {
+		self->on_click_ = Persistent<Function>::New(value.As<Function>());
+	}
+}
+
 void UIBase::DefineInstanceTemplate(Handle<ObjectTemplate>* object)
 {
     Handle<ObjectTemplate>& instance_template = *object;
@@ -442,7 +458,8 @@ void UIBase::DefineInstanceTemplate(Handle<ObjectTemplate>* object)
      * @default true
      */
     SetProperty(&instance_template, "visible", Property_visible, Property_set_visible);
-
+	
+    SetProperty(&instance_template, "onclick", Property_on_click, Property_set_on_click);
 
 }
 
