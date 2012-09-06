@@ -17,6 +17,7 @@ var list;
 // チャットメッセージ受信
 var even_line = false;
 Network.onReceive = function(info, msg) {
+
 	list.addItem(
 		new UI.Label({
 			docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT,

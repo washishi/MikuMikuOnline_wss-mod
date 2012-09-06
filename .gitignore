@@ -28,3 +28,4 @@
 /client/get_auto_ver_client.vbs
 /server/get_auto_ver_server.vbs
 /server/buildversion.hpp
+/server/Release

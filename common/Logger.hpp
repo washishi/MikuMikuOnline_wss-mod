@@ -69,27 +69,37 @@ class Logger {
 
 
         static void Debug(const tstring& format) {
+		#ifdef _DEBUG
             getInstance().Log(_T("DEBUG: "), format);
+		#endif
         }
 
         template<class T1>
         static void Debug(const tstring& format, const T1& t1) {
+		#ifdef _DEBUG
             getInstance().Log(_T("DEBUG: "), format, t1);
+		#endif
         }
 
         template<class T1, class T2>
         static void Debug(const tstring& format, const T1& t1, const T2& t2) {
+		#ifdef _DEBUG
             getInstance().Log(_T("DEBUG: "), format, t1, t2);
+		#endif
         }
 
         template<class T1, class T2, class T3>
         static void Debug(const tstring& format, const T1& t1, const T2& t2, const T3& t3) {
+		#ifdef _DEBUG
             getInstance().Log(_T("DEBUG: "), format, t1, t2, t3);
+		#endif
         }
 
         template<class T1, class T2, class T3, class T4>
         static void Debug(const tstring& format, const T1& t1, const T2& t2, const T3& t3, const T4& t4) {
+		#ifdef _DEBUG
             getInstance().Log(_T("DEBUG: "), format, t1, t2, t3, t4);
+		#endif
         }
 
 

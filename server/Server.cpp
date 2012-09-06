@@ -43,6 +43,7 @@ namespace network {
             // 通信量制限を越えていた場合、強制的に切断
             else if (auto session = c.session().lock()) {
                 if (session->GetReadByteAverage() > session_read_average_) {
+					Logger::Info(_T("Banished session: %d"), session->id());
                     session->Close();
                 }
             }
