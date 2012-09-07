@@ -58,7 +58,6 @@ class UIBase : public UISuper {
         Handle<Object> parent() const;
         void set_parent(const Handle<Object>& parent);
 
-        int focus_index() const;
         size_t children_size() const;
 
         template<class T>
@@ -94,11 +93,6 @@ class UIBase : public UISuper {
         void Focus();
 
     protected:
-        static int max_focus_index;
-
-    protected:
-
-        int focus_index_;
 
         Persistent<Object> parent_;
         std::vector<Persistent<Object>> children_;

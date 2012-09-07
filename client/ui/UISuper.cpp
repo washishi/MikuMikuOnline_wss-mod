@@ -14,6 +14,8 @@
 
 #include "UISuper.hpp"
 
+int UISuper::max_focus_index = 0;
+
 int Hex2Int(const std::string& hex)
 {
     int dec = 0;
@@ -64,6 +66,7 @@ UISuper::Color UISuper::Color::FromString(const std::string & str)
 }
 
 UISuper::UISuper() :
+                focus_index_(0),
                 width_(100),
                 height_(100),
                 top_(12),
@@ -96,7 +99,51 @@ int UISuper::absolute_height() const
 }
 void UISuper::UpdatePosition()
 {
+    int parent_x_,
+        parent_y_,
+        parent_width_,
+        parent_height_;
 
+    // 画面のサイズを取得
+	parent_x_ = 0;
+	parent_y_ = 0;
+	GetScreenState(&parent_width_, &parent_height_, nullptr);
+
+    // 幅を計算
+    if ((docking_ & DOCKING_LEFT) && (docking_ & DOCKING_RIGHT)) {
+        int left = parent_x_ + left_;
+        int right = parent_x_ + parent_width_ - right_;
+        absolute_rect_.width = right - left;
+    } else {
+        absolute_rect_.width = width_;
+    }
+
+    // 高さを計算
+    if ((docking_ & DOCKING_TOP) && (docking_ & DOCKING_BOTTOM)) {
+        int top = parent_y_ + top_;
+        int bottom = parent_y_ + parent_height_ - bottom_;
+        absolute_rect_.height = bottom - top;
+    } else {
+        absolute_rect_.height = height_;
+    }
+
+    // 左上X座標を計算
+    if (docking_ & DOCKING_HCENTER) {
+        absolute_rect_.x = parent_x_ + parent_width_ / 2 - absolute_rect_.width / 2;
+    } else if (docking_ & DOCKING_RIGHT) {
+        absolute_rect_.x = parent_x_ + parent_width_ - right_ - absolute_rect_.width;
+    } else {
+        absolute_rect_.x = parent_x_ + left_;
+    }
+
+    // 左上Y座標を計算
+    if (docking_ & DOCKING_VCENTER) {
+        absolute_rect_.y = parent_y_ + parent_height_ / 2 - absolute_rect_.height / 2;
+    } else if (docking_ & DOCKING_BOTTOM) {
+        absolute_rect_.y = parent_y_ + parent_height_ - bottom_ - absolute_rect_.height;
+    } else {
+        absolute_rect_.y = parent_y_ + top_;
+    }
 }
 
 void UISuper::UpdateBaseImage()
@@ -120,6 +167,11 @@ void UISuper::set_bottom(int bottom) { bottom_ = bottom; }
 
 int UISuper::docking() const { return docking_; }
 void UISuper::set_docking(int docking) { docking_ = docking; }
+
+void UISuper::Focus()
+{
+	focus_index_ = ++max_focus_index;
+}
 
 bool UISuper::visible() const
 {
@@ -169,4 +221,9 @@ int UISuper::offset_height() const
 void UISuper::set_offset_height(int offset_height)
 {
     offset_rect_.height = offset_height;
+}
+
+int UISuper::focus_index() const
+{
+    return focus_index_;
 }

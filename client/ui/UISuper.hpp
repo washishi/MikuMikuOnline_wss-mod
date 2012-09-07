@@ -74,6 +74,8 @@ class UISuper : public std::enable_shared_from_this<UISuper> {
         int offset_height() const;
         void set_offset_height(int offset_height);
 
+		int focus_index() const;
+
         enum {
             DOCKING_NONE = 0,
             DOCKING_TOP = 1,
@@ -91,8 +93,14 @@ class UISuper : public std::enable_shared_from_this<UISuper> {
 
         virtual void UpdateBaseImage();
 
+        void Focus();
+
+	protected:
+        static int max_focus_index;
+
     protected:
 
+        int focus_index_;  
         int width_, height_;
         int top_, left_, bottom_, right_;
         Rect absolute_rect_, offset_rect_;

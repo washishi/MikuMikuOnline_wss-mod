@@ -19,10 +19,7 @@
 #include <DxLib.h>
 #include <algorithm>
 
-int UIBase::max_focus_index = 0;
-
-UIBase::UIBase() :
-                focus_index_(0)
+UIBase::UIBase()
 {
 
 }
@@ -465,11 +462,6 @@ void UIBase::Focus()
 Handle<Object> UIBase::parent() const
 {
     return parent_;
-}
-
-int UIBase::focus_index() const
-{
-    return focus_index_;
 }
 
 void UIBase::set_parent(const Handle<Object>& parent)
