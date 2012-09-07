@@ -60,7 +60,7 @@ void FieldPlayer::Draw() const
 
 void FieldPlayer::Init(tstring model_name)
 {
-    SetModel(model_name);
+    LoadModel(model_name);
     ResetPosition();
 }
 
@@ -96,9 +96,18 @@ void FieldPlayer::RescuePosition()
 	current_stat_.vel.y = 0;
 }
 
-void FieldPlayer::SetModel(const tstring& name)
+void FieldPlayer::LoadModel(const tstring& name)
 {
-    model_handle_ = ResourceManager::LoadModelFromName(name);
+    if (model_handle_) {
+		loading_model_handle_ = ResourceManager::LoadModelFromName(name, true);
+	} else {
+		SetModel(ResourceManager::LoadModelFromName(name));
+	}
+}
+
+void FieldPlayer::SetModel(const ModelHandle& model)
+{
+    model_handle_ = model;
     model_height_ = model_handle_.property().get<float>("character.height", 1.58f);
 	flight_duration_ideal_ = sqrt((model_height_*2.0f)/9.8f) + sqrt((model_height_*0.8f)/9.8);
 	jump_height_ = sqrt(15.0f)*2.0f;
@@ -112,6 +121,10 @@ void FieldPlayer::SetModel(const tstring& name)
 
 void FieldPlayer::Update()
 {
+	if (loading_model_handle_ && loading_model_handle_.CheckLoaded()) {
+		SetModel(loading_model_handle_);
+		loading_model_handle_ = ModelHandle();
+	}
     /*
     if (key_checker_.Check() == -1)
     {

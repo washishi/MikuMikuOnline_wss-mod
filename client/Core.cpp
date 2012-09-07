@@ -103,6 +103,9 @@ int Core::SetUpDxLib()
     SetDragFileValidFlag(TRUE);
     DragFileInfoClear();
 
+    MV1SetLoadModelPhysicsWorldGravity(-100);
+    MV1SetLoadModelUsePhysicsMode(DX_LOADMODEL_PHYSICS_LOADCALC);
+
     return 0;
 }
 

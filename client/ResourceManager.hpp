@@ -23,6 +23,15 @@ class ModelHandle;
 typedef std::shared_ptr<ImageHandle> ImageHandlePtr;
 typedef std::shared_ptr<ModelHandle> ModelHandlePtr;
 
+struct ReadFuncData {
+	ReadFuncData(){};
+	ReadFuncData(const ptree& info);
+    boost::filesystem::wpath model_dir;
+    std::list<std::pair<std::string, std::string>> motions;
+    std::list<std::pair<std::string, std::string>>::iterator motions_it;
+};
+typedef std::shared_ptr<ReadFuncData> ReadFuncDataPtr;
+
 class ResourceManager {
 
     public:
@@ -66,8 +75,13 @@ class ResourceManager {
         // models
         static void BuildModelFileTree();
         static void CacheBakedModel();
-        static ModelHandle LoadModelFromName(const tstring&);
+        static ModelHandle LoadModelFromName(const tstring&, bool async = false);
+        static void RequestModelFromName(const tstring&);
+        static bool IsCachedModelName(const tstring&);
 		static const std::vector<std::string>& GetModelNameList();
+
+	private:
+		static tstring NameToFullPath(const tstring& name);
 
     private:
         static int default_font_handle_;
@@ -95,7 +109,7 @@ class ModelHandle {
     friend class ResourceManager;
 
     private:
-        ModelHandle(int handle, const std::shared_ptr<ptree>& property, bool async_load = false);
+        ModelHandle(int handle, const ReadFuncDataPtr& funcdata, const std::shared_ptr<ptree>& property, bool async_load = false);
         ModelHandle Clone();
 
     public:
@@ -105,9 +119,14 @@ class ModelHandle {
         int handle() const;
         const ptree& property() const;
         std::string name() const;
+		
+        operator bool() const;
+
+		bool CheckLoaded();
 
     private:
         int handle_;
+		ReadFuncDataPtr funcdata_;
         std::shared_ptr<ptree> property_;
         std::string name_;
         bool async_load_;
