@@ -128,7 +128,7 @@ void GameLoop::FixCameraPosition()
     }
 	if(VSize(camera_pos - target_pos) <= model_coll_size)
 	{
-		camera_pos = target_pos + VScale(camera_pos - target_pos,(model_coll_size)/VSize(camera_pos - target_pos));
+		camera_pos = target_pos + VScale(camera_pos - target_pos,(model_coll_size)/(VSize(camera_pos - target_pos) <= 0 ? 0.000001f : VSize(camera_pos - target_pos)));
 	}
 
 	auto camera_pos_delta = VScale(camera_pos - GetCameraPosition(),(float)0.3);

@@ -21,64 +21,7 @@
 
 int UIBase::max_focus_index = 0;
 
-int Hex2Int(const std::string& hex)
-{
-    int dec = 0;
-    int base = 1;
-    for (auto it = hex.rbegin(); it != hex.rend(); ++it) {
-        auto c = *it;
-        int d = 0;
-        if ('A' <= c && c <= 'F') {
-            d = (c - 'A') + 10;
-        } else
-        if ('a' <= c && c <= 'f'){
-            d = (c - 'a') + 10;
-        } else
-        if ('0' <= c && c <= '9'){
-            d = (c - '0');
-        }
-        dec += d * base;
-        base *= 16;
-    }
-    return dec;
-}
-
-std::string UIBase::Color::ToString() const
-{
-    std::stringstream stream;
-    stream << "#";
-    stream << std::hex << std::setw(2) << std::setfill('0') << r;
-    stream << std::hex << std::setw(2) << std::setfill('0') << g;
-    stream << std::hex << std::setw(2) << std::setfill('0') << b;
-    stream << std::hex << std::setw(2) << std::setfill('0') << a;
-    return stream.str();
-}
-
-UIBase::Color UIBase::Color::FromString(const std::string & str)
-{
-    Color color;
-    if (str.length() >= 7) {
-        color.r = (unsigned char)Hex2Int(str.substr(1, 2));
-        color.b = (unsigned char)Hex2Int(str.substr(3, 2));
-        color.g = (unsigned char)Hex2Int(str.substr(5, 2));
-        if (str.length() >= 9) {
-            color.a = (unsigned char)Hex2Int(str.substr(7, 2));
-        } else {
-            color.a = 255;
-        }
-    }
-    return color;
-}
-
 UIBase::UIBase() :
-                width_(100),
-                height_(100),
-                top_(12),
-                left_(12),
-                bottom_(12),
-                right_(12),
-                docking_(DOCKING_TOP | DOCKING_LEFT),
-                visible_(true),
                 focus_index_(0)
 {
 
@@ -98,29 +41,9 @@ void UIBase::ProcessInput(InputManager* input)
 
 }
 
-
 void UIBase::AsyncUpdate()
 {
     AsyncUpdateChildren();
-}
-
-int UIBase::absolute_x() const
-{
-    return absolute_rect_.x + offset_rect_.x;
-}
-
-int UIBase::absolute_y() const
-{
-    return absolute_rect_.y + offset_rect_.y;
-}
-int UIBase::absolute_width() const
-{
-    return absolute_rect_.width + offset_rect_.width;
-}
-
-int UIBase::absolute_height() const
-{
-    return absolute_rect_.height + offset_rect_.height;
 }
 
 void UIBase::UpdatePosition()
@@ -539,33 +462,6 @@ void UIBase::Focus()
     focus_index_ = ++max_focus_index;
 }
 
-int UIBase::height() const { return height_; }
-void UIBase::set_height(int height) { height_ = height; }
-int UIBase::width() const { return width_; }
-void UIBase::set_width(int width) { width_ = width; }
-
-int UIBase::top() const { return top_; }
-void UIBase::set_top(int top) { top_ = top; }
-int UIBase::left() const { return left_; }
-void UIBase::set_left(int left) { left_ = left; }
-int UIBase::right() const { return right_; }
-void UIBase::set_right(int right) { right_ = right; }
-int UIBase::bottom() const { return bottom_; }
-void UIBase::set_bottom(int bottom) { bottom_ = bottom; }
-
-int UIBase::docking() const { return docking_; }
-void UIBase::set_docking(int docking) { docking_ = docking; }
-
-bool UIBase::visible() const
-{
-    return visible_;
-}
-
-void UIBase::set_visible(bool visible)
-{
-    visible_ = visible;
-}
-
 Handle<Object> UIBase::parent() const
 {
     return parent_;
@@ -579,46 +475,6 @@ int UIBase::focus_index() const
 void UIBase::set_parent(const Handle<Object>& parent)
 {
     parent_ = Persistent<Object>::New(parent);
-}
-
-int UIBase::offset_x() const
-{
-    return offset_rect_.x;
-}
-
-void UIBase::set_offset_x(int offset_x)
-{
-    offset_rect_.x = offset_x;
-}
-
-int UIBase::offset_y() const
-{
-    return offset_rect_.y;
-}
-
-void UIBase::set_offset_y(int offset_y)
-{
-    offset_rect_.y = offset_y;
-}
-
-int UIBase::offset_width() const
-{
-    return offset_rect_.width;
-}
-
-void UIBase::set_offset_width(int offset_width)
-{
-    offset_rect_.width = offset_width;
-}
-
-int UIBase::offset_height() const
-{
-    return offset_rect_.height;
-}
-
-void UIBase::set_offset_height(int offset_height)
-{
-    offset_rect_.height = offset_height;
 }
 
 size_t UIBase::children_size() const

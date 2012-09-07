@@ -92,6 +92,8 @@ void FieldPlayer::RescuePosition()
 
     current_stat_.pos = *new_pos;
     current_stat_.pos.y = stage_->GetFloorY(current_stat_.pos + VGet(0, 100, 0), current_stat_.pos - VGet(0, 100, 0));
+	current_stat_.acc.y = 0;
+	current_stat_.vel.y = 0;
 }
 
 void FieldPlayer::SetModel(const tstring& name)
