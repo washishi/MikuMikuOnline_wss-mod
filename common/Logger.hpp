@@ -7,7 +7,7 @@
 #include "unicode.hpp"
 
 #ifndef _WIN32
-#define OutputDebugString(str) std::cout << str
+#define OutputDebugString(str) (str)
 #endif
 
 class Logger {
@@ -114,6 +114,7 @@ class Logger {
         void Log(const tstring& prefix, const tstring& format) {
             auto out = prefix + format + _T("\n");
             OutputDebugString(out.c_str());
+			std::wcout << unicode::ToWString(out);
 			ofs_ << unicode::ToString(out);
         }
 
@@ -121,6 +122,7 @@ class Logger {
         void Log(const tstring& prefix, const tstring& format, const T1& t1) {
             auto out = prefix + (tformat(format) % t1).str() + _T("\n");
             OutputDebugString(out.c_str());
+			std::wcout << unicode::ToWString(out);
 			ofs_ << unicode::ToString(out);
         }
 
@@ -128,6 +130,7 @@ class Logger {
         void Log(const tstring& prefix, const tstring& format, const T1& t1, const T2& t2) {
             auto out = prefix + (tformat(format) % t1 % t2).str() + _T("\n");
             OutputDebugString(out.c_str());
+			std::wcout << unicode::ToWString(out);
 			ofs_ << unicode::ToString(out);
         }
 
@@ -135,6 +138,7 @@ class Logger {
         void Log(const tstring& prefix, const tstring& format, const T1& t1, const T2& t2, const T3& t3) {
             auto out = prefix + (tformat(format) % t1 % t2 % t3).str() + _T("\n");
             OutputDebugString(out.c_str());
+			std::wcout << unicode::ToWString(out);
 			ofs_ << unicode::ToString(out);
         }
 
@@ -142,6 +146,7 @@ class Logger {
         void Log(const tstring& prefix, const tstring& format, const T1& t1, const T2& t2, const T3& t3, const T4& t4) {
             auto out = prefix + (tformat(format) % t1 % t2 % t3 % t4).str() + _T("\n");
             OutputDebugString(out.c_str());
+			std::wcout << unicode::ToWString(out);
 			ofs_ << unicode::ToString(out);
         }
 

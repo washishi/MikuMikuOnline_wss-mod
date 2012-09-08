@@ -2,16 +2,6 @@
 // UISuper.cpp
 //
 
-/**
-* @module global
-* @submodule UI
- */
-
-/**
- * @class Base
- * @namespace UI
- */
-
 #include "UISuper.hpp"
 
 int UISuper::max_focus_index = 0;
