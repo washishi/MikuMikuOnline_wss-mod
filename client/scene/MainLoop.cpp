@@ -8,19 +8,20 @@
 #include "../ResourceManager.hpp"
 
 namespace scene {
-MainLoop::MainLoop(const ManagerAccessorPtr& manager_accesor) :
-      manager_accesor_(manager_accesor),
-      player_manager_(std::make_shared<PlayerManager>(manager_accesor_)),
-      card_manager_(manager_accesor->card_manager().lock()),
-      command_manager_(std::make_shared<CommandManager>(manager_accesor_)),
-      world_manager_(std::make_shared<WorldManager>(manager_accesor_)),
-      account_manager_(manager_accesor->account_manager().lock()),
-      config_manager_(manager_accesor->config_manager().lock()),
-      inputbox_(manager_accesor_)
+MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
+      manager_accessor_(manager_accessor),
+      player_manager_(std::make_shared<PlayerManager>(manager_accessor_)),
+      card_manager_(manager_accessor->card_manager().lock()),
+      command_manager_(std::make_shared<CommandManager>(manager_accessor_)),
+      world_manager_(std::make_shared<WorldManager>(manager_accessor_)),
+      account_manager_(manager_accessor->account_manager().lock()),
+      config_manager_(manager_accessor->config_manager().lock()),
+      inputbox_(manager_accessor_),
+	  minimap_(manager_accessor_)
 {
-    manager_accesor_->set_player_manager(player_manager_);
-    manager_accesor_->set_command_manager(command_manager_);
-    manager_accesor_->set_world_manager(world_manager_);
+    manager_accessor_->set_player_manager(player_manager_);
+    manager_accessor_->set_command_manager(command_manager_);
+    manager_accessor_->set_world_manager(world_manager_);
 
     inputbox_.ReloadTabs();
 
@@ -38,8 +39,9 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accesor) :
             )
     );
 
+	minimap_.UIPlacement(config_manager_->screen_width() - MINIMAP_MINSIZE - 12, 12);
     player_manager_->Init();
-    world_manager_->Init();
+    world_manager_->Init();	
 
     world_manager_->myself()->Init(unicode::ToTString(account_manager_->model_name()));
 }
@@ -69,8 +71,12 @@ void MainLoop::Update()
     card_manager_->ProcessInput(&input);
     card_manager_->Update();
 
+	minimap_.ProcessInput(&input);
+	minimap_.Update();
+
     world_manager_->ProcessInput(&input);
     world_manager_->Update();
+
 }
 
 void MainLoop::Draw()
@@ -79,6 +85,7 @@ void MainLoop::Draw()
     player_manager_->Draw();
     card_manager_->Draw();
     inputbox_.Draw();
+	minimap_.Draw();
 }
 
 void MainLoop::End()

@@ -15,6 +15,7 @@
 #include "../ConfigManager.hpp"
 #include "../ManagerAccessor.hpp"
 #include "../ui/InputBox.hpp"
+#include "../MiniMap.hpp"
 
 namespace scene {
 
@@ -33,13 +34,14 @@ class MainLoop : public Base {
 
     private:
         // アクセサ
-        ManagerAccessorPtr manager_accesor_;
+        ManagerAccessorPtr manager_accessor_;
         PlayerManagerPtr player_manager_;
         CardManagerPtr card_manager_;
         CommandManagerPtr command_manager_;
         WorldManagerPtr world_manager_;
         AccountManagerPtr account_manager_;
         ConfigManagerPtr config_manager_;
+		MiniMap minimap_;
         InputBox inputbox_;
 };
 
