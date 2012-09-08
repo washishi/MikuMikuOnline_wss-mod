@@ -55,6 +55,7 @@ Player.onLogin = function(player) {
 			width: 0
 		})
 	);
+	list.scroll_y = 999999;
 }
 
 Player.onLogout = function(player) {
@@ -66,6 +67,7 @@ Player.onLogout = function(player) {
 			width: 0
 		})
 	);
+	list.scroll_y = 999999;
 }
 
 // チャットメッセージ送信
