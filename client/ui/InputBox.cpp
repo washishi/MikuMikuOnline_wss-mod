@@ -320,6 +320,8 @@ void InputBox::ProcessInput(InputManager* input)
 
     bool first_key_shift = (input->GetKeyCount(KEY_INPUT_RSHIFT) == 1
             || input->GetKeyCount(KEY_INPUT_LSHIFT) == 1);
+	
+    bool push_key_esc = input->GetKeyCount(KEY_INPUT_ESCAPE) > 0;
 
     bool push_key_shift = (input->GetKeyCount(KEY_INPUT_RSHIFT) > 0
             || input->GetKeyCount(KEY_INPUT_LSHIFT) > 0);
@@ -341,7 +343,7 @@ void InputBox::ProcessInput(InputManager* input)
     bool empty = input_.text().empty();
     input_.ProcessInput(input);
 
-    if (IsActive() && first_key_return && empty) {
+    if (IsActive() && ((first_key_return && empty) || push_key_esc)) {
         Inactivate();
     } else if (!IsActive() && first_key_return) {
         Activate();
