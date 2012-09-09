@@ -3,6 +3,7 @@
 //
 
 #include "MiniMap.hpp"
+#include "Profiler.hpp"
 
 const int MiniMap::BASE_BLOCK_SIZE = 24;
 float MiniMap::ZOOM_SIZE = 1.0f;
@@ -100,11 +101,15 @@ void MiniMap::UIPlacement(int x, int y, int height, int width)
 
 void MiniMap::ProcessInput(InputManager* input)
 {
+	MMO_PROFILE_FUNCTION;
+
 	UpdateDrag(input, resizable_);
 }
 
 void MiniMap::Draw()
 {
+	MMO_PROFILE_FUNCTION;
+
     if (!visible_) {
         return;
     }
@@ -197,6 +202,8 @@ void MiniMap::DrawPosAndCalc()
 
 void MiniMap::Update()
 {
+	MMO_PROFILE_FUNCTION;
+
 	UpdatePosition();
 }
 

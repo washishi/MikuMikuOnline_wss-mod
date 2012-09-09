@@ -350,7 +350,7 @@ void InputBox::ProcessInput(InputManager* input)
     } else if (!IsActive() && push_key_v && push_key_ctrl) {
         Activate();
     }
-
+	
     ProcessInputTabs(input);
     UpdateBase(input);
     UpdateTabs();

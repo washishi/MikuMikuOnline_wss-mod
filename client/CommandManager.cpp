@@ -9,6 +9,7 @@
 #include "../common/Logger.hpp"
 #include "Client.hpp"
 #include "../common/network/Utils.hpp"
+#include "Profiler.hpp"
 
 CommandManager::CommandManager(const ManagerAccessorPtr& manager_accessor) :
 manager_accessor_(manager_accessor)
@@ -17,6 +18,8 @@ manager_accessor_(manager_accessor)
 
 void CommandManager::Update()
 {
+	MMO_PROFILE_FUNCTION;
+
     if (client_ && !client_->command_empty())
     {
         auto command = client_->PopCommand();
@@ -102,6 +105,8 @@ void CommandManager::set_client(ClientUniqPtr client)
 
 void CommandManager::Write(const network::Command& command)
 {
+	MMO_PROFILE_FUNCTION;
+
     if (client_) {
         client_->Write(command);
     }
@@ -124,6 +129,8 @@ unsigned int CommandManager::user_id()
 }
 
 void CommandManager::SendJSON(const std::string& msg) {
+	MMO_PROFILE_FUNCTION;
+
     if (client_ && msg.size() > 0) {
         client_->Write(network::ServerReceiveJSON(msg));
     }

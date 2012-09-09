@@ -19,6 +19,7 @@
 #include "../common/unicode.hpp"
 #include "../common/network/Command.hpp"
 #include "../common/database/AccountProperty.hpp"
+#include "Profiler.hpp"
 
 char Card::STORAGE_DIR[] = "storage";
 char Card::SCRIPT_PATH[] = "resources/js";
@@ -1025,6 +1026,8 @@ void Card::Execute(const std::string& script, const std::string& filename,
 
 void Card::Update()
 {
+	MMO_PROFILE_FUNCTION;
+
     //if (force_gc_flag) {
     //    PROCESS_MEMORY_COUNTERS pmc = { 0 };
     //    DWORD dwProcessID = GetCurrentProcessId();
@@ -1056,6 +1059,8 @@ void Card::Update()
 
 void Card::Draw()
 {
+	MMO_PROFILE_FUNCTION;
+
     if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
         auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
 
@@ -1079,6 +1084,8 @@ void Card::Draw()
 
 void Card::ProcessInput(InputManager* input)
 {
+	MMO_PROFILE_FUNCTION;
+
     CheckFunctionKey(KEY_INPUT_F1,  "F1",  *input);
     CheckFunctionKey(KEY_INPUT_F2,  "F2",  *input);
     CheckFunctionKey(KEY_INPUT_F3,  "F3",  *input);

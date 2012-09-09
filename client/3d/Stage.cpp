@@ -4,6 +4,7 @@
 
 #include "Stage.hpp"
 #include "../../common/Logger.hpp"
+#include "../Profiler.hpp"
 #include <string>
 
 Stage::Stage(const tstring& model_name) :
@@ -38,18 +39,24 @@ Stage::~Stage()
 
 void Stage::Draw()
 {
+	MMO_PROFILE_FUNCTION;
+
     MV1DrawModel(skymap_handle_.handle());
     MV1DrawModel(map_handle_.handle());
 }
 
 float Stage::GetFloorY(const VECTOR& v1, const VECTOR& v2) const
 {
+	MMO_PROFILE_FUNCTION;
+
     auto coll_info = MV1CollCheck_Line(map_handle_.handle(), -1, v1, v2);
     return coll_info.HitFlag ? coll_info.HitPosition.y : 0;
 }
 
 bool Stage::GetFloorY(const VECTOR& v1, const VECTOR& v2, float* y) const
 {
+	MMO_PROFILE_FUNCTION;
+
     auto coll_info = MV1CollCheck_Line(map_handle_.handle(), -1, v1, v2);
     if (y) {
         *y = coll_info.HitFlag ? coll_info.HitPosition.y : 0;
@@ -59,6 +66,8 @@ bool Stage::GetFloorY(const VECTOR& v1, const VECTOR& v2, float* y) const
 
 std::pair<bool, VECTOR> Stage::FloorExists(const VECTOR& foot_pos, float model_height, float collision_depth_limit) const
 {
+	MMO_PROFILE_FUNCTION;
+
     // 床検出
     auto coll_info = MV1CollCheck_Line(map_handle_.handle(), -1,
             foot_pos + VGet(0, 0.5 * model_height * map_scale_, 0),
@@ -73,6 +82,8 @@ std::pair<bool, VECTOR> Stage::FloorExists(const VECTOR& foot_pos, float model_h
 
 bool Stage::IsFlatFloor(const VECTOR& foot_pos, const VECTOR& direction) const
 {
+	MMO_PROFILE_FUNCTION;
+
     const float interval = 0.01 * map_scale_;
     const auto direction_ = VNorm(VGet(direction.x, 0, direction.z));
     const float threshold = 0.02 * map_scale_;
@@ -107,6 +118,8 @@ bool Stage::IsFlatFloor(const VECTOR& foot_pos, const VECTOR& direction) const
 std::pair<bool,VECTOR> Stage::FrontCollides(float collision_length, const VECTOR& current_pos, const VECTOR& prev_pos,
         float height_begin, float height_end, size_t num_division) const
 {
+	MMO_PROFILE_FUNCTION;
+
 	auto direction = current_pos - prev_pos;
 	direction.y = 0; // 水平な進行方向を求める
 	const auto collision_vector =
@@ -170,6 +183,8 @@ std::pair<bool,VECTOR> Stage::FrontCollides(float collision_length, const VECTOR
 
 bool Stage::IsVisiblePoint(const VECTOR& point) const
 {
+	MMO_PROFILE_FUNCTION;
+
     auto coll_info = MV1CollCheck_Line(map_handle_.handle(), -1, point, GetCameraPosition());
     auto screen_pos = ConvWorldPosToScreenPos(point);
     return (!coll_info.HitFlag && screen_pos.z > 0.0f && screen_pos.z < 1.0f);
