@@ -159,7 +159,7 @@ public:
 					floor_coll = stage_->FloorExists(moved_pos,model_height_,0);
 				}
                 //moved_pos.y = std::max(moved_pos.y, floor_y); // 床にあたっているときは床の方がyが高くなる
-				if(jump_flag_){
+				if(!jump_flag_){
 					// 登ったり下ったりできる段差の大きさの制限を求める
 					static const float y_max_limit_factor = sin(45 * PHI_F / 180);
 					static const float y_min_limit_factor = sin(-45 * PHI_F / 180);
