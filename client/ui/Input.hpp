@@ -40,6 +40,9 @@ class Input {
         bool reverse_color() const;
         void set_reverse_color(bool flag);
 
+        bool multiline() const;
+        void set_multiline(bool flag);
+
         void set_on_enter(const CallbackFunc& func);
 
     public:    
@@ -65,7 +68,7 @@ class Input {
         int selecting_candidate_, selecting_clause_;
         int cursor_moveto_x_, cursor_moveto_y_;
         int prev_cursor_pos_, cursor_drag_count_;
-        int multiline_;
+        bool multiline_;
 
         std::vector<std::pair<int, int>> selecting_lines_;
         std::vector<std::pair<int, int>> clause_lines_;

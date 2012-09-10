@@ -343,7 +343,7 @@ void InputBox::ProcessInput(InputManager* input)
     bool empty = input_.text().empty();
     input_.ProcessInput(input);
 
-    if (IsActive() && ((first_key_return && empty) || push_key_esc)) {
+    if (IsActive() && ((first_key_return && !push_key_shift && empty) || push_key_esc)) {
         Inactivate();
     } else if (!IsActive() && first_key_return) {
         Activate();

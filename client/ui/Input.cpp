@@ -20,6 +20,7 @@ const int Input::IME_MAX_PAGE_SIZE = 6;
 const int Input::IME_MIN_WIDTH = 120;
 
 Input::Input() :
+	multiline_(true),
     reverse_color_(false)
 {
     input_bg_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
@@ -38,6 +39,7 @@ Input::Input() :
     candidate_x_ = -1;
     candidate_y_ = -1;
     blink_count_ = 0;
+	prev_cursor_pos_ = -1;
 
     x_ = 100;
     y_ = 100;
@@ -91,22 +93,22 @@ void Input::Draw()
         // int internal_height = height_ - INPUT_MARGIN * 2;
 
         // 選択範囲の背景を描画
-        int current_line = 0;
-        for (auto it = selecting_lines_.begin(); it != selecting_lines_.end(); ++it) {
-            auto line = *it;
-            if (line.first < line.second) {
-                SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
-                DrawBox(internal_x + line.first,
-                        internal_y + current_line * font_height_,
-                        internal_x + line.second,
-                        internal_y + (current_line + 1) * font_height_,
-                        GetColor(255, 0, 255), TRUE);
-                SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-            }
-            current_line++;
-        }
+        //int current_line = 0;
+        //for (auto it = selecting_lines_.begin(); it != selecting_lines_.end(); ++it) {
+        //    auto line = *it;
+        //    if (line.first < line.second) {
+        //        SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+        //        DrawBox(internal_x + line.first,
+        //                internal_y + current_line * font_height_,
+        //                internal_x + line.second,
+        //                internal_y + (current_line + 1) * font_height_,
+        //                GetColor(255, 0, 255), TRUE);
+        //        SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+        //    }
+        //    current_line++;
+        //}
 
-        current_line = 0;
+       int current_line = 0;
        for (auto it = clause_lines_.begin(); it != clause_lines_.end(); ++it) {
             auto line = *it;
             if (line.first < line.second) {
@@ -260,8 +262,7 @@ void Input::Draw()
 
 void Input::Update()
 {
-    blink_count_ += 1;
-    blink_count_ %= 60;
+    blink_count_ = (blink_count_ + 1) % 60;
 }
 
 void Input::ProcessInput(InputManager* input)
@@ -281,7 +282,8 @@ void Input::ProcessInput(InputManager* input)
     bool push_key_v = (input->GetKeyCount(KEY_INPUT_V) > 0);
     bool push_key_ctrl = (input->GetKeyCount(KEY_INPUT_LCONTROL) > 0
             || input->GetKeyCount(KEY_INPUT_RCONTROL) > 0);
-
+	
+    bool push_key_return = (input->GetKeyCount(KEY_INPUT_RETURN) > 0);
     bool first_key_return = (input->GetKeyCount(KEY_INPUT_RETURN) == 1);
 
     bool push_repeat_key_return = (input->GetKeyCount(KEY_INPUT_RETURN)
@@ -296,7 +298,7 @@ void Input::ProcessInput(InputManager* input)
     if (!active() && push_key_v && push_key_ctrl) {
         set_active(true);
     } else {
-        if (push_key_shift && first_key_return) {
+        if (push_key_shift && push_key_return) {
             SetActiveKeyInput(input_handle_);
         } else if (first_key_return) {
             if (CheckKeyInput(input_handle_) == 1) {
@@ -364,6 +366,7 @@ void Input::ProcessInput(InputManager* input)
             TCHAR c = *it;
             int width = GetDrawStringWidthToHandle(&c, 1, font_handle_);
             line_buffer += c;
+            char_count++;
         #else
             unsigned char c = *it;
             TCHAR string[2] = { 0, 0 };
@@ -406,6 +409,11 @@ void Input::ProcessInput(InputManager* input)
     if (active()) {
         // カーソル位置（byte）を取得
         cursor_byte_pos = GetKeyInputCursorPosition(input_handle_);
+		if (prev_cursor_pos_ != cursor_byte_pos) {
+			ResetCursorCount();
+		}
+
+		prev_cursor_pos_ = cursor_byte_pos;
 
         // カーソルのドット単位の位置を取得する
         cursor_dot_pos = GetDrawStringWidthToHandle(String, cursor_byte_pos,
@@ -471,6 +479,7 @@ void Input::ProcessInput(InputManager* input)
             TCHAR c = *it;
             int width = GetDrawStringWidthToHandle(&c, 1, font_handle_);
             line_buffer += c;
+			char_count++;
         #else
             unsigned char c = *it;
             TCHAR string[2] = { 0, 0 };
@@ -552,6 +561,7 @@ void Input::ProcessInput(InputManager* input)
             TCHAR c = *it;
             int width = GetDrawStringWidthToHandle(&c, 1, font_handle_);
             line_buffer += tstring(&c, 1);
+			char_count++;
         #else
             unsigned char c = *it;
             TCHAR string[2] = { 0, 0 };
@@ -696,10 +706,10 @@ void Input::ProcessInput(InputManager* input)
         line_buffer.clear();
         line_width = 0;
 
-        if (push_key_shift && (push_repeat_key_up || push_repeat_key_down)) {
-            SetKeyInputSelectArea(GetKeyInputCursorPosition(input_handle_),
-                    prev_cursor_pos_, input_handle_);
-        }
+        //if (push_key_shift && (push_repeat_key_up || push_repeat_key_down)) {
+        //    SetKeyInputSelectArea(GetKeyInputCursorPosition(input_handle_),
+        //            prev_cursor_pos_, input_handle_);
+        //}
 
     }
 
@@ -732,7 +742,7 @@ void Input::ResetCursorCount()
 void Input::CancelSelect()
 {
     int pos = GetKeyInputCursorPosition(input_handle_);
-    prev_cursor_pos_ = pos;
+    // prev_cursor_pos_ = pos;
     SetKeyInputSelectArea(-1, -1, input_handle_);
 }
 
@@ -811,4 +821,14 @@ bool Input::reverse_color() const
 void Input::set_reverse_color(bool flag)
 {
     reverse_color_ = flag;
+}
+
+bool Input::multiline() const
+{
+    return multiline_;
+}
+
+void Input::set_multiline(bool flag)
+{
+    multiline_ = flag;
 }
