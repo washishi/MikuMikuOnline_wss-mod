@@ -1,4 +1,4 @@
-﻿Miku Miku Online 0.2.4
+﻿Miku Miku Online 0.2.6
 
 // ******************************** 警告 *********************************** //
 // *** 
@@ -97,5 +97,6 @@ Client.exeを終了した状態で、server/Server.exe を実行すると単独�
 
 
 --
-mmo@h2so5.net
+mailto:mmo@h2so5.net
+http://mmo.h2so5.net/
 http://sourceforge.jp/projects/mmo/
