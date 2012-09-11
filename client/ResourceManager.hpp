@@ -79,6 +79,8 @@ class ResourceManager {
         static void RequestModelFromName(const tstring&);
         static bool IsCachedModelName(const tstring&);
 		static const std::vector<std::string>& GetModelNameList();
+		static void SetModelEdgeSize(int handle);
+		static void set_model_edge_size(float edge_size);
 
 	private:
 		static tstring NameToFullPath(const tstring& name);
@@ -92,7 +94,7 @@ class ResourceManager {
         static std::unordered_map<tstring, tstring> model_names_;
         static std::unordered_map<tstring, ModelHandle> model_handles_;
 		static std::vector<std::string> model_name_list_;
-
+		static float model_edge_size_;
 };
 
 class ImageHandle {

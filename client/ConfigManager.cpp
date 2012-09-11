@@ -28,6 +28,7 @@ void ConfigManager::Load(const std::string& filename)
     max_local_storage_size_ = pt.get<int>("max_local_storage_size", 512000);
     upnp_ = pt.get<bool>("upnp", false);
     udp_port_ = pt.get<uint16_t>("udp_port", 39391);
+	model_edge_size_ = pt.get<float>("edge_size",1.0f);
 
 }
 
@@ -97,4 +98,9 @@ bool  ConfigManager::shader_shadow() const
 bool  ConfigManager::shader_depth_field() const
 {
 	return shader_depth_field_;
+}
+
+float ConfigManager::model_edge_size() const
+{
+	return model_edge_size_;
 }

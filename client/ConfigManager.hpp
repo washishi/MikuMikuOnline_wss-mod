@@ -33,6 +33,8 @@ class ConfigManager
 		bool shader_shadow_;
 		bool shader_depth_field_;
 
+		float model_edge_size_;
+
     public:
         bool fullscreen() const;
         int screen_width() const;
@@ -49,6 +51,8 @@ class ConfigManager
 		bool shader_bloom() const;
 		bool shader_shadow() const;
 		bool shader_depth_field() const;
+
+		float model_edge_size() const;
 
     private:
         ManagerAccessorPtr manager_accessor_;

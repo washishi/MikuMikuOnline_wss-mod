@@ -103,6 +103,7 @@ void FieldPlayer::LoadModel(const tstring& name)
 	} else {
 		SetModel(ResourceManager::LoadModelFromName(name));
 	}
+	ResourceManager::SetModelEdgeSize(model_handle_.handle());
 }
 
 void FieldPlayer::SetModel(const ModelHandle& model)
