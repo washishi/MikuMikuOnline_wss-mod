@@ -1,0 +1,9 @@
+{
+    "name": "MMO Client API",
+    "description": "",
+    "version": "0.1.0",
+    "url": "",
+    "options": {
+        "outdir": "./client/bin/apidocs"
+    }
+}
