@@ -13,7 +13,6 @@
 /Client/bin/account.xml
 /Client/bin/config.json
 /Client/bin/Log.txt
-/Client/bin/resources
 /Client/bin/server
 /Server/*.sdf
 /Server/*.user
@@ -29,3 +28,6 @@
 /server/get_auto_ver_server.vbs
 /server/buildversion.hpp
 /server/Release
+/client/bin/resources/models
+/client/bin/resources/motions
+/client/bin/resources/fonts

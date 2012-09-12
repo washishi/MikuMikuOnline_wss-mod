@@ -1,4 +1,4 @@
-﻿Miku Miku Online 0.2.4
+﻿Miku Miku Online 0.2.7
 
 // ******************************** 警告 *********************************** //
 // *** 
@@ -50,7 +50,7 @@ Client.exe を起動してください。
 
 チャットウィンドウで以下のコマンドを使うことができます
 
-/nick [名前] - 名前を設定します　（例：　/name 名無し
+/nick [名前] - 名前を設定します　（例：　/nick 名無し
 
 /model [モデル名] - モデルを設定します　（例：　/model 亞北ネル
 
@@ -97,5 +97,6 @@ Client.exeを終了した状態で、server/Server.exe を実行すると単独�
 
 
 --
-mmo@h2so5.net
+mailto:mmo@h2so5.net
+http://mmo.h2so5.net/
 http://sourceforge.jp/projects/mmo/
