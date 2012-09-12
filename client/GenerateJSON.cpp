@@ -185,7 +185,7 @@ JsonGen::JsonGen()
 	FILE *json_file = 0;
 
 	// resources/models/ì‡åüçıÅ@óÒãì
-	hFind = FindFirstFile(_T("\\resources\\models\\?*"), &win32fd_dir);
+	hFind = FindFirstFile(_T(".\\resources\\models\\?*"), &win32fd_dir);
 
 	if (hFind == INVALID_HANDLE_VALUE) {
 		return;
@@ -196,7 +196,7 @@ JsonGen::JsonGen()
 			_tcscmp(win32fd_dir.cFileName,_T("."))!=0 &&
 			_tcscmp(win32fd_dir.cFileName,_T(".."))!=0 &&
 			_tcscmp(win32fd_dir.cFileName,_T(".svn"))!=0) {
-			_tcscpy_s(tcsTmpDir,_T("\\resources\\models\\"));
+			_tcscpy_s(tcsTmpDir,_T(".\\resources\\models\\"));
 			_tcscat_s(tcsTmpDir,win32fd_dir.cFileName);
 			_tcscat_s(tcsTmpDir,_T("\\"));
 
@@ -221,14 +221,14 @@ JsonGen::JsonGen()
 				ZeroMemory(cur_dir,MAX_PATH);
 				GetCurrentDirectory(MAX_PATH,cur_dir);
 				bool flag = false;
-				for(int k = MAX_PATH - 1;k != 0;--k)
+				/*for(int k = MAX_PATH - 1;k != 0;--k)
 				{
 					if( cur_dir[k] == _T('\\') )
 					{
 						cur_dir[k] = 0;
 						break;
 					}
-				}
+				}*/
 				do {
 					std::wstring tmp_path = cur_dir;
 					tmp_path += _T("\\resources\\models\\");
@@ -304,7 +304,7 @@ JsonGen::JsonGen()
 					prejson += tmp_f;
 					prejson += _T(",\n\t\t\t\"motions\":\n\t\t\t\t{\n\t\t\t\t\t\"stand\":\"basic_stand.vmd\",\n\t\t\t\t\t\"walk\": \t\"basic_walk.vmd\",\n\t\t\t\t\t\"run\":\t\"basic_run.vmd\"\n\t\t\t\t}\n\t\t}\n}");
 					TCHAR tmp_dir[MAX_PATH];
-					_tcscpy_s(tmp_dir,_T("\\resources\\models\\"));
+					_tcscpy_s(tmp_dir,_T(".\\resources\\models\\"));
 					_tcscat_s(tmp_dir,tmp_w_a);
 					_tcscat_s(tmp_dir,_T("éÆ"));
 					_tcscat_s(tmp_dir,tmp_w_m);
