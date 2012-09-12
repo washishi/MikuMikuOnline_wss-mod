@@ -176,7 +176,7 @@ JsonGen::JsonGen()
 	DxLib::MATRIX chglcl = {0};
 
 	char pmd_model_name_[256] = {0};
-	char pmd_author_name_[256] = {0};
+	TCHAR pmd_author_name_[256] = {0};
 
 	int exist_num_pmd_ = 0;
 
@@ -211,7 +211,7 @@ JsonGen::JsonGen()
 				_tcscpy_s(tcsTmpPath_Pmd,tcsTmpDir);
 				_tcscat_s(tcsTmpPath_Pmd,_T("*.pmd"));
 				hPmdFind = FindFirstFile(tcsTmpPath_Pmd, &win32fd_pmd);
-				if(hPmdFind < 0)
+				if(hPmdFind == (HANDLE)0xffffffff)
 				{
 					FindClose(hPmdFind);
 					continue;
@@ -247,22 +247,26 @@ JsonGen::JsonGen()
 
 					// モデル名取得
 					strcpy_s(pmd_model_name_,pmd_info+7);
-
-					int cnt = 7 + strlen(pmd_info+7);
-					while(cnt < PMDINFO_SIZE){
-						if(!strncmp("モデリング",pmd_info+cnt,10))break;
+					int cnt = 0x1b;
+					size_t info_size = ADFUNC_DXconvAnsiToWide(0,0,pmd_info+cnt);
+					TCHAR *pmd_info_t = new TCHAR[info_size + 1];
+					ADFUNC_DXconvAnsiToWide(info_size,pmd_info_t,pmd_info+cnt);
+					cnt = 0;
+					while(cnt < info_size){
+						if(!_tcsncmp(_T("モデリング"),pmd_info_t+cnt,5))break;
 						else	++cnt;
 					}
-					if(cnt == PMDINFO_SIZE)
+					if(cnt == info_size)
 					{
-						strcpy_s(pmd_author_name_,"Unknown");
+						_tcscpy_s(pmd_author_name_,_T("Unknown"));
 					}else{
-						for(cnt;cnt<PMDINFO_SIZE && (*(pmd_info+cnt) != 0x46 && *(pmd_info+cnt-1) != 0x81);++cnt);
+						for(cnt;cnt<info_size && *(pmd_info_t+cnt) != _T('：'); ++cnt);
 						int tmp_str_cnt = 1;
-						for(tmp_str_cnt;cnt+tmp_str_cnt<PMDINFO_SIZE && (*(pmd_info+cnt+tmp_str_cnt) != 0x0a && *(pmd_info+cnt+tmp_str_cnt) != 0x20);++tmp_str_cnt);
+						for(tmp_str_cnt;cnt+tmp_str_cnt<info_size && (*(pmd_info_t+cnt+tmp_str_cnt) != _T('\n') && *(pmd_info_t+cnt+tmp_str_cnt) != _T(' ') && *(pmd_info_t+cnt+tmp_str_cnt) != _T('.'));++tmp_str_cnt);
 						// 作者取得
-						strncpy_s(pmd_author_name_,pmd_info+cnt+1,tmp_str_cnt-1);
+						_tcsncpy_s(pmd_author_name_,pmd_info_t+cnt+1,tmp_str_cnt-1);
 					}
+					delete []pmd_info_t;
 
 					TCHAR tmp_mv1_path[MAX_PATH] = {0};
 					_tcscpy_s(tmp_mv1_path,pmd_paths[i].c_str());
@@ -294,10 +298,10 @@ JsonGen::JsonGen()
 					ADFUNC_DXconvAnsiToWide(tmp_w_s_m,tmp_w_m,pmd_model_name_);
 					prejson += tmp_w_m;
 					prejson += _T(":");
-					size_t tmp_w_s_a = ADFUNC_DXconvAnsiToWide(0,0,pmd_author_name_);
-					TCHAR *tmp_w_a = new TCHAR[tmp_w_s_a + 1];
-					ADFUNC_DXconvAnsiToWide(tmp_w_s_a,tmp_w_a,pmd_author_name_);
-					prejson += tmp_w_a;
+					//size_t tmp_w_s_a = ADFUNC_DXconvAnsiToWide(0,0,pmd_author_name_);
+					//TCHAR *tmp_w_a = new TCHAR[tmp_w_s_a + 1];
+					//ADFUNC_DXconvAnsiToWide(tmp_w_s_a,tmp_w_a,pmd_author_name_);
+					prejson += pmd_author_name_;
 					prejson += _T("式\",\n\t\"character\":\n\t\t{\n\t\t\t\"height\":");
 					TCHAR tmp_f[32];
 					_ftot_s(tmp_f,32,floor(prePos.y*2)/10.0f,2);
@@ -305,13 +309,13 @@ JsonGen::JsonGen()
 					prejson += _T(",\n\t\t\t\"motions\":\n\t\t\t\t{\n\t\t\t\t\t\"stand\":\"basic_stand.vmd\",\n\t\t\t\t\t\"walk\": \t\"basic_walk.vmd\",\n\t\t\t\t\t\"run\":\t\"basic_run.vmd\"\n\t\t\t\t}\n\t\t}\n}");
 					TCHAR tmp_dir[MAX_PATH];
 					_tcscpy_s(tmp_dir,_T(".\\resources\\models\\"));
-					_tcscat_s(tmp_dir,tmp_w_a);
+					_tcscat_s(tmp_dir,pmd_author_name_);
 					_tcscat_s(tmp_dir,_T("式"));
 					_tcscat_s(tmp_dir,tmp_w_m);
 					_tcscat_s(tmp_dir,_T("\\"));
 					_wmkdir(tmp_dir);
 					delete [] tmp_w_m;
-					delete [] tmp_w_a;
+					//delete [] tmp_w_a;
 					TCHAR json_path[MAX_PATH];
 					_tcscpy_s(json_path,tmp_dir);
 					_tcscat_s(json_path,_T("info.json"));
@@ -350,7 +354,7 @@ JsonGen::JsonGen()
 					_tcscat_s(tmp_type,tmp_cpy);
 					CopyFile(pmd_paths[i].c_str(),tmp_type,TRUE);
 				}
-
+				pmd_paths.clear();
 				DeleteDirectory(tcsTmpDir);
 			}
 		}
