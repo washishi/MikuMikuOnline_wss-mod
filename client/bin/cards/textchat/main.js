@@ -16,34 +16,55 @@ var list;
 
 // チャットメッセージ受信
 var even_line = false;
-Network.onReceive = function(info, msg) {
-
-	list.addItem(
+Network.onReceive = function (info, msg) {
+    if (msg.body && !msg.private) {
+        list.addItem(
 		new UI.Label({
-			docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT,
-			text: "[" + info.player.name() + "] " + msg.body,
-			bgcolor: ((even_line = !even_line) ? "#AFEEEECC" : "#FFFFFFCC")
+		    docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT,
+		    text: "[" + info.player.name() + "] " + msg.body,
+		    bgcolor: ((even_line = !even_line) ? "#AFEEEECC" : "#FFFFFFCC")
 		})
-	);
-	list.scroll_y = 999999;
-	
-	if (info.player) {
-	
-		// 吹き出しを表示
-		info.player.setBalloonContent(
+	    );
+    }
+    if (msg.private) {
+        if (Account.name() == msg.private || info.player.name() == Account.name()) {
+            list.addItem(
+		new UI.Label({
+		    docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT,
+		    text: "[ private:" + info.player.name() + "] " + msg.body,
+		    bgcolor: ((even_line = !even_line) ? "#add8e6CC" : "#87ceebCC")
+		})
+	    );
+        }
+    }
+    if (msg.system) {
+        list.addItem(
+		new UI.Label({
+		    docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT,
+		    text: "[サーバーより] " + msg.system,
+		    bgcolor: "#FFFACDCC"
+		})
+	    );
+    }
+    list.scroll_y = 999999;
+
+    if (info.player && msg.body && !msg.private) {
+
+        // 吹き出しを表示
+        info.player.setBalloonContent(
 			new UI.Label({
-				width: Screen.width() / 6,
-				text: msg.body
+			    width: Screen.width() / 6,
+			    text: msg.body
 			})
 		);
-		
-		// 一定時間経過後に吹き出しを消す
-		clearTimeout(info.player.baloon_timer)
-		info.player.baloon_timer = setTimeout(function(){
-			info.player.setBalloonContent(null)
-		},BALLOON_EXPIRATION);
-	}
-	
+
+        // 一定時間経過後に吹き出しを消す
+        clearTimeout(info.player.baloon_timer)
+        info.player.baloon_timer = setTimeout(function () {
+            info.player.setBalloonContent(null)
+        }, BALLOON_EXPIRATION);
+    }
+
 }
 
 Player.onLogin = function(player) {
@@ -82,25 +103,37 @@ InputBox.onEnter = function (text) {
 
         switch (command) {
 
-            // ニックネームを変更  
+            // ニックネームを変更       
             case "nick":
                 Account.updateName(args.trim());
                 break;
 
-            // モデルを変更  
+            // モデルを変更       
             case "model":
                 Account.updateModelName("char:" + args.trim());
                 break;
 
-            // プレイヤー位置をリセット  
+            // プレイヤー位置をリセット       
             case "escape":
                 Player.escape();
                 break;
             case "reload":
                 Model.rebuild();
                 break;
+            case "system":
+                var msgObject = { system: args.trim() };
+                Network.sendAll(msgObject);
+                break;
+            case "private":
+                args.trim();
+                var tok = args.split(" ");
+                var msgObject = {
+                    prvate: token[0],
+                    body: tok[1]
+                    };
+                Network.sendAll(msgObject);
+                break;
         }
-
 
     } else {
         // コマンドでない場合はそのままチャットメッセージとして送信
