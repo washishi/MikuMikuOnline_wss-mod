@@ -46,3 +46,5 @@ for root, dirs, files in os.walk(os.path.join(bin_path, 'resources')):
     	absolute_path = os.path.join(root, file)
         relative_path = os.path.relpath(absolute_path, bin_path)
         zip.write(absolute_path, relative_path)
+        
+zip.close()

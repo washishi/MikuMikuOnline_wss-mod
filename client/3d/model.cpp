@@ -147,6 +147,11 @@ void GameLoop::ResetCameraPosition()
 
 void GameLoop::MoveCamera(InputManager* input)
 {
+	// 非アクティブ時はマウス操作無効
+	if (GetActiveFlag() == 0) {
+		return;
+	}
+
     const bool prev_right = input->GetPrevMouseRight();
     const bool prev_left = input->GetPrevMouseLeft();
     const bool right = input->GetMouseRight();
