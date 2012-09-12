@@ -71,40 +71,43 @@ Player.onLogout = function(player) {
 }
 
 // チャットメッセージ送信
-InputBox.onEnter = function(text) {
+InputBox.onEnter = function (text) {
 
-	// コマンドを解析
-	var parsed_text = text.match(/^\/(\w{1,8})\s?(\S*)/)
-	if (parsed_text) {
-	
-		var command = parsed_text[1]
-		var args = parsed_text[2]
-		
-		switch (command) {
-			
-			// ニックネームを変更
-			case "nick":
-				Account.updateName(args.trim());
-				break;
-				
-			// モデルを変更
-			case "model":
-				Account.updateModelName("char:" + args.trim());
-				break;
-				
-			// プレイヤー位置をリセット
-			case "escape":
-				Player.escape();
-				break;
-		}
-		
-		
-	} else {
-		// コマンドでない場合はそのままチャットメッセージとして送信
-		var msgObject = {body: text};
-		Network.sendAll(msgObject);
-	}
-	
+    // コマンドを解析
+    var parsed_text = text.match(/^\/(\w{1,8})\s?(\S*)/)
+    if (parsed_text) {
+
+        var command = parsed_text[1]
+        var args = parsed_text[2]
+
+        switch (command) {
+
+            // ニックネームを変更  
+            case "nick":
+                Account.updateName(args.trim());
+                break;
+
+            // モデルを変更  
+            case "model":
+                Account.updateModelName("char:" + args.trim());
+                break;
+
+            // プレイヤー位置をリセット  
+            case "escape":
+                Player.escape();
+                break;
+            case "reload":
+                Model.rebuild();
+                break;
+        }
+
+
+    } else {
+        // コマンドでない場合はそのままチャットメッセージとして送信
+        var msgObject = { body: text };
+        Network.sendAll(msgObject);
+    }
+
 };
 
 list = new UI.List({

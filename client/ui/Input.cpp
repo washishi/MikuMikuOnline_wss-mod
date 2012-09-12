@@ -726,9 +726,11 @@ bool Input::active()
 void Input::set_active(bool flag)
 {
     if (active() && !flag) {
+		SetUseIMEFlag(flag);
         ReStartKeyInput(input_handle_);
         SetActiveKeyInput(-1);
     } else if (!active() && flag) {
+		SetUseIMEFlag(flag);
         SetActiveKeyInput(input_handle_);
         ResetCursorCount();
     }

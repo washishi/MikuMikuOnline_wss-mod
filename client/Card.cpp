@@ -20,6 +20,7 @@
 #include "../common/network/Command.hpp"
 #include "../common/database/AccountProperty.hpp"
 #include "Profiler.hpp"
+#include "GenerateJSON.hpp"
 
 char Card::STORAGE_DIR[] = "storage";
 char Card::SCRIPT_PATH[] = "resources/js";
@@ -352,6 +353,13 @@ Handle<Value> Card::Function_Screen_player_focus(const Arguments& args)
         card_manager->FocusPlayer();
     }
     return Undefined();
+}
+
+Handle<Value> Card::Function_Rebuild_Modeltree(const Arguments& args)
+{
+	JsonGen jsongen;
+	ResourceManager::BuildModelFileTree();
+	return Undefined();
 }
 
 
@@ -765,6 +773,13 @@ void Card::SetFunctions()
      */
     script_.SetFunction("Screen.player_focus", Function_Screen_player_focus);
 
+    /**
+     * モデルファイルの構造を再構築します
+     *
+     * @method player_focus
+     * @static
+     */
+	script_.SetFunction("Model.rebuild", Function_Rebuild_Modeltree);
 //    /**
 //     * ワールド座標をスクリーン座標に変換します
 //     *
