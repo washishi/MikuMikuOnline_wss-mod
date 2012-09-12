@@ -5,6 +5,7 @@
 #include "Server.hpp"
 #include <algorithm>
 #include <boost/make_shared.hpp>
+#include <boost/foreach.hpp>
 #include "../common/Logger.hpp"
 #include "../common/network/Command.hpp"
 #include "../common/network/Utils.hpp"

@@ -166,10 +166,10 @@ std::string Encrypter::GetPublicKeyFingerPrint()
 
 std::string Encrypter::GetHash(const std::string& in)
 {
-    std::unique_ptr<byte[]> outbuf(new byte [CryptoPP::SHA512().DIGESTSIZE]);
+    std::unique_ptr<byte[]> outbuf(new byte [64]);
     CryptoPP::SHA512().CalculateDigest(outbuf.get(), (const byte*)in.data(), in.size());
 
-    return std::string((char*)outbuf.get(), CryptoPP::SHA512().DIGESTSIZE);
+    return std::string((char*)outbuf.get(), 64);
 }
 
 std::string Encrypter::GetTrip(const std::string& in)
