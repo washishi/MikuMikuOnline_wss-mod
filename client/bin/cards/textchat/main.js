@@ -31,7 +31,7 @@ Network.onReceive = function (info, msg) {
             list.addItem(
 		new UI.Label({
 		    docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT,
-		    text: "[ private:" + info.player.name() + "] " + msg.body,
+		    text: "[private:" + info.player.name() + "] " + msg.body,
 		    bgcolor: ((even_line = !even_line) ? "#add8e6CC" : "#87ceebCC")
 		})
 	    );
@@ -128,7 +128,7 @@ InputBox.onEnter = function (text) {
                 args.trim();
                 var tok = args.split(" ");
                 var msgObject = {
-                    prvate: token[0],
+                    prvate: tok[0],
                     body: tok[1]
                     };
                 Network.sendAll(msgObject);
