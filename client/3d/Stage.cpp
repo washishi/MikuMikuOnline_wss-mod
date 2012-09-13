@@ -13,7 +13,7 @@ Stage::Stage(const tstring& model_name) :
 	min_height_(map_handle_.property().get<float>("min_height", -200.0))
 {
     MV1SetScale(map_handle_.handle(), VGet(map_scale_, map_scale_, map_scale_));
-    MV1SetupCollInfo(map_handle_.handle(), -1, 256, 256, 256);
+    MV1SetupCollInfo(map_handle_.handle(), -1, 128, 64, 128);// 元の数値は256,256,256
 
     auto start_points_array = map_handle_.property().get_child("stage.start_points", ptree());
     for (auto it = start_points_array.begin(); it != start_points_array.end(); ++it) {

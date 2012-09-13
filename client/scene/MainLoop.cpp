@@ -17,7 +17,8 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
       account_manager_(manager_accessor->account_manager().lock()),
       config_manager_(manager_accessor->config_manager().lock()),
       inputbox_(manager_accessor_),
-	  minimap_(manager_accessor_)
+	  minimap_(manager_accessor_),
+	  snapshot_number_(0)
 {
     manager_accessor_->set_player_manager(player_manager_);
     manager_accessor_->set_command_manager(command_manager_);
@@ -86,10 +87,26 @@ void MainLoop::Draw()
     card_manager_->Draw();
     inputbox_.Draw();
 	minimap_.Draw();
+
+    InputManager input;
+
+	ProcessInput(&input);
 }
 
 void MainLoop::End()
 {
 }
 
+void MainLoop::ProcessInput(InputManager *input)
+{
+	if(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) > 0)
+	{
+		TCHAR tmp_str[MAX_PATH];
+		_stprintf( tmp_str , _T(".\\screenshot\\ss%03d.png") , snapshot_number_ );
+		SaveDrawScreenToPNG( 0, 0, config_manager_->screen_width(), config_manager_->screen_height(),tmp_str);
+		snapshot_number_++;
+	}
 }
+
+}
+

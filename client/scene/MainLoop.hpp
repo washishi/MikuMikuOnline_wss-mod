@@ -31,6 +31,7 @@ class MainLoop : public Base {
 
     private:
         std::function<void(const tstring&)> push_message_;
+		void ProcessInput(InputManager *input);
 
     private:
         // アクセサ
@@ -43,6 +44,7 @@ class MainLoop : public Base {
         ConfigManagerPtr config_manager_;
 		MiniMap minimap_;
         InputBox inputbox_;
+		int snapshot_number_;
 };
 
 }
