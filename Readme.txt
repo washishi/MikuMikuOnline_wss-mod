@@ -1,4 +1,4 @@
-﻿Miku Miku Online 0.2.7
+﻿Miku Miku Online 0.3.2
 
 // ******************************** 警告 *********************************** //
 // *** 
@@ -17,7 +17,7 @@
 
 
 === 動作環境
-　Windows Vista, 7
+　Windows XP, Vista, 7
 　2GB RAM
 　DirectX 9
 　シェーダーモデル 2.0 以上

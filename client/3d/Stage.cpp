@@ -9,7 +9,8 @@
 
 Stage::Stage(const tstring& model_name) :
     map_handle_(ResourceManager::LoadModelFromName(model_name)),
-    map_scale_(map_handle_.property().get<float>("scale", 20.0))
+    map_scale_(map_handle_.property().get<float>("scale", 20.0)),
+	min_height_(map_handle_.property().get<float>("min_height", -200.0))
 {
     MV1SetScale(map_handle_.handle(), VGet(map_scale_, map_scale_, map_scale_));
     MV1SetupCollInfo(map_handle_.handle(), -1, 256, 256, 256);
@@ -185,9 +186,14 @@ bool Stage::IsVisiblePoint(const VECTOR& point) const
 {
 	MMO_PROFILE_FUNCTION;
 
-    auto coll_info = MV1CollCheck_Line(map_handle_.handle(), -1, point, GetCameraPosition());
+	const auto& camera = GetCameraPosition();
+
+	auto distance = (point.x - camera.x) * (point.x - camera.x) +
+		(point.y - camera.y) * (point.y - camera.y) +
+		(point.z - camera.z) * (point.z - camera.z);
+
     auto screen_pos = ConvWorldPosToScreenPos(point);
-    return (!coll_info.HitFlag && screen_pos.z > 0.0f && screen_pos.z < 1.0f);
+    return (distance < 500000 && screen_pos.z > 0.0f && screen_pos.z < 1.0f);
 }
 
 void Stage::UpdateSkymapPosition(const VECTOR& pos)
@@ -208,4 +214,9 @@ const std::vector<VECTOR>& Stage::start_points() const
 float Stage::map_scale() const
 {
     return map_scale_;
+}
+
+float Stage::min_height() const
+{
+    return min_height_;
 }

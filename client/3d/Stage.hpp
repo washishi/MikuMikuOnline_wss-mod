@@ -28,6 +28,7 @@ class Stage {
 
         const ModelHandle& map_handle() const;
         float map_scale() const;
+        float min_height() const;
 
         const std::vector<VECTOR>& start_points() const;
 
@@ -36,6 +37,7 @@ class Stage {
     private:
         ModelHandle map_handle_;
         float map_scale_;
+		float min_height_;
         ModelHandle skymap_handle_;
 
         std::vector<VECTOR> start_points_;

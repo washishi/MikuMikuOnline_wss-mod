@@ -132,9 +132,9 @@ void GameLoop::FixCameraPosition()
 	}
 
 	auto camera_pos_delta = VScale(camera_pos - GetCameraPosition(),(float)0.3);
-    if (VSize(camera_pos_delta) > 10) {
-        camera_pos_delta = VNorm(camera_pos_delta) * 10;
-    }
+    // if (VSize(camera_pos_delta) > 10) {
+    //    camera_pos_delta = VNorm(camera_pos_delta) * 10;
+    //}
 
 	SetCameraPositionAndTarget_UpVecY(
 		GetCameraPosition() + camera_pos_delta, target_pos);

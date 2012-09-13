@@ -28,8 +28,8 @@ namespace unicode {
 
 #ifdef _WIN32
 
-std::string sjis2utf8(std::string);
-std::string utf82sjis(std::string);
+std::string sjis2utf8(const std::string&);
+std::string utf82sjis(const std::string&);
 
 std::string ToString(const std::wstring& s);
 std::wstring ToWString(const std::string& s);
