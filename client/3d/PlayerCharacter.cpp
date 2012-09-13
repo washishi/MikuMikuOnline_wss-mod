@@ -6,6 +6,7 @@
 #include "dx_vector.hpp"
 #include "BasicMotion.hpp"
 #include "MotionPlayer.hpp"
+#include "../Profiler.hpp"
 #include "../../common/Logger.hpp"
 
 
@@ -64,6 +65,7 @@ public:
 
     void Impl::Update()
     {
+		MMO_PROFILE_FUNCTION;
 		static auto time_now = 0.0f;
 		prev_target_pos_ = current_target_pos_;
         const auto current_target_pos = data_provider_.target_position();
