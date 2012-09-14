@@ -20,81 +20,84 @@ void CommandManager::Update()
 {
 	MMO_PROFILE_FUNCTION;
 
-    if (client_ && !client_->command_empty())
+    if (client_)
     {
         auto command = client_->PopCommand();
-        unsigned int header =  command.header();
 
-        CardManagerPtr card_manager = manager_accessor_->card_manager().lock();
-        PlayerManagerPtr player_manager = manager_accessor_->player_manager().lock();
-        AccountManagerPtr account_manager = manager_accessor_->account_manager().lock();
+		if (command) {
+			unsigned int header =  command->header();
 
-        Logger::Debug(_T("Receive: 0x%08x %d byte"), header, command.body().size());
+			CardManagerPtr card_manager = manager_accessor_->card_manager().lock();
+			PlayerManagerPtr player_manager = manager_accessor_->player_manager().lock();
+			AccountManagerPtr account_manager = manager_accessor_->account_manager().lock();
 
-        switch (header) {
-        using namespace network::header;
+			Logger::Debug(_T("Receive: 0x%08x %d byte"), header, command->body().size());
 
-        // 暗号化通信を開始
-        case ClientStartEncryptedSession:
-        {
-            const std::string& data = account_manager->GetSerializedData();
-            if (data.size() > 0) {
-                client_->Write(network::ServerReceiveAccountInitializeData(data));
-            }
-        }
-            break;
+			switch (header) {
+			using namespace network::header;
 
-        case ClientReceiveJSON:
-        // case ClientReceiveChatLog:
-        {
-            std::string info_json, msg_json;
-            network::Utils::Deserialize(command.body(), &info_json, &msg_json);
+			// 暗号化通信を開始
+			case ClientStartEncryptedSession:
+			{
+				const std::string& data = account_manager->GetSerializedData();
+				if (data.size() > 0) {
+					client_->Write(network::ServerReceiveAccountInitializeData(data));
+				}
+			}
+				break;
 
-            Logger::Info(_T("Receive JSON: %s %s"), unicode::ToTString(info_json), unicode::ToTString(msg_json));
+			case ClientReceiveJSON:
+			// case ClientReceiveChatLog:
+			{
+				std::string info_json, msg_json;
+				network::Utils::Deserialize(command->body(), &info_json, &msg_json);
 
-            card_manager->OnReceiveJSON(info_json, msg_json);
-        }
-            break;
+				Logger::Info(_T("Receive JSON: %s %s"), unicode::ToTString(info_json), unicode::ToTString(msg_json));
 
-        // プレイヤー位置更新
-        case ClientUpdatePlayerPosition:
-        {
-            PlayerPosition pos;
-            uint32_t user_id;
-            network::Utils::Deserialize(command.body(), &user_id, &pos.x, &pos.y, &pos.z, &pos.theta, &pos.vy);
+				card_manager->OnReceiveJSON(info_json, msg_json);
+			}
+				break;
 
-            player_manager->UpdatePlayerPosition(user_id, pos);
-        }
-            break;
+			// プレイヤー位置更新
+			case ClientUpdatePlayerPosition:
+			{
+				PlayerPosition pos;
+				uint32_t user_id;
+				network::Utils::Deserialize(command->body(), &user_id, &pos.x, &pos.y, &pos.z, &pos.theta, &pos.vy);
 
-        case ClientReceiveAccountRevisionUpdateNotify:
-        {
-            uint32_t user_id;
-            uint32_t server_revision;
-            network::Utils::Deserialize(command.body(), &user_id, &server_revision);
+				player_manager->UpdatePlayerPosition(user_id, pos);
+			}
+				break;
 
-            auto current_revision = player_manager->GetCurrentUserRevision(user_id);
+			case ClientReceiveAccountRevisionUpdateNotify:
+			{
+				uint32_t user_id;
+				uint32_t server_revision;
+				network::Utils::Deserialize(command->body(), &user_id, &server_revision);
 
-            Logger::Info(_T("Receive account database update notify　%d %d [%d]"), user_id, server_revision, current_revision);
+				auto current_revision = player_manager->GetCurrentUserRevision(user_id);
 
-            if (server_revision > current_revision) {
-                client_->Write(network::ServerRequestedAccountRevisionPatch(user_id, current_revision));
-            }
-        }
-            break;
+				Logger::Info(_T("Receive account database update notify　%d %d [%d]"), user_id, server_revision, current_revision);
 
-        case ClientReceiveAccountRevisionPatch:
-        {
-            Logger::Info(_T("Receive account database update data"));
-            assert(command.body().size() > 0);
-            player_manager->ApplyRevisionPatch(command.body());
-        }
-            break;
+				if (server_revision > current_revision) {
+					client_->Write(network::ServerRequestedAccountRevisionPatch(user_id, current_revision));
+				}
+			}
+				break;
 
-        default:
-            break;
-        }
-    }
+			case ClientReceiveAccountRevisionPatch:
+			{
+				Logger::Info(_T("Receive account database update data"));
+				assert(command->body().size() > 0);
+				player_manager->ApplyRevisionPatch(command->body());
+			}
+				break;
+
+			default:
+				break;
+			}
+		}
+	}
 }
 
 void CommandManager::set_client(ClientUniqPtr client)

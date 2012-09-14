@@ -94,6 +94,21 @@ Player.onLogout = function(player) {
 // チャットメッセージ送信
 InputBox.onEnter = function (text) {
 
+	//サイコロ用
+	var dice_parsed_text = text.match(/^\/(\d+)[Dd](\d+)/)
+	if (dice_parsed_text) {
+		var time = dice_parsed_text[1]
+        var size = dice_parsed_text[2]
+        var msg = "【ダイス /" + time + "D" + size + "】\n "
+        for (var i = 0; i < time; i++) {
+        	msg += Number.random(1, size) + ", "
+        }
+        
+        var msgObject = { body: msg };
+        Network.sendAll(msgObject);
+		return;
+	}
+
     // コマンドを解析
     var parsed_text = text.match(/^\/(\w{1,8})\s?(\S*)/)
     if (parsed_text) {
@@ -117,13 +132,19 @@ InputBox.onEnter = function (text) {
             case "escape":
                 Player.escape();
                 break;
+                
+            // リロード
             case "reload":
                 Model.rebuild();
                 break;
+                
+            // システム
             case "system":
                 var msgObject = { system: args.trim() };
                 Network.sendAll(msgObject);
                 break;
+                
+            // プライベート
             case "private":
                 args.trim();
                 var tok = args.split(" ");

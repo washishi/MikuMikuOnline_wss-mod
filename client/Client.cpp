@@ -247,12 +247,16 @@ void Client::Close()
 {
 }
 
-Command Client::PopCommand()
+std::shared_ptr<Command> Client::PopCommand()
 {
     boost::mutex::scoped_lock lock(mutex_);
-    Command command = command_queue_.front();
-    command_queue_.pop();
-    return command;
+	std::shared_ptr<Command> command_ptr;
+	if (!command_queue_.empty()) {
+		Command command = command_queue_.front();
+		command_ptr = std::make_shared<Command>(command);
+		command_queue_.pop();
+	}
+	return command_ptr;
 }
 
 bool Client::command_empty()

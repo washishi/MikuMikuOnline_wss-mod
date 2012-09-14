@@ -68,7 +68,7 @@ namespace network {
            void WriteUDP(const Command&);
            void Close();
 
-           Command PopCommand();
+           std::shared_ptr<Command> Client::PopCommand();
            bool command_empty();
 
            unsigned int id() const;
