@@ -28,6 +28,7 @@ class Server {
         Server(uint16_t port);
         void Start(CallbackFuncPtr callback);
         void Stop();
+        void Stop(int interrupt_type);
         void SendAll(const Command&);
         void SendOthers(const Command&, SessionWeakPtr);
 

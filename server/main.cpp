@@ -16,6 +16,8 @@
 #include "../common/Logger.hpp"
 #include "Config.hpp"
 #include "Account.hpp"
+#include "ServerSigHandler.hpp"
+#include <csignal>
 
 #ifdef _WIN32
 #include <boost/interprocess/windows_shared_memory.hpp>
@@ -316,11 +318,12 @@ int main(int argc, char* argv[])
         });
     }
 	#endif
-
+    network::ServerSigHandler handler(SIGINT,&server);
     server.Start(callback);
 
   } catch (std::exception& e) {
       Logger::Error(e.what());
+      
       Logger::Info("Stop Server");
   }
 

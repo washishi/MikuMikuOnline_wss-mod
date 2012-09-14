@@ -75,7 +75,14 @@ namespace network {
     void Server::Stop()
     {
         io_service_.stop();
+	Logger::Info("stop server");
     }
+    void Server::Stop(int innterrupt_type)
+    {
+        io_service_.stop();
+	Logger::Info(_T("stop server innterrupt_type=%d"),innterrupt_type);
+    }
+
 
     bool Server::Empty() const
     {
