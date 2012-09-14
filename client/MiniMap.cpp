@@ -16,8 +16,8 @@ MiniMap::MiniMap(const ManagerAccessorPtr& manager_accessor) :
 				prev_myself_pos_on_map_(VGet(0,0,0)),
 				drag_offset_rect_(-1, -1, -1, -1),
 				drag_resize_offset_rect_(-1, -1, -1, -1),
-				manager_accessor_(manager_accessor)
-
+				manager_accessor_(manager_accessor),
+				font_handle_(ResourceManager::default_font_handle())
 {
 	base_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
 		_T("resources/images/gui/gui_board_bg.png"), 2, 2, 24, 24);
@@ -158,7 +158,7 @@ void MiniMap::Draw()
 		DrawBox( x, y + height - thickness, x + width, y + height, Color, TRUE);
 	};// thicknessで示した太さで縁のみの四角形を描画
 
-	DrawOfOnlyEdge(x + 12, y + 12, width - 24, height - 24, GetColor(133,211,192),2);
+	DrawOfOnlyEdge(x + 12, y + 12, width - 24, height - 24 - 16, GetColor(133,211,192),2);
 
 	DrawPosAndCalc();
 }
@@ -198,6 +198,11 @@ void MiniMap::DrawPosAndCalc()
 		DrawCircle( tmp_pos_x, tmp_pos_z, 2, GetColor(23,162,175),TRUE);
 	}
 	prev_myself_pos_on_map_ = player_manager_->char_data_providers()[player_manager_->charmgr()->my_character_id()]->position();
+
+	TCHAR tcs_tmp[256];
+	_stprintf(tcs_tmp, _T("ログイン人数: %d"),player_manager_->GetAll().size());
+	DrawBox(absolute_x() + 12,absolute_y() + absolute_height() - 24,absolute_x() + absolute_width() - 12,absolute_y() + absolute_height() - 4,GetColor(133,211,192),TRUE);
+	DrawStringToHandle(absolute_x() + 12,absolute_y() + absolute_height() - 24 + 2, tcs_tmp,GetColor(34,34,34),font_handle_);
 }
 
 void MiniMap::Update()

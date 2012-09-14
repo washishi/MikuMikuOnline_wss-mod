@@ -14,7 +14,7 @@
 #include "3d/Stage.hpp"
 
 #define MINIMAP_MAXSIZE 800
-#define MINIMAP_MINSIZE 128
+#define MINIMAP_MINSIZE 132
 
 class MiniMap : public UISuper
 {
@@ -27,7 +27,7 @@ public:
 	bool resizable() const;
 	void set_resizable(bool resizable);
 
-	void UIPlacement(int x = 12, int y = 12, int height = MINIMAP_MINSIZE, int width = MINIMAP_MINSIZE);
+	void UIPlacement(int x = 12, int y = 12, int height = MINIMAP_MINSIZE + 16, int width = MINIMAP_MINSIZE);
 
 private:
 	void UpdateDrag(InputManager* input, bool resizeable = true);
@@ -44,6 +44,8 @@ private:
 
 	int max_width_, min_width_;
 	int max_height_, min_height_;
+
+	int font_handle_;
 
     Rect drag_offset_rect_, drag_resize_offset_rect_;
 private:
