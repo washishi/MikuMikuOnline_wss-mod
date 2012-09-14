@@ -16,8 +16,10 @@
 #include "../common/Logger.hpp"
 #include "Config.hpp"
 #include "Account.hpp"
+#ifdef __linux__
 #include "ServerSigHandler.hpp"
 #include <csignal>
+#endif
 
 #ifdef _WIN32
 #include <boost/interprocess/windows_shared_memory.hpp>
@@ -318,7 +320,9 @@ int main(int argc, char* argv[])
         });
     }
 	#endif
+    #ifdef __linux__
     network::ServerSigHandler handler(SIGINT,&server);
+    #endif
     server.Start(callback);
 
   } catch (std::exception& e) {
