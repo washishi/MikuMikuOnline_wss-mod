@@ -188,6 +188,7 @@ Client::Client(const std::string& host,
                 }
 
                 {
+					boost::mutex::scoped_lock lock(mutex_);
                     command_queue_.push(c);
                 }
 
@@ -257,12 +258,6 @@ std::shared_ptr<Command> Client::PopCommand()
 		command_queue_.pop();
 	}
 	return command_ptr;
-}
-
-bool Client::command_empty()
-{
-    boost::mutex::scoped_lock lock(mutex_);
-    return command_queue_.empty();
 }
 
 unsigned int Client::id() const
