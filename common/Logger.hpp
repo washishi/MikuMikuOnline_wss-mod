@@ -24,14 +24,14 @@ class Logger {
 		inline tstring GetTimeString() const
 		{
 			using namespace boost::posix_time;
-			ptime now = second_clock::universal_time();
+			ptime now = second_clock::local_time();
             return unicode::ToTString(to_iso_extended_string(now));
 		}
 
 		inline std::string GetLogFileName() const
 		{
 			using namespace boost::posix_time;
-			ptime now = second_clock::universal_time();
+			ptime now = second_clock::local_time();
 			std::string date_string = to_iso_extended_string(now);
 			boost::algorithm::replace_all(date_string, ":", "_");
             return "log_" + date_string + ".txt";

@@ -56,6 +56,7 @@ class Account {
         void Set(UserID user_id, AccountProperty property, T value, bool revision = true)
         {
 			if (user_id == 0) {
+				Logger::Error(_T("Invalid session id"));
 				return;
 			}
 
