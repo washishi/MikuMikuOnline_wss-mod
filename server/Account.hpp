@@ -12,6 +12,7 @@
 #include "../common/database/AccountProperty.hpp"
 #include "../common/network/Utils.hpp"
 #include "../common/Logger.hpp"
+#include <boost/thread.hpp>
 
 typedef unsigned int UserID;
 

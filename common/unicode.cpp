@@ -6,6 +6,10 @@
 
 namespace unicode {
 
+#ifdef __linux__
+  std::string ToString(const std::string& str){return str;}
+#endif
+
 #ifdef _WIN32
 
     std::string sjis2utf8(const std::string& in) {
