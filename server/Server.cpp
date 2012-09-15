@@ -126,7 +126,7 @@ namespace network {
         });
         sessions_.erase(it, sessions_.end());
 
-		Logger::Info("Active sessoin: %d", sessions_.size() - 1);
+		Logger::Info("Active connection: %d", sessions_.size() - 1);
     }
 
     void Server::SendAll(const Command& command)

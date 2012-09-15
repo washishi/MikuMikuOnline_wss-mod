@@ -71,7 +71,10 @@ int main(int argc, char* argv[])
         {
             if (auto session = c.session().lock()) {
                 unsigned int id = static_cast<unsigned int>(session->id());
-				assert(id > 0);
+				if (id == 0) {
+					Logger::Error(_T("Invalid session id"));
+					break;
+				}
 
                 ptime now = second_clock::universal_time();
                 auto time_string = to_iso_extended_string(now);
