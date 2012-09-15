@@ -23,6 +23,11 @@ SessionWeakPtr Command::session()
     return session_;
 }
 
+boost::asio::ip::udp::endpoint Command::udp_endpoint() const
+{
+	return udp_endpoint_;
+}
+
 FatalConnectionError::FatalConnectionError() :
         Command(header::FatalConnectionError, "")
 {

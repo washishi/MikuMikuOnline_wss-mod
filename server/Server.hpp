@@ -33,10 +33,14 @@ class Server {
         void SendOthers(const Command&, SessionWeakPtr);
 
         bool Empty() const;
+		std::string GetStatusJSON() const;
 
         int GetSessionReadAverageLimit();
+		int GetUserCount() const;
+		void RefreshSession();
 
         void SendUDPTestPacket(const std::string& ip_address, uint16_t port);
+		void SendUDP(const std::string& message, const boost::asio::ip::udp::endpoint endpoint);
 
         int max_total_read_average() const;
         int max_session_read_average() const;
@@ -52,7 +56,7 @@ class Server {
         void DoWriteUDP(const std::string& msg, const udp::endpoint& endpoint);
         void WriteUDP(const boost::system::error_code& error, boost::shared_ptr<std::string> holder);
 
-        Command FetchUDP(const std::string& buffer);
+        void FetchUDP(const std::string& buffer, const boost::asio::ip::udp::endpoint endpoint);
 
     private:
        boost::asio::io_service io_service_;

@@ -7,6 +7,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+#include <boost/asio.hpp>
 #include <stdint.h>
 #include "CommandHeader.hpp"
 #include "../database/AccountProperty.hpp"
@@ -24,9 +25,14 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
             Command(header::CommandHeader header, const std::string body, const SessionWeakPtr& session) :
                 header_(header), body_(body), session_(session) {}
 
+            Command(header::CommandHeader header, const std::string body,
+				const boost::asio::ip::udp::endpoint& udp_endpoint) :
+                header_(header), body_(body), udp_endpoint_(udp_endpoint) {}
+
             header::CommandHeader header() const;
             const std::string& body() const;
             SessionWeakPtr session();
+			boost::asio::ip::udp::endpoint udp_endpoint() const;
 
         private:
             header::CommandHeader header_;
@@ -34,6 +40,7 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
         protected:
             std::string body_;
             SessionWeakPtr session_;
+			boost::asio::ip::udp::endpoint udp_endpoint_;
     };
 
     // コネクションの切断

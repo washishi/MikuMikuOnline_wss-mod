@@ -29,6 +29,8 @@ namespace header {
         ServerReceiveJSON =                         0x14,
         ClientReceiveJSON =                         0x15,
 
+		ServerRequstedStatus =						0xE0,
+
         LZ4_COMPRESS_HEADER =                       0xF0,
         ENCRYPT_HEADER =                            0xF1
     };

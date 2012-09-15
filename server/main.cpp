@@ -66,6 +66,14 @@ int main(int argc, char* argv[])
 
         switch (c.header()) {
 
+		// ステータス要求
+		case network::header::ServerRequstedStatus:
+		{
+			// ステータスを送り返す
+			server.SendUDP(server.GetStatusJSON(), c.udp_endpoint());
+		}
+		break;
+
         // JSONメッセージ受信
         case network::header::ServerReceiveJSON:
         {

@@ -3,6 +3,7 @@
 //
 
 #include "Server.hpp"
+#include "version.hpp"
 #include <algorithm>
 #include <boost/make_shared.hpp>
 #include <boost/foreach.hpp>
@@ -83,10 +84,28 @@ namespace network {
 	Logger::Info(_T("stop server innterrupt_type=%d"),innterrupt_type);
     }
 
+	int Server::GetUserCount() const
+	{
+		auto count = std::count_if(sessions_.begin(), sessions_.end(),
+			[](const SessionWeakPtr& s){ return !s.expired() && s.lock()->online(); });
+
+		return count;
+	}
+
+	std::string Server::GetStatusJSON() const
+	{
+		auto msg = (
+					boost::format("{\"ver\":%d.%d.%d,\"cnt\":%d}")
+						% MMO_VERSION_MAJOR % MMO_VERSION_MINOR % MMO_VERSION_REVISION %
+						GetUserCount()
+					).str();
+
+		return msg;
+	}
 
     bool Server::Empty() const
     {
-        return sessions_.size() == 0;
+        return GetUserCount() == 0;
     }
 
     void Server::ReceiveSession(const SessionPtr& session, const boost::system::error_code& error)
@@ -119,15 +138,19 @@ namespace network {
          acceptor_.async_accept(new_session->tcp_socket(),
                  boost::bind(&Server::ReceiveSession, this, new_session, boost::asio::placeholders::error));
 
-        // 使用済のセッションのポインタを破棄
+		RefreshSession();
+    }
+
+	void Server::RefreshSession()
+	{
+		// 使用済のセッションのポインタを破棄
         auto it = std::remove_if(sessions_.begin(), sessions_.end(),
                 [](const SessionWeakPtr& ptr){
             return ptr.expired();
         });
         sessions_.erase(it, sessions_.end());
-
-		Logger::Info("Active connection: %d", sessions_.size() - 1);
-    }
+		Logger::Info("Active connection: %d", GetUserCount());
+	}
 
     void Server::SendAll(const Command& command)
     {
@@ -169,11 +192,16 @@ namespace network {
         }
     }
 
+    void Server::SendUDP(const std::string& message, const boost::asio::ip::udp::endpoint endpoint)
+    {
+		io_service_.post(boost::bind(&Server::DoWriteUDP, this, message, endpoint));
+    }
+
     void Server::ReceiveUDP(const boost::system::error_code& error, size_t bytes_recvd)
     {
         if (bytes_recvd > 0) {
             std::string buffer(receive_buf_udp_, bytes_recvd);
-            FetchUDP(buffer);
+            FetchUDP(buffer, sender_endpoint_);
         }
         if (!error) {
           socket_udp_.async_receive_from(
@@ -216,20 +244,26 @@ namespace network {
 //        }
     }
 
-    Command Server::FetchUDP(const std::string& buffer)
+    void Server::FetchUDP(const std::string& buffer, const boost::asio::ip::udp::endpoint endpoint)
     {
-        uint32_t user_id;
+        unsigned char header;
+		uint32_t user_id;
         unsigned char count;
-        header::CommandHeader header;
         std::string body;
         SessionPtr session;
 
-        size_t readed = network::Utils::Deserialize(buffer, &user_id, &count, &header);
+		size_t readed = 0;
+        if (buffer.size() > network::Utils::Deserialize(buffer, &header)) {
+			readed = network::Utils::Deserialize(buffer, &user_id, &count);
+		}
+
         if (readed < buffer.size()) {
             body = buffer.substr(readed);
         }
 
-        return Command(header, body, session);
+        if (callback_) {
+			(*callback_)(Command(static_cast<network::header::CommandHeader>(header), body, endpoint));
+        }
     }
 
     void Server::ServerSession::Start()
