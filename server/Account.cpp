@@ -266,7 +266,9 @@ std::vector<UserID> Account::GetIDList() const
 {
     std::vector<UserID> list;
     for (auto it = user_map_.begin(); it != user_map_.end(); ++it) {
-        list.push_back(it->first);
+		if (it->first != 0) {
+			list.push_back(it->first);
+		}
     }
     return list;
 }

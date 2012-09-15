@@ -55,6 +55,10 @@ class Account {
         template <class T>
         void Set(UserID user_id, AccountProperty property, T value, bool revision = true)
         {
+			if (user_id == 0) {
+				return;
+			}
+
             T old_value;
             if (!Get(user_id, property, &old_value) || old_value != value) {
 				boost::unique_lock<boost::recursive_mutex> lock(mutex_);

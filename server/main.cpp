@@ -71,6 +71,8 @@ int main(int argc, char* argv[])
         {
             if (auto session = c.session().lock()) {
                 unsigned int id = static_cast<unsigned int>(session->id());
+				assert(id > 0);
+
                 ptime now = second_clock::universal_time();
                 auto time_string = to_iso_extended_string(now);
 
@@ -129,7 +131,7 @@ int main(int argc, char* argv[])
                 server.SendUDPTestPacket(session->global_ip(), session->udp_port());
 
                 long id = account.GetUserIdFromFingerPrint(finger_print);
-                if (id < 1) {
+                if (id == 0) {
                     // 未登録の場合、公開鍵を要求
                     session->Send(network::ClientRequestedPublicKey());
                 } else {
@@ -156,8 +158,9 @@ int main(int argc, char* argv[])
         case network::header::ServerReceivePublicKey:
         {
             if (auto session = c.session().lock()) {
-                long id = account.RegisterPublicKey(c.body());
-                unsigned int user_id = static_cast<unsigned int>(id);
+                unsigned int user_id = account.RegisterPublicKey(c.body());
+				assert(user_id > 0);
+
                 // ログイン
                 session->set_id(user_id);
                 account.LogIn(user_id);
