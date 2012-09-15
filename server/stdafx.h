@@ -50,6 +50,7 @@
 #include <boost/timer.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
 #include <boost/foreach.hpp>

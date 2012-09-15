@@ -57,6 +57,7 @@ class Account {
         {
             T old_value;
             if (!Get(user_id, property, &old_value) || old_value != value) {
+				boost::unique_lock<boost::recursive_mutex> lock(mutex_);
 
                 if (user_map_.find(user_id) == user_map_.end()) {
                     user_map_[user_id] = PropertyMap();
@@ -107,4 +108,6 @@ class Account {
 
         unsigned int revision_;
         UserID max_user_id_;
+
+		boost::recursive_mutex mutex_;
 };

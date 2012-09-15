@@ -28,6 +28,10 @@ namespace network {
     typedef std::shared_ptr<CallbackFunc> CallbackFuncPtr;
     typedef long UserID;
 
+	class Session;
+    typedef boost::weak_ptr<Session> SessionWeakPtr;
+    typedef boost::shared_ptr<Session> SessionPtr;
+
     class Session : public boost::enable_shared_from_this<Session> {
         public:
             Session(boost::asio::io_service& io_service_tcp);
@@ -72,11 +76,12 @@ namespace network {
             Command Deserialize(const std::string& msg);
 
             void ReceiveTCP(const boost::system::error_code& error);
-            void DoWriteTCP(const std::string);
-            void WriteTCP(const boost::system::error_code& error, boost::shared_ptr<std::string> holder);
+            void DoWriteTCP(const std::string, SessionPtr session_holder);
+            void WriteTCP(const boost::system::error_code& error,
+					 boost::shared_ptr<std::string> holder, SessionPtr session_holder);
             void FetchTCP(const std::string&);
 
-            void FatalError();
+            void FatalError(SessionPtr session_holder = SessionPtr());
 
         protected:
             // ソケット
@@ -106,8 +111,5 @@ namespace network {
 
             UserID id_;
     };
-
-    typedef boost::weak_ptr<Session> SessionWeakPtr;
-    typedef boost::shared_ptr<Session> SessionPtr;
 
 }

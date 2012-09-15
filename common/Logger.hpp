@@ -5,6 +5,8 @@
 #pragma once
 #include <iostream>
 #include "unicode.hpp"
+#include <boost/algorithm/string.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #ifndef _WIN32
 #define OutputDebugString(str) (std::cout << str)
@@ -13,9 +15,27 @@
 class Logger {
         // Singleton
     private:
-        Logger() : ofs_("mmo_log.txt") {}
+        Logger() : ofs_(GetLogFileName()) {
+		}
+
         Logger(const Logger& logger) {}
         virtual ~Logger() {}
+
+		inline tstring GetTimeString() const
+		{
+			using namespace boost::posix_time;
+			ptime now = second_clock::universal_time();
+            return unicode::ToTString(to_iso_extended_string(now));
+		}
+
+		inline std::string GetLogFileName() const
+		{
+			using namespace boost::posix_time;
+			ptime now = second_clock::universal_time();
+			std::string date_string = to_iso_extended_string(now);
+			boost::algorithm::replace_all(date_string, ":", "_");
+            return "log_" + date_string + ".txt";
+		}
 
     public:
         static void Info(const tstring& format) {
@@ -112,42 +132,42 @@ class Logger {
         }
 
         void Log(const tstring& prefix, const tstring& format) {
-            auto out = prefix + format + _T("\n");
+            auto out = GetTimeString() + _T(">  ") + prefix + format + _T("\n");
             OutputDebugString(out.c_str());
-	    // std::wcout << unicode::ToWString(out);
-	    //ofs_ << unicode::ToString(out);
+			std::cout << unicode::ToString(out);
+			ofs_ << unicode::ToString(out) << std::flush;
         }
 
         template<class T1>
         void Log(const tstring& prefix, const tstring& format, const T1& t1) {
-            auto out = prefix + (tformat(format) % t1).str() + _T("\n");
+            auto out = GetTimeString() + _T(">  ") + prefix + (tformat(format) % t1).str() + _T("\n");
             OutputDebugString(out.c_str());
-	    // std::wcout << unicode::ToWString(out);
-	    //ofs_ << unicode::ToString(out);
+			std::cout << unicode::ToString(out);
+			ofs_ << unicode::ToString(out) << std::flush;
         }
 
         template<class T1, class T2>
         void Log(const tstring& prefix, const tstring& format, const T1& t1, const T2& t2) {
-            auto out = prefix + (tformat(format) % t1 % t2).str() + _T("\n");
+            auto out = GetTimeString() + _T(">  ") + prefix + (tformat(format) % t1 % t2).str() + _T("\n");
             OutputDebugString(out.c_str());
-	    // std::wcout << unicode::ToWString(out);
-            //ofs_ << unicode::ToString(out);
+			std::cout << unicode::ToString(out);
+            ofs_ << unicode::ToString(out) << std::flush;
         }
 
         template<class T1, class T2, class T3>
         void Log(const tstring& prefix, const tstring& format, const T1& t1, const T2& t2, const T3& t3) {
-            auto out = prefix + (tformat(format) % t1 % t2 % t3).str() + _T("\n");
+            auto out = GetTimeString() + _T(">  ") + prefix + (tformat(format) % t1 % t2 % t3).str() + _T("\n");
             OutputDebugString(out.c_str());
-	    // std::wcout << unicode::ToWString(out);
-	    //ofs_ << unicode::ToString(out);
+			std::cout << unicode::ToString(out);
+			ofs_ << unicode::ToString(out) << std::flush;
         }
 
         template<class T1, class T2, class T3, class T4>
         void Log(const tstring& prefix, const tstring& format, const T1& t1, const T2& t2, const T3& t3, const T4& t4) {
-            auto out = prefix + (tformat(format) % t1 % t2 % t3 % t4).str() + _T("\n");
+            auto out = GetTimeString() + _T(">  ") + prefix + (tformat(format) % t1 % t2 % t3 % t4).str() + _T("\n");
             OutputDebugString(out.c_str());
-	    // std::wcout << unicode::ToWString(out);
-	    //ofs_ << unicode::ToString(out);
+			std::cout << unicode::ToString(out);
+			ofs_ << unicode::ToString(out) << std::flush;
         }
 
 	std::ofstream ofs_;

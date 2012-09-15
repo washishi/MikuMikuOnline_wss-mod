@@ -45,7 +45,7 @@ namespace network {
         write_byte_sum_ += msg.size();
         UpdateWriteByteAverage();
 
-        io_service_tcp_.post(boost::bind(&Session::DoWriteTCP, this, msg));
+        io_service_tcp_.post(boost::bind(&Session::DoWriteTCP, this, msg, shared_from_this()));
     }
 
     void Session::SyncSend(const Command& command)
@@ -256,7 +256,7 @@ namespace network {
         }
     }
 
-    void Session::DoWriteTCP(const std::string msg)
+    void Session::DoWriteTCP(const std::string msg, SessionPtr session_holder)
     {
         bool write_in_progress = !send_queue_.empty();
         send_queue_.push(msg);
@@ -269,11 +269,12 @@ namespace network {
           boost::asio::async_write(socket_tcp_,
               boost::asio::buffer(s->data(), s->size()),
               boost::bind(&Session::WriteTCP, this,
-                boost::asio::placeholders::error, s));
+                boost::asio::placeholders::error, s, session_holder));
         }
     }
 
-    void Session::WriteTCP(const boost::system::error_code& error, boost::shared_ptr<std::string> holder)
+    void Session::WriteTCP(const boost::system::error_code& error,
+		boost::shared_ptr<std::string> holder, SessionPtr session_holder)
     {
         if (!error) {
             if (!send_queue_.empty()) {
@@ -287,11 +288,11 @@ namespace network {
                     boost::asio::async_write(socket_tcp_,
                         boost::asio::buffer(s->data(), s->size()),
                         boost::bind(&Session::WriteTCP, this,
-                          boost::asio::placeholders::error, s));
+                          boost::asio::placeholders::error, s, session_holder));
                   }
             }
         } else {
-            FatalError();
+            FatalError(session_holder);
         }
     }
 
@@ -306,7 +307,7 @@ namespace network {
         }
     }
 
-    void Session::FatalError()
+    void Session::FatalError(SessionPtr session_holder)
     {
         if (online_) {
             online_ = false;
