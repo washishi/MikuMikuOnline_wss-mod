@@ -9,6 +9,7 @@ LIBDIRS = -L/usr/lib -L/usr/local/lib
 
 TARGET = server
 OBJS := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
+OBJS += $(patsubst %.cpp,%.o,$(wildcard ../common/*.cpp))
 OBJS += $(patsubst %.cpp,%.o,$(wildcard ../common/network/*.cpp))
 OBJS += $(patsubst %.c,%.o,$(wildcard ../common/network/lz4/*.c))
 
