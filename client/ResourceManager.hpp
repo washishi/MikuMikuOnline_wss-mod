@@ -76,13 +76,14 @@ class ResourceManager {
         static void BuildModelFileTree();
         static void CacheBakedModel();
         static ModelHandle LoadModelFromName(const tstring&, bool async = false);
+
         static void RequestModelFromName(const tstring&);
         static bool IsCachedModelName(const tstring&);
 		static const std::vector<std::string>& GetModelNameList();
+
 		static void SetModelEdgeSize(int handle);
 		static void set_model_edge_size(float edge_size);
 
-	private:
 		static tstring NameToFullPath(const tstring& name);
 
     private:

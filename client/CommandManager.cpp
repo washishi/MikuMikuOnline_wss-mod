@@ -58,8 +58,7 @@ void CommandManager::Update()
 			case ClientReceiveServerInfo:
 			{
 				network::Utils::Deserialize(command->body(), & stage_);
-				const auto& model_list = ResourceManager::GetModelNameList();
-				if (std::find(model_list.begin(),model_list.end(), stage_) == model_list.end()) {
+				if (ResourceManager::NameToFullPath(unicode::ToTString(stage_)).empty()) {
 					status_ = STATUS_ERROR_NOSTAGE;
 				} else {
 					status_ = STATUS_READY;

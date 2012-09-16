@@ -32,6 +32,8 @@ zip.write(os.path.join(base_dir, 'readme.txt'), 'readme.txt')
 zip.write(os.path.join(base_dir, 'license.txt'), 'license.txt')
 zip.write(os.path.join(base_dir, 'mmd.txt'), 'mmd.txt')
 
+zip.write(os.path.join(base_dir, 'server/config.json'), 'server/config.json')
+
 zip.write(os.path.join(bin_path, 'config.json'), 'config.json')
 zip.write(os.path.join(bin_path, 'server/server.exe'), 'server/server.exe')
 
