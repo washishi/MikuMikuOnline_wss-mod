@@ -114,7 +114,7 @@ namespace network {
 
     void Server::ReceiveSession(const SessionPtr& session, const boost::system::error_code& error)
     {
-        if (session_read_average_ > min_session_read_average_) {
+		if (GetUserCount() < config_.capacity()) {
             session->set_on_receive(callback_);
             session->Start();
             sessions_.push_back(SessionWeakPtr(session));

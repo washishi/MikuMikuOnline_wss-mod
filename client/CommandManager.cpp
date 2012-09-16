@@ -70,11 +70,13 @@ void CommandManager::Update()
 			// プレイヤー位置更新
 			case ClientUpdatePlayerPosition:
 			{
-				PlayerPosition pos;
-				uint32_t user_id;
-				network::Utils::Deserialize(command->body(), &user_id, &pos.x, &pos.y, &pos.z, &pos.theta, &pos.vy);
+				if (status_ == STATUS_READY) {
+					PlayerPosition pos;
+					uint32_t user_id;
+					network::Utils::Deserialize(command->body(), &user_id, &pos.x, &pos.y, &pos.z, &pos.theta, &pos.vy);
 
-				player_manager->UpdatePlayerPosition(user_id, pos);
+					player_manager->UpdatePlayerPosition(user_id, pos);
+				}
 			}
 				break;
 
