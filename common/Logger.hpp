@@ -7,6 +7,7 @@
 #include "unicode.hpp"
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/filesystem.hpp>
 
 #ifndef _WIN32
 #define OutputDebugString(str) (std::cout << str)
@@ -15,7 +16,14 @@
 class Logger {
         // Singleton
     private:
-        Logger() : ofs_(GetLogFileName()) {
+        inline Logger() {
+			using namespace boost::filesystem;
+
+			if (!exists("./log")) {
+				create_directory("./log");
+			}
+
+			ofs_.open("./log/" + GetLogFileName());
 		}
 
         Logger(const Logger& logger) {}

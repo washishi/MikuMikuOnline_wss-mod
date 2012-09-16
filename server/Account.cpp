@@ -89,6 +89,12 @@ std::string Account::GetUserRevisionPatch(UserID user_id, unsigned int revision)
     return patch;
 }
 
+void Account::Remove(UserID user_id)
+{
+	boost::unique_lock<boost::recursive_mutex> lock(mutex_);
+	user_map_.erase(user_id);
+}
+
 /*
 void Account::ApplyRevisionPatch(const std::string& patch)
 {

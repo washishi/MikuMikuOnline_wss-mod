@@ -34,6 +34,8 @@ class Account {
         void LogOut(UserID);
         void LogOutAll();
 
+		void Remove(UserID);
+
         std::string GetUserName(UserID) const;
         void SetUserName(UserID, const std::string&);
         std::string GetUserTrip(UserID) const;

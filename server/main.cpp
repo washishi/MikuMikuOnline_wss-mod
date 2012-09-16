@@ -30,6 +30,9 @@ using namespace boost::posix_time;
 
 int main(int argc, char* argv[])
 {
+    // 設定を読み込み
+    Config config("config.json");
+
 	Logger::Info(_T("%s"), unicode::ToTString(MMO_VERSION_TEXT));
 
  try {
@@ -37,19 +40,9 @@ int main(int argc, char* argv[])
     // 署名
     network::Signature sign("server_key");
 
-    // 設定を読み込み
-    Config config("config.json");
-
     // アカウント
     Account account("account.db");
-
-    int port = config.port();
-    network::Server server(port);
-
-    // サーバー設定
-    server.set_max_total_read_average(config.max_total_read_average());
-    server.set_max_session_read_average(config.max_session_read_average());
-    server.set_min_session_read_average(config.min_session_read_average());
+    network::Server server(config);
 
     auto callback = std::make_shared<std::function<void(network::Command)>>(
             [&server, &account, &sign](network::Command c){
@@ -294,6 +287,7 @@ int main(int argc, char* argv[])
                                 account.GetUserRevision(user_id)));
 
                 Logger::Info("Logout User: %d", user_id);
+				// account.Remove(user_id);
             }
         }
         Logger::Info(msg);

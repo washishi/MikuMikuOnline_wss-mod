@@ -8,6 +8,7 @@
 #include <list>
 #include <functional>
 #include "../common/network/Session.hpp"
+#include "Config.hpp"
 
 #define UDP_MAX_RECEIVE_LENGTH (2048)
 #define UDP_TEST_PACKET_TIME (5)
@@ -25,7 +26,7 @@ class Server {
         };
 
     public:
-        Server(uint16_t port);
+        Server(const Config& config);
         void Start(CallbackFuncPtr callback);
         void Stop();
         void Stop(int interrupt_type);
@@ -59,6 +60,8 @@ class Server {
         void FetchUDP(const std::string& buffer, const boost::asio::ip::udp::endpoint endpoint);
 
     private:
+	   Config config_;
+
        boost::asio::io_service io_service_;
        tcp::endpoint endpoint_;
        tcp::acceptor acceptor_;

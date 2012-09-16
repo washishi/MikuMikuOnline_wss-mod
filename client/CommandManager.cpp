@@ -12,7 +12,8 @@
 #include "Profiler.hpp"
 
 CommandManager::CommandManager(const ManagerAccessorPtr& manager_accessor) :
-manager_accessor_(manager_accessor)
+	manager_accessor_(manager_accessor),
+	status_(STATUS_STANDBY)
 {
 }
 
@@ -103,6 +104,7 @@ void CommandManager::Update()
 void CommandManager::set_client(ClientUniqPtr client)
 {
     client_= std::move(client);
+	status_ = STATUS_CONNECTING;
 }
 
 
@@ -139,3 +141,7 @@ void CommandManager::SendJSON(const std::string& msg) {
     }
 }
 
+Status CommandManager::status() const
+{
+	return status_;
+}

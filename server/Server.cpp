@@ -13,10 +13,11 @@
 
 namespace network {
 
-    Server::Server(uint16_t port) :
-            endpoint_(tcp::v4(), port),
+    Server::Server(const Config& config) :
+			config_(config),
+            endpoint_(tcp::v4(), config.port()),
             acceptor_(io_service_, endpoint_),
-            socket_udp_(io_service_, udp::endpoint(udp::v4(), port)),
+            socket_udp_(io_service_, udp::endpoint(udp::v4(), config.port())),
             udp_packet_count_(0),
             max_total_read_average_(5000),
             max_session_read_average_(600),
@@ -95,9 +96,12 @@ namespace network {
 	std::string Server::GetStatusJSON() const
 	{
 		auto msg = (
-					boost::format("{\"ver\":%d.%d.%d,\"cnt\":%d}")
-						% MMO_VERSION_MAJOR % MMO_VERSION_MINOR % MMO_VERSION_REVISION %
-						GetUserCount()
+					boost::format("{\"nam\":\"%s\",\"ver\":\"%d.%d.%d\",\"cnt\":%d,\"cap\":%d,\"stg\":\"%s\"}")
+						% config_.server_name()
+						% MMO_VERSION_MAJOR % MMO_VERSION_MINOR % MMO_VERSION_REVISION
+						% GetUserCount()
+						% config_.capacity()
+						% config_.stage()
 					).str();
 
 		return msg;
