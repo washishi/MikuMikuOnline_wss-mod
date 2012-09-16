@@ -24,7 +24,7 @@ void CommandManager::Update()
     if (client_)
     {
         auto command = client_->PopCommand();
-
+		
 		if (command) {
 			unsigned int header =  command->header();
 
@@ -46,6 +46,14 @@ void CommandManager::Update()
 				}
 			}
 				break;
+
+			// サーバーデータ受信
+			case ClientReceiveServerInfo:
+			{
+				network::Utils::Deserialize(command->body(), & stage_);
+				status_ = STATUS_READY;
+			}
+			break;
 
 			case ClientReceiveJSON:
 			// case ClientReceiveChatLog:
@@ -104,7 +112,7 @@ void CommandManager::Update()
 void CommandManager::set_client(ClientUniqPtr client)
 {
     client_= std::move(client);
-	status_ = STATUS_CONNECTING;
+	// status_ = STATUS_CONNECTING;
 }
 
 
@@ -141,7 +149,12 @@ void CommandManager::SendJSON(const std::string& msg) {
     }
 }
 
-Status CommandManager::status() const
+CommandManager::Status CommandManager::status() const
 {
 	return status_;
+}
+
+std::string CommandManager::stage() const
+{
+	return stage_;
 }

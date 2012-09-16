@@ -158,4 +158,9 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
         ClientReceiveJSON(const std::string& info_json, const std::string& message_json);
     };
 
+	class ClientReceiveServerInfo : public Command {
+    public:
+        ClientReceiveServerInfo(const std::string& stage);
+	};
+
 }

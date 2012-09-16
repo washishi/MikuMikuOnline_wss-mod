@@ -33,6 +33,7 @@ class CommandManager {
 
         void set_client(ClientUniqPtr client);
         unsigned int user_id();
+		std::string stage() const;
 
 		Status status() const;
 
@@ -40,6 +41,7 @@ class CommandManager {
         ManagerAccessorPtr manager_accessor_;
         ClientUniqPtr client_;
 		Status status_;
+		std::string stage_;
 };
 
 typedef std::shared_ptr<CommandManager> CommandManagerPtr;

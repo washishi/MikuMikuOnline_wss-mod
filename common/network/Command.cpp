@@ -151,4 +151,10 @@ ClientReceiveJSON::ClientReceiveJSON(const std::string& info_json, const std::st
 {
 }
 
+ClientReceiveServerInfo::ClientReceiveServerInfo(const std::string& stage) :
+	Command(header::ClientReceiveServerInfo, Utils::Serialize(stage))
+{
+
+}
+
 }

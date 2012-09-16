@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     network::Server server(config);
 
     auto callback = std::make_shared<std::function<void(network::Command)>>(
-            [&server, &account, &sign](network::Command c){
+            [&server, &account, &sign, &config](network::Command c){
 
         // ログを出力
         auto msg = (boost::format("Receive: 0x%08x %dbyte") % c.header() % c.body().size()).str();
@@ -186,6 +186,9 @@ int main(int argc, char* argv[])
         case network::header::ServerStartEncryptedSession:
         {
             if (auto session = c.session().lock()) {
+				
+				session->Send(network::ClientReceiveServerInfo(config.stage()));
+
                 session->Send(network::ClientStartEncryptedSession());
                 session->EnableEncryption();
 
