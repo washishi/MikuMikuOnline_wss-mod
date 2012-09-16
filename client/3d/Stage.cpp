@@ -32,7 +32,7 @@ Stage::Stage(const tstring& model_name) :
         float z = it->second.get<float>("z", 0);
         warp_points_.push_back(VGet(x, y, z));
     }
-    if (start_points_.empty()) {
+    if (warp_points_.empty()) {
         warp_points_.push_back(VGet(0,0,0));
     }
 
