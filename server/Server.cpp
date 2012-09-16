@@ -43,12 +43,12 @@ namespace network {
             }
 
             // 通信量制限を越えていた場合、強制的に切断
-            else if (auto session = c.session().lock()) {
-                if (session->GetReadByteAverage() > session_read_average_) {
-					Logger::Info(_T("Banished session: %d"), session->id());
-                    session->Close();
-                }
-            }
+     //       else if (auto session = c.session().lock()) {
+     //           if (session->GetReadByteAverage() > session_read_average_) {
+					//Logger::Info(_T("Banished session: %d"), session->id());
+     //               session->Close();
+     //           }
+     //       }
 
             if (callback) {
                 (*callback)(c);
@@ -272,6 +272,10 @@ namespace network {
 
         // Nagleアルゴリズムを無効化
         socket_tcp_.set_option(boost::asio::ip::tcp::no_delay(true));
+
+		// バッファサイズを変更 1MiB
+		boost::asio::socket_base::receive_buffer_size option(1048576);
+		socket_tcp_.set_option(option);
 
         // IPアドレスを取得
         global_ip_ = socket_tcp_.remote_endpoint().address().to_string();

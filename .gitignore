@@ -4,6 +4,7 @@
 *.sln
 *.vcxproj
 *.vcxproj.filters
+log_*.txt
 /ipch
 /Release
 /Debug
