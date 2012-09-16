@@ -63,6 +63,7 @@ Client::Client(const std::string& host,
         iterator_ = resolver_.resolve(query);
     } catch (const std::exception& e) {
         Logger::Error(_T("%s"), unicode::ToTString(e.what()));
+		command_queue_.push(network::FatalConnectionError());
         return;
     }
 
@@ -211,7 +212,9 @@ Client::Client(const std::string& host,
 
 Client::~Client()
 {
-    session_->Close();
+	if (session_) {
+		session_->Close();
+	}
     thread_.join();
     //Close();
 }

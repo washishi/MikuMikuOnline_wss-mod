@@ -6,6 +6,7 @@
 #include "CardManager.hpp"
 #include "PlayerManager.hpp"
 #include "AccountManager.hpp"
+#include "ResourceManager.hpp"
 #include "../common/Logger.hpp"
 #include "Client.hpp"
 #include "../common/network/Utils.hpp"
@@ -47,11 +48,22 @@ void CommandManager::Update()
 			}
 				break;
 
+			case ClientReceiveServerCrowdedError:
+			{
+				status_ = STATUS_ERROR_CROWDED;
+			}
+			break;
+
 			// サーバーデータ受信
 			case ClientReceiveServerInfo:
 			{
 				network::Utils::Deserialize(command->body(), & stage_);
-				status_ = STATUS_READY;
+				const auto& model_list = ResourceManager::GetModelNameList();
+				if (std::find(model_list.begin(),model_list.end(), stage_) == model_list.end()) {
+					status_ = STATUS_ERROR_NOSTAGE;
+				} else {
+					status_ = STATUS_READY;
+				}
 			}
 			break;
 
@@ -103,6 +115,11 @@ void CommandManager::Update()
 				player_manager->ApplyRevisionPatch(command->body());
 			}
 				break;
+
+			case FatalConnectionError:
+			{
+				status_ = STATUS_ERROR;
+			}
 
 			default:
 				break;

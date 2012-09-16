@@ -6,6 +6,8 @@
 
 #include <memory>
 #include "Base.hpp"
+#include "../ui/UILabel.hpp"
+#include "../ui/UIButton.hpp"
 #include "../ManagerAccessor.hpp"
 
 namespace scene {
@@ -30,6 +32,12 @@ class Connect : public Base {
         AccountManagerPtr account_manager_;
         ConfigManagerPtr config_manager_;
 		CommandManagerPtr command_manager_;
+		
+		UILabel message_;
+		UILabel button_label_;
+        UIButton button_;
+
+		bool return_flag_;
 
         BasePtr next_scene_;
 };
