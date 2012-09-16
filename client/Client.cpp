@@ -328,6 +328,10 @@ void Client::ClientSession::Connect(const boost::system::error_code& error)
         // Nagleアルゴリズムを無効化
         socket_tcp_.set_option(boost::asio::ip::tcp::no_delay(true));
 
+		// バッファサイズを変更 1MiB
+		boost::asio::socket_base::receive_buffer_size option(1048576);
+		socket_tcp_.set_option(option);
+
         boost::asio::async_read_until(socket_tcp_, receive_buf_, NETWORK_UTILS_DELIMITOR,
                 boost::bind(&ClientSession::ReceiveTCP, shared_from_this(),
                         boost::asio::placeholders::error));
