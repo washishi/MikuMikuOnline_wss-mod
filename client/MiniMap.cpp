@@ -4,6 +4,7 @@
 
 #include "MiniMap.hpp"
 #include "Profiler.hpp"
+#include "CommandManager.hpp"
 
 const int MiniMap::BASE_BLOCK_SIZE = 24;
 float MiniMap::ZOOM_SIZE = 1.0f;
@@ -166,17 +167,18 @@ void MiniMap::Draw()
 void MiniMap::DrawPosAndCalc()
 {
 
-	auto player_manager_ = manager_accessor_->player_manager().lock();
-	auto world_manager_ = manager_accessor_->world_manager().lock();
+	auto player_manager = manager_accessor_->player_manager().lock();
+	auto world_manager = manager_accessor_->world_manager().lock();
+	auto command_manager = manager_accessor_->command_manager().lock();
 
-	const auto& providers = player_manager_->char_data_providers();
-	auto myself_pos = player_manager_->char_data_providers()[player_manager_->charmgr()->my_character_id()]->position();
+	const auto& providers = player_manager->char_data_providers();
+	auto myself_pos = player_manager->char_data_providers()[player_manager->charmgr()->my_character_id()]->position();
 
 	VECTOR direction = {0},move_direction = {0};
 	move_direction = VSize(myself_pos - prev_myself_pos_on_map_) == 0 ? move_direction : myself_pos - prev_myself_pos_on_map_;
 	move_direction.y = 0;
 	float tmp_pos_x = 0, tmp_pos_z = 0;
-	auto theta = 0.0f, mtheta = player_manager_->char_data_providers()[player_manager_->charmgr()->my_character_id()]->theta();
+	auto theta = 0.0f, mtheta = player_manager->char_data_providers()[player_manager->charmgr()->my_character_id()]->theta();
 
 	// 先に自分の位置を描画【中央固定】
 	DrawCircle( absolute_x() + absolute_width()/2, absolute_y() + absolute_height()/2, 2, GetColor(206,52,95));
@@ -184,25 +186,32 @@ void MiniMap::DrawPosAndCalc()
 	auto it = providers.begin();
 	for(it; it != providers.end(); ++it)
 	{
-		if(it->first == player_manager_->charmgr()->my_character_id())continue;
+		if(it->first == player_manager->charmgr()->my_character_id())continue;
 
 		direction = VSub(it->second->position(),myself_pos);
 		direction.y = 0;
 		theta = atan2( -direction.x, -direction.z);
-		tmp_pos_x = ( sin(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager_->stage()->map_scale()) )/ 3.0f + absolute_x() + absolute_width()/2;
-		tmp_pos_z = ( cos(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager_->stage()->map_scale()) )/ 3.0f + absolute_y() + absolute_height()/2; // y座標化する
+		tmp_pos_x = ( sin(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager->stage()->map_scale()) )/ 3.0f + absolute_x() + absolute_width()/2;
+		tmp_pos_z = ( cos(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager->stage()->map_scale()) )/ 3.0f + absolute_y() + absolute_height()/2; // y座標化する
 		if(tmp_pos_x < absolute_x() + 12)tmp_pos_x = absolute_x() + 12;
 		if(tmp_pos_x > absolute_x() + absolute_width() - 12)tmp_pos_x = absolute_x() + absolute_width() - 12;
 		if(tmp_pos_z < absolute_y() + 12)tmp_pos_z = absolute_y() + 12;
 		if(tmp_pos_z > absolute_y() + absolute_height() -12)tmp_pos_z = absolute_y() + absolute_height() - 12;
 		DrawCircle( tmp_pos_x, tmp_pos_z, 2, GetColor(23,162,175),TRUE);
 	}
-	prev_myself_pos_on_map_ = player_manager_->char_data_providers()[player_manager_->charmgr()->my_character_id()]->position();
+	prev_myself_pos_on_map_ = player_manager->char_data_providers()[player_manager->charmgr()->my_character_id()]->position();
 
-	TCHAR tcs_tmp[256];
-	_stprintf(tcs_tmp, _T("ログイン人数: %d"),player_manager_->GetAll().size());
-	DrawBox(absolute_x() + 12,absolute_y() + absolute_height() - 24,absolute_x() + absolute_width() - 12,absolute_y() + absolute_height() - 6,GetColor(133,211,192),TRUE);
-	DrawStringToHandle(absolute_x() + 10,absolute_y() + absolute_height() - 24 + 2, tcs_tmp,GetColor(34,34,34),font_handle_);
+	tstring login_num;
+	int color;
+	if (command_manager->status() == CommandManager::STATUS_ERROR) {
+		login_num = _T("オフライン");
+		color = GetColor(255,163,167);
+	} else {
+		login_num = (tformat(_T("ログイン人数: %d")) % player_manager->GetAll().size()).str();
+		color = GetColor(133,211,192);
+	}
+	DrawBox(absolute_x() + 12,absolute_y() + absolute_height() - 24,absolute_x() + absolute_width() - 12,absolute_y() + absolute_height() - 6,color,TRUE);
+	DrawStringToHandle(absolute_x() + 12,absolute_y() + absolute_height() - 24, login_num.c_str(),GetColor(34,34,34),font_handle_);
 }
 
 void MiniMap::Update()

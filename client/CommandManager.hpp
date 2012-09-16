@@ -37,7 +37,7 @@ class CommandManager {
         unsigned int user_id();
 		std::string stage() const;
 
-		Status status() const;
+		Status status() const;		
 
     private:
         ManagerAccessorPtr manager_accessor_;
