@@ -40,6 +40,7 @@ FieldPlayer::FieldPlayer(CharacterDataProvider& data_provider, const StagePtr& s
         model_handle_(),
         stage_(stage),
         any_move_(),
+		dummy_move_count_(0),
         data_provider_(data_provider),
         camera_roty_(nullptr)
 {
@@ -117,7 +118,7 @@ void FieldPlayer::SetModel(const ModelHandle& model)
     motion.run_ = MV1GetAnimIndex(model_handle_.handle(), _T("run"));
 
     motion_player_.reset(new MotionPlayer(model_handle_.handle()));
-    motion_player_->Play(motion.stand_, false, 0, -1, FALSE);
+	dummy_move_count_ = 2;
 }
 
 void FieldPlayer::Update()
@@ -386,14 +387,22 @@ void FieldPlayer::InputFromUser()
 	*/
 
     int move_dir = 0;
-    if (input.GetKeyCount(InputManager::KEYBIND_FORWARD) > 0)
-    {
-        ++move_dir;
-    }
-    if (input.GetKeyCount(InputManager::KEYBIND_BACK) > 0)
-    {
-        --move_dir;
-    }
+
+	if (dummy_move_count_ > 0) {
+		dummy_move_count_--;
+		if (dummy_move_count_ == 1) {
+			++move_dir;
+		}
+	} else {
+		if (input.GetKeyCount(InputManager::KEYBIND_FORWARD) > 0)
+		{
+			++move_dir;
+		}
+		if (input.GetKeyCount(InputManager::KEYBIND_BACK) > 0)
+		{
+			--move_dir;
+		}
+	}
 
     if(input.GetGamepadAnalogY() > 0) {
         --move_dir;

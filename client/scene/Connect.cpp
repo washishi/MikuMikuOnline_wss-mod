@@ -84,7 +84,8 @@ void Connect::Update()
 		command_manager_->set_client(ClientUniqPtr());
 		break;
 	case CommandManager::STATUS_ERROR_NOSTAGE:
-		message_.set_text(_T("エラー：サーバーが指定するステージモデルを持っていません"));
+		message_.set_text((tformat(_T("エラー：接続するにはステージデータ「%s」が必要です")) % 
+			unicode::ToTString(command_manager_->stage())).str());
 		command_manager_->set_client(ClientUniqPtr());
 		break;
 	}
