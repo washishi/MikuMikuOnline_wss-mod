@@ -30,11 +30,10 @@ Stage::Stage(const tstring& model_name) :
         float x = it->second.get<float>("x", 0);
         float y = it->second.get<float>("y", 0);
         float z = it->second.get<float>("z", 0);
-		auto host = it->second.get<std::string>("host",unicode::ToString(_T("127.0.0.1")));
-        warp_points_.push_back(std::make_pair<VECTOR,std::string>(VGet(x, y, z),host));
+        warp_points_.push_back(VGet(x, y, z));
     }
     if (start_points_.empty()) {
-        warp_points_.push_back(std::make_pair<VECTOR,std::string>(VGet(0,0,0),"127.0.0.1"));
+        warp_points_.push_back(VGet(0,0,0));
     }
 
     auto skymap_name = map_handle_.property().get<std::string>("stage.skydome", unicode::ToString(_T("skydome:入道雲のある風景")));
@@ -76,30 +75,30 @@ bool Stage::GetFloorY(const VECTOR& v1, const VECTOR& v2, float* y) const
     return coll_info.HitFlag;
 }
 
-std::pair<bool,std::string> Stage::CheckWarpPoint(const VECTOR& v)
+bool Stage::CheckWarpPoint(const VECTOR& v)
 {
 	if(
-		warp_points_[0].first.x == 0 &&
-		warp_points_[0].first.y == 0 &&
-		warp_points_[0].first.z == 0)return std::make_pair<bool,std::string>(false,"");
+		warp_points_[0].x == 0 &&
+		warp_points_[0].y == 0 &&
+		warp_points_[0].z == 0)return false;
 	auto it = warp_points_.begin();
 	auto vec = VGet(0,200,0);
 	VECTOR check_vec = VGet(0,0,0);
 
 	for(it;it != warp_points_.end(); ++it)
 	{
-		check_vec = v - VGet(it->first.x,it->first.y-100,it->first.z);
+		check_vec = v - VGet(it->x,it->y-100,it->z);
 		auto s = VSize(check_vec);
 		auto t = VSize(vec*cos(VRad(check_vec,vec)));
 		if((s * s) - (t * t) <= ( 8 * 8 ))
 		{
-			return std::make_pair<bool,std::string>(true,it->second);
+			return true;
 		}
 	}
-	return std::make_pair<bool,std::string>(false,"");
+	return false;
 }
 
-void Stage::SetHostChangeFlag(std::pair<bool,std::string> flag)
+void Stage::SetHostChangeFlag(bool flag)
 {
 	host_change_flag_ = flag;
 }
@@ -260,7 +259,7 @@ float Stage::min_height() const
     return min_height_;
 }
 
-const std::pair<bool,std::string>& Stage::host_change_flag() const
+const bool& Stage::host_change_flag() const
 {
 	return host_change_flag_;
 }

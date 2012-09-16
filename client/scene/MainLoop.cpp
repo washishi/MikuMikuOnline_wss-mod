@@ -126,9 +126,9 @@ void MainLoop::ProcessInput(InputManager *input)
 
 BasePtr MainLoop::NextScene()
 {
-	if(world_manager_->stage()->host_change_flag().first)
+	if(world_manager_->stage()->host_change_flag())
 	{
-		account_manager_->set_host(world_manager_->stage()->host_change_flag().second);
+		//account_manager_->set_host(world_manager_->stage()->host_change_flag().second);
 		return BasePtr(new scene::ServerChange(manager_accessor_));
 	}else{
 		return nullptr;

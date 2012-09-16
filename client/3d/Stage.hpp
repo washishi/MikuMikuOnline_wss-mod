@@ -18,7 +18,7 @@ class Stage {
 
         float GetFloorY(const VECTOR& v1, const VECTOR& v2) const;
         bool GetFloorY(const VECTOR& v1, const VECTOR& v2, float* y) const;
-		std::pair<bool,std::string> CheckWarpPoint(const VECTOR& v);
+		bool CheckWarpPoint(const VECTOR& v);
 
         std::pair<bool, VECTOR> FloorExists(const VECTOR& foot_pos, float model_height, float collision_depth_limit) const;
         bool IsFlatFloor(const VECTOR& foot_pos, const VECTOR& direction) const;
@@ -32,10 +32,10 @@ class Stage {
         float min_height() const;
 
         const std::vector<VECTOR>& start_points() const;
-		const std::vector<std::pair<VECTOR,std::string>>& warp_points() const;
-		const std::pair<bool,std::string>& host_change_flag() const;
+		const std::vector<VECTOR>& warp_points() const;
+		const bool& host_change_flag() const;
 
-		void SetHostChangeFlag(std::pair<bool,std::string> flag);
+		void SetHostChangeFlag(bool flag);
 
         void UpdateSkymapPosition(const VECTOR& pos);
 
@@ -46,9 +46,9 @@ class Stage {
         ModelHandle skymap_handle_;
 
         std::vector<VECTOR> start_points_;
-		std::vector<std::pair<VECTOR,std::string>> warp_points_;
+		std::vector<VECTOR> warp_points_;
 
-		std::pair<bool,std::string> host_change_flag_;
+		bool host_change_flag_;
 };
 
 typedef std::shared_ptr<Stage> StagePtr;

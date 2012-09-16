@@ -378,7 +378,7 @@ void FieldPlayer::InputFromUser()
         : 90.0f) * PHI_F / 180;
 
 	auto warp_chk = stage_->CheckWarpPoint(current_stat_.pos);
-	if (warp_chk.first && input.GetKeyCount(InputManager::KEYBIND_ENTER) > 0 )
+	if (warp_chk && input.GetKeyCount(InputManager::KEYBIND_ENTER) > 0 )
 	{
 		stage_->SetHostChangeFlag(warp_chk);
 	}
