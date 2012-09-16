@@ -10,7 +10,8 @@
 Stage::Stage(const tstring& model_name) :
     map_handle_(ResourceManager::LoadModelFromName(model_name)),
     map_scale_(map_handle_.property().get<float>("scale", 20.0)),
-	min_height_(map_handle_.property().get<float>("min_height", -200.0))
+	min_height_(map_handle_.property().get<float>("min_height", -200.0)),
+	host_change_flag_(false)
 {
     MV1SetScale(map_handle_.handle(), VGet(map_scale_, map_scale_, map_scale_));
     MV1SetupCollInfo(map_handle_.handle(), -1, 128, 64, 128);// 元の数値は256,256,256
