@@ -29,6 +29,7 @@ void ConfigManager::Load(const std::string& filename)
     upnp_ = pt.get<bool>("upnp", false);
     udp_port_ = pt.get<uint16_t>("udp_port", 39391);
 	model_edge_size_ = pt.get<float>("edge_size",1.0f);
+	stage_ = pt.get<std::string>("stage","ƒPƒƒŠƒ“’¬");
 
 }
 
@@ -103,4 +104,9 @@ bool  ConfigManager::shader_depth_field() const
 float ConfigManager::model_edge_size() const
 {
 	return model_edge_size_;
+}
+
+std::string ConfigManager::stage() const
+{
+	return stage_;
 }

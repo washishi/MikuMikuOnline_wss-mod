@@ -35,6 +35,8 @@ class ConfigManager
 
 		float model_edge_size_;
 
+		std::string stage_;
+
     public:
         bool fullscreen() const;
         int screen_width() const;
@@ -53,6 +55,8 @@ class ConfigManager
 		bool shader_depth_field() const;
 
 		float model_edge_size() const;
+
+		std::string stage() const;
 
     private:
         ManagerAccessorPtr manager_accessor_;
