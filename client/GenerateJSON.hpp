@@ -9,8 +9,6 @@
 #include <shlwapi.h>
 #include <DxLib.h>
 
-#pragma comment(lib, "shlwapi.lib")
-
 #define PMDINFO_SIZE 0x11A
 
 class JsonGen

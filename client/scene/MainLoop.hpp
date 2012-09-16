@@ -28,6 +28,7 @@ class MainLoop : public Base {
         void Update();
         void Draw();
         void End();
+		BasePtr NextScene();
 
     private:
         std::function<void(const tstring&)> push_message_;

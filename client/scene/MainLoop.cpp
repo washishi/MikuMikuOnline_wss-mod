@@ -6,6 +6,9 @@
 #include <vector>
 #include <algorithm>
 #include "../ResourceManager.hpp"
+#include "../Core.hpp"
+#include <shlwapi.h>
+#include "ServerChange.hpp"
 
 namespace scene {
 MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
@@ -99,12 +102,36 @@ void MainLoop::End()
 
 void MainLoop::ProcessInput(InputManager *input)
 {
-	if(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) > 0)
+	if(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) > 0 && !inputbox_.IsActive())
 	{
 		TCHAR tmp_str[MAX_PATH];
 		_stprintf( tmp_str , _T(".\\screenshot\\ss%03d.png") , snapshot_number_ );
+		if(PathFileExists(tmp_str))
+		{
+			while(1)
+			{
+				snapshot_number_++;
+				_stprintf( tmp_str , _T(".\\screenshot\\ss%03d.png") , snapshot_number_ );
+				if(!PathFileExists(tmp_str))break;
+			}
+		}
 		SaveDrawScreenToPNG( 0, 0, config_manager_->screen_width(), config_manager_->screen_height(),tmp_str);
 		snapshot_number_++;
+		while(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) > 0)
+		{
+			input->Update();
+		}
+	}
+}
+
+BasePtr MainLoop::NextScene()
+{
+	if(world_manager_->stage()->host_change_flag().first)
+	{
+		account_manager_->set_host(world_manager_->stage()->host_change_flag().second);
+		return BasePtr(new scene::ServerChange(manager_accessor_));
+	}else{
+		return nullptr;
 	}
 }
 

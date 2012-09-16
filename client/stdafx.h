@@ -20,6 +20,9 @@
 // Windows ヘッダー ファイル:
 #include <windows.h>
 #include <DxLib.h>
+#include <shlwapi.h>
+
+#pragma comment(lib, "shlwapi.lib")
 
 #endif
 

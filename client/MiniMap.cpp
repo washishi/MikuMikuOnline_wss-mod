@@ -201,8 +201,8 @@ void MiniMap::DrawPosAndCalc()
 
 	TCHAR tcs_tmp[256];
 	_stprintf(tcs_tmp, _T("ƒƒOƒCƒ“l”: %d"),player_manager_->GetAll().size());
-	DrawBox(absolute_x() + 12,absolute_y() + absolute_height() - 24,absolute_x() + absolute_width() - 12,absolute_y() + absolute_height() - 4,GetColor(133,211,192),TRUE);
-	DrawStringToHandle(absolute_x() + 12,absolute_y() + absolute_height() - 24 + 2, tcs_tmp,GetColor(34,34,34),font_handle_);
+	DrawBox(absolute_x() + 12,absolute_y() + absolute_height() - 24,absolute_x() + absolute_width() - 12,absolute_y() + absolute_height() - 6,GetColor(133,211,192),TRUE);
+	DrawStringToHandle(absolute_x() + 10,absolute_y() + absolute_height() - 24 + 2, tcs_tmp,GetColor(34,34,34),font_handle_);
 }
 
 void MiniMap::Update()

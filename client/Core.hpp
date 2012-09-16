@@ -26,8 +26,6 @@ class Core {
         void LoadFont();
 
     private:
-
-    private:
         scene::BasePtr current_scene_;
 
     private:

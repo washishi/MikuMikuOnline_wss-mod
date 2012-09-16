@@ -361,6 +361,7 @@ void FieldPlayer::Move()
         current_stat_.vel = VGet(0, 0, 0);
     }
 
+
     InputFromUser();
 }
 
@@ -375,6 +376,12 @@ void FieldPlayer::InputFromUser()
     auto rot_speed = (prev_stat_.motion == motion.walk_ ? 90.0f
         : prev_stat_.motion == motion.run_ ? 180.0f
         : 90.0f) * PHI_F / 180;
+
+	auto warp_chk = stage_->CheckWarpPoint(current_stat_.pos);
+	if (warp_chk.first && input.GetKeyCount(InputManager::KEYBIND_ENTER) > 0 )
+	{
+		stage_->SetHostChangeFlag(warp_chk);
+	}
 
     int move_dir = 0;
     if (input.GetKeyCount(InputManager::KEYBIND_FORWARD) > 0)

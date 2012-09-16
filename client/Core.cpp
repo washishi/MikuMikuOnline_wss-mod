@@ -8,6 +8,7 @@
 #include "ConfigManager.hpp"
 #include "../common/Logger.hpp"
 #include "version.hpp"
+#include "resource.h"
 
 const TCHAR* Core::CONFIG_PATH = _T("config.json");
 const TCHAR* Core::FONT_FILE_PATH = _T("resources/fonts/umeplus-p-gothic.ttf");
