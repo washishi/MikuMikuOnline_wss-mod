@@ -10,7 +10,6 @@
 #include "../common/network/Signature.hpp"
 
 #define UDP_MAX_RECEIVE_LENGTH (512)
-#define PROTOCOL_VERSION (1)
 #define DEFAULT_WRITE_AVERAGE_LIMIT (200)
 
 namespace network {

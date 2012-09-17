@@ -77,7 +77,7 @@ namespace network {
     void Server::Stop()
     {
         io_service_.stop();
-	Logger::Info("stop server");
+		Logger::Info("stop server");
     }
     void Server::Stop(int innterrupt_type)
     {
@@ -259,6 +259,11 @@ namespace network {
 		size_t readed = 0;
         if (buffer.size() > network::Utils::Deserialize(buffer, &header)) {
 			readed = network::Utils::Deserialize(buffer, &user_id, &count);
+		}
+
+		// 現在コマンドがひとつしか無いのでそれ以外は無視
+		if (header != network::header::ServerRequstedStatus) {
+			return;
 		}
 
         if (readed < buffer.size()) {

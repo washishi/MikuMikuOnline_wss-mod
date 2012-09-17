@@ -91,7 +91,7 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
     // クライアントの情報を受信した　（公開鍵のフィンガープリント, UDPポート）
     class ServerReceiveClientInfo : public Command {
     public:
-        ServerReceiveClientInfo(const std::string& key, uint32_t version, uint16_t udp_port);
+        ServerReceiveClientInfo(const std::string& key, uint16_t version, uint16_t udp_port);
     };
 
     // 公開鍵を要求された

@@ -8,6 +8,7 @@
 #include "../common/network/Utils.hpp"
 #include "../common/network/Command.hpp"
 #include "../common/Logger.hpp"
+#include "version.hpp"
 
 namespace network {
 
@@ -104,7 +105,7 @@ Client::Client(const std::string& host,
 
                             session->Send(network::ServerReceiveClientInfo(
                                             network::Encrypter::GetHash(public_key),
-                                            PROTOCOL_VERSION,
+                                            (uint16_t)MMO_PROTOCOL_VERSION,
                                             session->udp_port()
                                     ));
                         }

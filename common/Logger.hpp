@@ -142,7 +142,7 @@ class Logger {
         void Log(const tstring& prefix, const tstring& format) {
             auto out = GetTimeString() + _T(">  ") + prefix + format + _T("\n");
             OutputDebugString(out.c_str());
-			std::cout << unicode::ToString(out);
+			std::cout << unicode::ToString(out) << std::flush;
 			ofs_ << unicode::ToString(out) << std::flush;
         }
 
@@ -150,7 +150,7 @@ class Logger {
         void Log(const tstring& prefix, const tstring& format, const T1& t1) {
             auto out = GetTimeString() + _T(">  ") + prefix + (tformat(format) % t1).str() + _T("\n");
             OutputDebugString(out.c_str());
-			std::cout << unicode::ToString(out);
+			std::cout << unicode::ToString(out) << std::flush;
 			ofs_ << unicode::ToString(out) << std::flush;
         }
 
@@ -158,7 +158,7 @@ class Logger {
         void Log(const tstring& prefix, const tstring& format, const T1& t1, const T2& t2) {
             auto out = GetTimeString() + _T(">  ") + prefix + (tformat(format) % t1 % t2).str() + _T("\n");
             OutputDebugString(out.c_str());
-			std::cout << unicode::ToString(out);
+			std::cout << unicode::ToString(out) << std::flush;
             ofs_ << unicode::ToString(out) << std::flush;
         }
 
@@ -166,7 +166,7 @@ class Logger {
         void Log(const tstring& prefix, const tstring& format, const T1& t1, const T2& t2, const T3& t3) {
             auto out = GetTimeString() + _T(">  ") + prefix + (tformat(format) % t1 % t2 % t3).str() + _T("\n");
             OutputDebugString(out.c_str());
-			std::cout << unicode::ToString(out);
+			std::cout << unicode::ToString(out) << std::flush;
 			ofs_ << unicode::ToString(out) << std::flush;
         }
 
@@ -174,7 +174,7 @@ class Logger {
         void Log(const tstring& prefix, const tstring& format, const T1& t1, const T2& t2, const T3& t3, const T4& t4) {
             auto out = GetTimeString() + _T(">  ") + prefix + (tformat(format) % t1 % t2 % t3 % t4).str() + _T("\n");
             OutputDebugString(out.c_str());
-			std::cout << unicode::ToString(out);
+			std::cout << unicode::ToString(out) << std::flush;
 			ofs_ << unicode::ToString(out) << std::flush;
         }
 

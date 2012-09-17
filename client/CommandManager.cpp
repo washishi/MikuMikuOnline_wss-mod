@@ -54,6 +54,12 @@ void CommandManager::Update()
 			}
 			break;
 
+			case ClientReceiveUnsupportVersionError:
+			{
+				status_ = STATUS_ERROR_VERSION;
+			}
+			break;
+
 			// サーバーデータ受信
 			case ClientReceiveServerInfo:
 			{

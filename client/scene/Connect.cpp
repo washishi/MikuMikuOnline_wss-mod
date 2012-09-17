@@ -32,7 +32,7 @@ void Connect::Begin()
     int width, height;
     GetScreenState(&width, &height, nullptr);
 
-    message_.set_width(400);
+    message_.set_width(450);
     message_.set_text(_T("接続中..."));
     message_.set_bgcolor(UIBase::Color(0,0,0,0));
     message_.set_textcolor(UIBase::Color(0,0,0,255));
@@ -81,6 +81,10 @@ void Connect::Update()
 		break;
 	case CommandManager::STATUS_ERROR_CROWDED:
 		message_.set_text(_T("エラー：人数が多すぎます"));
+		command_manager_->set_client(ClientUniqPtr());
+		break;
+	case CommandManager::STATUS_ERROR_VERSION:
+		message_.set_text(_T("エラー：サーバーとクライアントのバージョンが対応していません"));
 		command_manager_->set_client(ClientUniqPtr());
 		break;
 	case CommandManager::STATUS_ERROR_NOSTAGE:

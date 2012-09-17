@@ -16,6 +16,7 @@
 #include "../common/Logger.hpp"
 #include "Config.hpp"
 #include "Account.hpp"
+#include "version.hpp"
 #ifdef __linux__
 #include "ServerSigHandler.hpp"
 #include <csignal>
@@ -114,13 +115,13 @@ int main(int argc, char* argv[])
             if (auto session = c.session().lock()) {
 
                 std::string finger_print;
-                uint32_t version;
+                uint16_t version;
                 uint16_t udp_port;
 
                 network::Utils::Deserialize(c.body(), &finger_print, &version, &udp_port);
 
                 // クライアントのプロトコルバージョンをチェック
-                if (version != 1) {
+                if (version != MMO_PROTOCOL_VERSION) {
                     Logger::Info("Unsupported Client Version : v%d", version);
                     session->Send(network::ClientReceiveUnsupportVersionError(1));
                     return;

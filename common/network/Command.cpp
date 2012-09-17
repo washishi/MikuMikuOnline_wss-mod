@@ -77,7 +77,7 @@ ServerUpdatePlayerPosition::ServerUpdatePlayerPosition(short x, short y, short z
 {
 }
 
-ServerReceiveClientInfo::ServerReceiveClientInfo(const std::string& key, uint32_t version, uint16_t udp_port) :
+ServerReceiveClientInfo::ServerReceiveClientInfo(const std::string& key, uint16_t version, uint16_t udp_port) :
                 Command(header::ServerReceiveClientInfo, Utils::Serialize(key, version, udp_port))
 {
 
