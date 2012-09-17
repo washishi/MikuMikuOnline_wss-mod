@@ -136,7 +136,7 @@ void UIList::ProcessInput(InputManager* input)
     for (auto it = items_.begin(); it != items_.end(); ++it) {
         auto item = *it;
         UIBasePtr item_ptr = *static_cast<UIBasePtr*>(item->GetPointerFromInternalField(0));
-		if (input->GetMousePos().first > absolute_y() && 
+		if (input->GetMousePos().second > absolute_y() && 
 			input->GetMousePos().second < absolute_y() + absolute_height()) {
 			item_ptr->ProcessInput(input);
 		}

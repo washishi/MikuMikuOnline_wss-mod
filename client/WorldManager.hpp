@@ -21,6 +21,7 @@ class WorldManager {
         void Draw();
 
         bool IsVisiblePoint(const VECTOR& point);
+        bool IsNearPoint(const VECTOR& point);
         void ResetCameraPosition();
 
     public:

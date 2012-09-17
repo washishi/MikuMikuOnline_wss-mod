@@ -26,6 +26,7 @@ class Stage {
         float height_begin, float height_end, size_t num_division) const;
 
         bool IsVisiblePoint(const VECTOR& point) const;
+        bool IsNearPoint(const VECTOR& point) const;
 
         const ModelHandle& map_handle() const;
         float map_scale() const;

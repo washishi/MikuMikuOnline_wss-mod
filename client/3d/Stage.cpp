@@ -235,6 +235,20 @@ bool Stage::IsVisiblePoint(const VECTOR& point) const
     return (distance < 500000 && screen_pos.z > 0.0f && screen_pos.z < 1.0f);
 }
 
+bool Stage::IsNearPoint(const VECTOR& point) const
+{
+	MMO_PROFILE_FUNCTION;
+
+	const auto& camera = GetCameraPosition();
+
+	auto distance = (point.x - camera.x) * (point.x - camera.x) +
+		(point.y - camera.y) * (point.y - camera.y) +
+		(point.z - camera.z) * (point.z - camera.z);
+
+    auto screen_pos = ConvWorldPosToScreenPos(point);
+    return (distance < 10000 && screen_pos.z > 0.0f && screen_pos.z < 1.0f);
+}
+
 void Stage::UpdateSkymapPosition(const VECTOR& pos)
 {
     MV1SetPosition(skymap_handle_.handle(), VGet(pos.x, 800, pos.z));
