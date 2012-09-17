@@ -13,11 +13,14 @@ OBJS += $(patsubst %.cpp,%.o,$(wildcard ../common/*.cpp))
 OBJS += $(patsubst %.cpp,%.o,$(wildcard ../common/network/*.cpp))
 OBJS += $(patsubst %.c,%.o,$(wildcard ../common/network/lz4/*.c))
 
-all: $(OBJS)
+all: stdafx.h.gch $(OBJS)
 	$(LD) $(CXXFLAGS) -o $(TARGET) $(OBJS) $(LIBS) $(LIBDIRS)
 
 clean:
-	@rm -f $(OBJS) $(TARGET)
+	@rm -f $(OBJS) $(TARGET) stdafx.h.gch
 
 .cpp.o:
-	$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -include stdafx.h -c -o $@ $<
+
+stdafx.h.gch:
+	$(CXX) $(CXXFLAGS) stdafx.h

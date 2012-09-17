@@ -10,7 +10,7 @@
 #include <boost/filesystem.hpp>
 
 #ifndef _WIN32
-#define OutputDebugString(str) (std::cout << str)
+#define OutputDebugString(str) (str)
 #endif
 
 class Logger {
