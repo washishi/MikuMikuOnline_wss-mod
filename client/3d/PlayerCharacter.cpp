@@ -43,7 +43,8 @@ public:
           motion_player_(),
 		  additional_motion_(false, -1),
           timer_(timer),
-          stage_(stage)
+          stage_(stage),
+		  shadow_size_(0.35f)
     {
         model_handle_ = data_provider_.model().handle();
 
@@ -55,6 +56,7 @@ public:
 		model_height_ = data_provider_.model().property().get<float>("character.height",1.58f);
 		flight_duration_ideal_ = sqrt((model_height_*2.0f)/9.8f) + sqrt((model_height_*0.8f)/9.8);	
 		shadow_handle_ = LoadGraph( _T(".\\resources\\textures\\shadow.tga") );
+		shadow_size_ = data_provider_.model().property().get<float>("character.shadow_size",0.35f);
 	}
 	// キャラクターの影を描画
 	void Impl::Chara_ShadowRender() const
@@ -65,7 +67,7 @@ public:
 		VERTEX3D Vertex[ 3 ] ;
 		VECTOR SlideVec ;
 		auto shadow_height = model_height_*stage_->map_scale();
-		auto shadow_size = 0.4f * stage_->map_scale();
+		auto shadow_size = shadow_size_ * stage_->map_scale();
 
 		// ライティングを無効にする
 		SetUseLighting( FALSE ) ;
@@ -370,6 +372,7 @@ private:
     TimerPtr timer_;
     StagePtr stage_;
 	int shadow_handle_;
+	float shadow_size_;
 
     struct {
         int stand_, walk_, run_;

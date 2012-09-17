@@ -55,7 +55,7 @@ void FieldPlayer::Chara_ShadowRender() const
 	VERTEX3D Vertex[ 3 ] ;
 	VECTOR SlideVec ;
 	auto shadow_height = model_height_*stage_->map_scale();
-	auto shadow_size = 0.4f * stage_->map_scale();
+	auto shadow_size = shadow_size_ * stage_->map_scale();
 
 	// ライティングを無効にする
 	SetUseLighting( FALSE ) ;
@@ -201,6 +201,7 @@ void FieldPlayer::SetModel(const ModelHandle& model)
 
     motion_player_.reset(new MotionPlayer(model_handle_.handle()));
 	dummy_move_count_ = 2;
+	shadow_size_ = data_provider_.model().property().get<float>("character.shadow_size",0.35f);
 }
 
 void FieldPlayer::Update()
