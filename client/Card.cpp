@@ -204,8 +204,19 @@ Handle<Value> Card::Function_Player_playMotion(const Arguments& args)
     if (args.Length() >= 1 && args[0]->IsString()) {
         auto name = std::string(*String::Utf8Value(args[0]->ToString()));
         auto world_manager = self->manager_accessor_->world_manager().lock();
-        world_manager->myself()->PlayMotion(unicode::ToTString(name));
+		auto isloop = bool(args[1]->BooleanValue());
+        world_manager->myself()->PlayMotion(unicode::ToTString(name),isloop);
     }
+
+    return Undefined();
+}
+
+Handle<Value> Card::Function_Player_stopMotion(const Arguments& args)
+{
+
+    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    auto world_manager = self->manager_accessor_->world_manager().lock();
+    world_manager->myself()->ResetMotion();
 
     return Undefined();
 }
@@ -631,7 +642,14 @@ void Card::SetFunctions()
      */
     script_.SetFunction("Player.playMotion", Function_Player_playMotion);
 
-
+    /**
+     * モーションを停止します
+     *
+     * @method playMotion
+     * @param {String} name モーション名
+     * @static
+     */
+    script_.SetFunction("Player.stopMotion", Function_Player_stopMotion);
     /**
      * アカウント
      *

@@ -35,7 +35,7 @@ FieldPlayer::FieldPlayer(CharacterDataProvider& data_provider, const StagePtr& s
 		jump_height_(1.0f),
 		prev_mouse_pos_y_(0.0f),
         motion_player_(),
-		additional_motion_(false,-1),
+		additional_motion_(),
         timer_(timer),
         model_handle_(),
         stage_(stage),
@@ -201,7 +201,7 @@ void FieldPlayer::SetModel(const ModelHandle& model)
 
     motion_player_.reset(new MotionPlayer(model_handle_.handle()));
 	dummy_move_count_ = 2;
-	shadow_size_ = data_provider_.model().property().get<float>("character.shadow_size",0.35f);
+	shadow_size_ = model_handle_.property().get<float>("character.shadow_size",0.35f);
 }
 
 void FieldPlayer::Update()
@@ -237,11 +237,11 @@ void FieldPlayer::Update()
         }
 
         motion_player_->Play(current_stat_.motion, connect_prev, 200, -1, false);
-	}else if(additional_motion_.first)
+	}else if(additional_motion_.flag_)
 	{
 		bool connect_prev = true;
-		motion_player_->Play(additional_motion_.second, connect_prev, 400, -1, false);
-		additional_motion_.first = false;
+		motion_player_->Play(additional_motion_.handle_, connect_prev, 400, -1, false,additional_motion_.isloop_);
+		additional_motion_.flag_ = false;
 	}
     // モーション再生時刻更新
     motion_player_->Next(timer_->Delta());
@@ -586,10 +586,16 @@ void FieldPlayer::InputFromUser()
     }
 }
 
-void FieldPlayer::PlayMotion(const tstring& name)
+void FieldPlayer::PlayMotion(const tstring& name,bool isloop)
 {
-	additional_motion_.second = MV1GetAnimIndex(model_handle_.handle(),name.c_str());
-	additional_motion_.first = true;
+	additional_motion_.handle_ = MV1GetAnimIndex(model_handle_.handle(),name.c_str());
+	additional_motion_.isloop_ = isloop;
+	additional_motion_.flag_ = true;
+}
+
+void FieldPlayer::ResetMotion()
+{
+	motion_player_->Stop();
 }
 
 const ModelHandle& FieldPlayer::model_handle() const

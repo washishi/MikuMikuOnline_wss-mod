@@ -25,6 +25,7 @@ for (var i = 0; i < model_names.length; i++) {
 					text: model_name,
 					bgcolor: ((even_line = !even_line) ? "#EEAFEECC" : "#FFFFFFCC"),
 					onclick: function() {
+						Player.stopMotion();
 						Account.updateModelName(model_name)
 					}
 				})
