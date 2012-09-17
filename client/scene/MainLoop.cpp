@@ -104,7 +104,7 @@ void MainLoop::ProcessInput(InputManager *input)
 		snapshot_number_++;
 		while(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) > 0)
 		{
-			input->Update();
+			input->CancelKeyCount(InputManager::KEYBIND_SCREEN_SHOT);
 		}
 	}
 }
