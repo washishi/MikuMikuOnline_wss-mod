@@ -44,6 +44,87 @@ FieldPlayer::FieldPlayer(CharacterDataProvider& data_provider, const StagePtr& s
         data_provider_(data_provider),
         camera_roty_(nullptr)
 {
+	shadow_handle_ = LoadGraph( _T(".\\resources\\textures\\shadow.tga") );
+}
+
+void FieldPlayer::Chara_ShadowRender() const
+{
+	int i ;
+	MV1_COLL_RESULT_POLY_DIM HitResDim ;
+	MV1_COLL_RESULT_POLY *HitRes ;
+	VERTEX3D Vertex[ 3 ] ;
+	VECTOR SlideVec ;
+	auto shadow_height = model_height_*stage_->map_scale();
+	auto shadow_size = 0.4f * stage_->map_scale();
+
+	// ライティングを無効にする
+	SetUseLighting( FALSE ) ;
+
+	// Ｚバッファを有効にする
+	SetUseZBuffer3D( TRUE ) ;
+
+	// テクスチャアドレスモードを CLAMP にする( テクスチャの端より先は端のドットが延々続く )
+	SetTextureAddressMode( DX_TEXADDRESS_CLAMP ) ;
+
+	// キャラクターの直下に存在する地面のポリゴンを取得
+	HitResDim = MV1CollCheck_Capsule( stage_->map_handle().handle() , -1, VAdd( current_stat_.pos, VGet( 0, 0.5f * shadow_height, 0 ) ), VAdd( current_stat_.pos, VGet( 0.0f,-shadow_height, 0.0f ) ), shadow_size ) ;
+
+	// 頂点データで変化が無い部分をセット
+	Vertex[ 0 ].dif = GetColorU8( 255,255,255,255 ) ;
+	Vertex[ 0 ].spc = GetColorU8( 0,0,0,0 ) ;
+	Vertex[ 0 ].su = 0.0f ;
+	Vertex[ 0 ].sv = 0.0f ;
+	Vertex[ 1 ] = Vertex[ 0 ] ;
+	Vertex[ 2 ] = Vertex[ 0 ] ;
+
+	// 球の直下に存在するポリゴンの数だけ繰り返し
+	HitRes = HitResDim.Dim ;
+	for( i = 0 ; i < HitResDim.HitNum ; i ++, HitRes ++ )
+	{
+		// ポリゴンの座標は地面ポリゴンの座標
+		Vertex[ 0 ].pos = HitRes->Position[ 0 ] ;
+		Vertex[ 1 ].pos = HitRes->Position[ 1 ] ;
+		Vertex[ 2 ].pos = HitRes->Position[ 2 ] ;
+
+		// ちょっと持ち上げて重ならないようにする
+		SlideVec = VScale( HitRes->Normal, 0.5f ) ;
+		Vertex[ 0 ].pos = VAdd( Vertex[ 0 ].pos, SlideVec ) ;
+		Vertex[ 1 ].pos = VAdd( Vertex[ 1 ].pos, SlideVec ) ;
+		Vertex[ 2 ].pos = VAdd( Vertex[ 2 ].pos, SlideVec ) ;
+
+		// ポリゴンの不透明度を設定する
+		Vertex[ 0 ].dif.a = 0 ;
+		Vertex[ 1 ].dif.a = 0 ;
+		Vertex[ 2 ].dif.a = 0 ;
+		if( HitRes->Position[ 0 ].y > current_stat_.pos.y - shadow_height )
+			Vertex[ 0 ].dif.a = 128 * ( 1.0f - fabs( HitRes->Position[ 0 ].y - current_stat_.pos.y ) / shadow_height ) ;
+
+		if( HitRes->Position[ 1 ].y > current_stat_.pos.y - shadow_height )
+			Vertex[ 1 ].dif.a = 128 * ( 1.0f - fabs( HitRes->Position[ 1 ].y - current_stat_.pos.y ) / shadow_height ) ;
+
+		if( HitRes->Position[ 2 ].y > current_stat_.pos.y - shadow_height )
+			Vertex[ 2 ].dif.a = 128 * ( 1.0f - fabs( HitRes->Position[ 2 ].y - current_stat_.pos.y ) / shadow_height ) ;
+
+		// ＵＶ値は地面ポリゴンとキャラクターの相対座標から割り出す
+		Vertex[ 0 ].u = ( HitRes->Position[ 0 ].x - current_stat_.pos.x ) / ( shadow_size * 2.0f ) + 0.5f ;
+		Vertex[ 0 ].v = ( HitRes->Position[ 0 ].z - current_stat_.pos.z ) / ( shadow_size * 2.0f ) + 0.5f ;
+		Vertex[ 1 ].u = ( HitRes->Position[ 1 ].x - current_stat_.pos.x ) / ( shadow_size * 2.0f ) + 0.5f ;
+		Vertex[ 1 ].v = ( HitRes->Position[ 1 ].z - current_stat_.pos.z ) / ( shadow_size * 2.0f ) + 0.5f ;
+		Vertex[ 2 ].u = ( HitRes->Position[ 2 ].x - current_stat_.pos.x ) / ( shadow_size * 2.0f ) + 0.5f ;
+		Vertex[ 2 ].v = ( HitRes->Position[ 2 ].z - current_stat_.pos.z ) / ( shadow_size * 2.0f ) + 0.5f ;
+
+		// 影ポリゴンを描画
+		DrawPolygon3D( Vertex, 1, shadow_handle_, TRUE ) ;
+	}
+
+	// 検出した地面ポリゴン情報の後始末
+	MV1CollResultPolyDimTerminate( HitResDim ) ;
+
+	// ライティングを有効にする
+	SetUseLighting( TRUE ) ;
+
+	// Ｚバッファを無効にする
+	SetUseZBuffer3D( FALSE ) ;
 }
 
 void FieldPlayer::Draw() const
@@ -53,6 +134,7 @@ void FieldPlayer::Draw() const
     MV1SetPosition(model_handle_.handle(), current_stat_.pos);
     MV1SetRotationXYZ(model_handle_.handle(), VGet(0, current_stat_.roty, 0));
     MV1DrawModel(model_handle_.handle());
+	Chara_ShadowRender();
 
     // DrawLine3D(current_stat_.pos, current_stat_.pos + VGet(2 * stage_->map_scale(), 0, 0), GetColor(255, 0, 0));
     // DrawLine3D(current_stat_.pos, current_stat_.pos + VGet(0, 2 * stage_->map_scale(), 0), GetColor(0, 255, 0));
