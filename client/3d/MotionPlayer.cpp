@@ -5,29 +5,44 @@
 
 MotionPlayer::MotionPlayer(int model_handle)
     : model_handle_(model_handle), prev_attach_index_(-1), current_attach_index_(-1),
-      connect_prev_(false), prev_blend_rate_(0), blend_time_(0)
+      connect_prev_(false), prev_blend_rate_(0), blend_time_(0),prev_anim_index_(-1),isloop_(true)
 {}
 
-void MotionPlayer::Play(int anim_index, bool connect_prev, int blend_time, int anim_src_model_handle, bool check_name)
+void MotionPlayer::Play(int anim_index, bool connect_prev, int blend_time, int anim_src_model_handle, bool check_name, bool isloop)
 {
-    // まだ前回の移行期間の最中なら、移行を中止する
+ 	prev_anim_index_ = MV1GetAttachAnim(model_handle_,current_attach_index_);
+
+	// まだ前回の移行期間の最中なら、移行を中止する
     DetachPrevMotionIfExist();
 
     connect_prev_ = connect_prev;
     prev_blend_rate_ = blend_time;
     blend_time_ = blend_time;
+	isloop_ = isloop;
 
     prev_attach_index_ = current_attach_index_;
     if (blend_time_ <= 0)
     {
         DetachPrevMotionIfExist();
     }
-
+	
     current_attach_index_ = MV1AttachAnim(model_handle_, anim_index,
             anim_src_model_handle, check_name ? TRUE : FALSE);
     MV1SetAttachAnimTime(model_handle_, current_attach_index_, 0);
 
     SetBlendRateToModel();
+}
+
+void MotionPlayer::Stop()
+{
+    if (current_attach_index_ != -1)
+    {
+        if (MV1DetachAnim(model_handle_, current_attach_index_) == -1)
+        {
+            throw std::logic_error("can't detach anim");
+        }
+        current_attach_index_ = -1;
+    }
 }
 
 // diff_time [ms]だけ時刻をすすめる
@@ -82,6 +97,12 @@ void MotionPlayer::AdvancePlayTime(int diff_time)
     anim_time += (diff_time * 30) / 1000.0f;
     if (anim_time > anim_total_time)
     {
+		if(!isloop_)
+		{
+			Stop();
+			Play(prev_anim_index_,connect_prev_,200,-1,false);
+			return;
+		}
         anim_time -= anim_total_time;
     }
     if (MV1SetAttachAnimTime(model_handle_, current_attach_index_, anim_time) == -1)
