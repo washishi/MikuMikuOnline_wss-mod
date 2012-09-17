@@ -79,7 +79,7 @@ public:
 		SetTextureAddressMode( DX_TEXADDRESS_CLAMP ) ;
 
 		// キャラクターの直下に存在する地面のポリゴンを取得
-		HitResDim = MV1CollCheck_Capsule( stage_->map_handle(), -1, VAdd( current_pos_, VGet( 0.0f, 0.5f * shadow_height, 0.0f ) ), VAdd( current_pos_, VGet( 0.0f, -shadow_height, 0.0f ) ), shadow_size ) ;
+		HitResDim = MV1CollCheck_Capsule( stage_->map_handle().handle(), -1, VAdd( current_pos_, VGet( 0.0f, 0.5f * shadow_height, 0.0f ) ), VAdd( current_pos_, VGet( 0.0f, -shadow_height, 0.0f ) ), shadow_size ) ;
 
 		// 頂点データで変化が無い部分をセット
 		Vertex[ 0 ].dif = GetColorU8( 255,255,255,255 ) ;
