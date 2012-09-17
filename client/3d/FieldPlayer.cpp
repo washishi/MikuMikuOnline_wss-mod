@@ -73,7 +73,7 @@ void FieldPlayer::ResetPosition()
     std::uniform_int_distribution<int> distribution(0, points.size() - 1);
 
     current_stat_.pos = points[distribution(engine)];
-    current_stat_.pos.y = stage_->GetFloorY(current_stat_.pos + VGet(0, 100, 0), current_stat_.pos - VGet(0, 100, 0));
+    current_stat_.pos.y = stage_->GetFloorY(current_stat_.pos + VGet(0, 20, 0), current_stat_.pos - VGet(0, 20, 0));
 }
 
 void FieldPlayer::RescuePosition()
@@ -92,7 +92,7 @@ void FieldPlayer::RescuePosition()
             });
 
     current_stat_.pos = *new_pos;
-    current_stat_.pos.y = stage_->GetFloorY(current_stat_.pos + VGet(0, 100, 0), current_stat_.pos - VGet(0, 100, 0));
+    current_stat_.pos.y = stage_->GetFloorY(current_stat_.pos - VGet(0, 100, 0), current_stat_.pos + VGet(0, 100, 0));
 	current_stat_.acc.y = 0;
 	current_stat_.vel.y = 0;
 }
