@@ -110,7 +110,7 @@ InputBox.onEnter = function (text) {
 	}
 
     // コマンドを解析
-    var parsed_text = text.match(/^\/(\w{1,8})\s?(\S*)/)
+    var parsed_text = text.match(/^\/(\w{1,8})(\s?(\S*))*/)
     if (parsed_text) {
 
         var command = parsed_text[1]
@@ -147,10 +147,9 @@ InputBox.onEnter = function (text) {
             // プライベート
             case "private":
                 args.trim();
-                var tok = args.split(" ");
                 var msgObject = {
-                    prvate: tok[0],
-                    body: tok[1]
+                    private: args.trim(),
+                    body: parsed_text[3].trim()
                     };
                 Network.sendAll(msgObject);
                 break;
