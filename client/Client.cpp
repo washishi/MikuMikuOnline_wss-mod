@@ -252,6 +252,13 @@ void Client::Close()
 {
 }
 
+size_t Client::GetCommandSize()
+{
+    boost::mutex::scoped_lock lock(mutex_);
+	Logger::Debug(_T("queue %d"), command_queue_.size());
+	return command_queue_.size();
+}
+
 std::shared_ptr<Command> Client::PopCommand()
 {
     boost::mutex::scoped_lock lock(mutex_);

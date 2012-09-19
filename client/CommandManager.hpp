@@ -38,6 +38,8 @@ class CommandManager {
         unsigned int user_id();
 		std::string stage() const;
 
+		void FetchCommand(const network::Command& command);
+
 		Status status() const;		
 
     private:
