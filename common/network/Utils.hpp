@@ -24,6 +24,7 @@ namespace network {
         std::string LZ4Uncompress(const std::string& in, size_t size);
 
         std::string ToHexString(const std::string&);
+		bool MatchWithWildcard(const std::string& pattern, const std::string& text);
 
         bool IsPrivateAddress(const std::string&);
 

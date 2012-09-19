@@ -2,5 +2,13 @@
 	"port": 39390,
 	"server_name": "MMO Server",
 	"stage": "stage:ケロリン町",
-	"capacity": 20
+	"capacity": 20,
+	
+	"receive_limit_1": 50,
+	"receive_limit_2": 80,
+	
+	"blocking_address_patterns" :
+		[
+			"192.0.0.*"
+		]
 }

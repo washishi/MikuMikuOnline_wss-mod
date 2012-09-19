@@ -18,11 +18,7 @@ namespace network {
             endpoint_(tcp::v4(), config.port()),
             acceptor_(io_service_, endpoint_),
             socket_udp_(io_service_, udp::endpoint(udp::v4(), config.port())),
-            udp_packet_count_(0),
-            max_total_read_average_(5000),
-            max_session_read_average_(600),
-            min_session_read_average_(100),
-            session_read_average_(200)
+            udp_packet_count_(0)
     {
     }
 
@@ -33,27 +29,23 @@ namespace network {
 
             // ログアウト
             if (c.header() == network::header::FatalConnectionError) {
-                // 受信制限量を更新
-                /*
-                auto new_average = GetSessionReadAverageLimit();
-                if (session_read_average_ != new_average) {
-                    session_read_average_ = new_average;
-                    SendAll(network::ClientReceiveWriteAverageLimitUpdate(session_read_average_));
+                if (callback) {
+					(*callback)(c);
+				}
+            } else if (auto session = c.session().lock()) {
+				auto read_average = session->GetReadByteAverage();
+				if (read_average > config_.receive_limit_2()) {
+					Logger::Info(_T("Banished session: %d"), session->id());
+					session->Close();
+				} else if(read_average > config_.receive_limit_1()) {
+					Logger::Info(_T("Receive limit exceeded: %d: %d byte/s"), session->id(), read_average);
+				} else {
+					if (callback) {
+						(*callback)(c);
+					}
                 }
-                */
             }
 
-            // 通信量制限を越えていた場合、強制的に切断
-     //       else if (auto session = c.session().lock()) {
-     //           if (session->GetReadByteAverage() > session_read_average_) {
-					//Logger::Info(_T("Banished session: %d"), session->id());
-     //               session->Close();
-     //           }
-     //       }
-
-            if (callback) {
-                (*callback)(c);
-            }
         });
 
         {
@@ -112,30 +104,35 @@ namespace network {
         return GetUserCount() == 0;
     }
 
+	bool Server::IsBlockedAddress(const boost::asio::ip::address& address)
+	{
+		BOOST_FOREACH(const auto& pattern, config_.blocking_address_patterns()) {
+			if (network::Utils::MatchWithWildcard(pattern, address.to_string())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
     void Server::ReceiveSession(const SessionPtr& session, const boost::system::error_code& error)
     {
-		if (GetUserCount() < config_.capacity()) {
+		const auto address = session->tcp_socket().remote_endpoint().address();
+		if(IsBlockedAddress(address)) {
+			Logger::Info("Blocked IP Address: %s", address);
+            session->Close();
+
+		} else if (GetUserCount() >= config_.capacity()) {
+			Logger::Info("Refused Session");
+            session->SyncSend(ClientReceiveServerCrowdedError());
+            session->Close();
+
+        } else {
             session->set_on_receive(callback_);
             session->Start();
             sessions_.push_back(SessionWeakPtr(session));
 
             // クライアント情報を要求
             session->Send(ClientRequestedClientInfo());
-
-            // 受信制限量を更新
-            auto new_average = GetSessionReadAverageLimit();
-            session->Send(network::ClientReceiveWriteAverageLimitUpdate(session_read_average_));
-
-            if (session_read_average_ != new_average) {
-                session_read_average_ = new_average;
-                SendOthers(network::ClientReceiveWriteAverageLimitUpdate(session_read_average_),
-                        session);
-            }
-
-        } else {
-            Logger::Info("Refuse Session");
-            session->SyncSend(ClientReceiveServerCrowdedError());
-            session->Close();
         }
 
         auto new_session = boost::make_shared<ServerSession>(io_service_);
@@ -295,43 +292,4 @@ namespace network {
               &ServerSession::ReceiveTCP, shared_from_this(),
               boost::asio::placeholders::error));
     }
-
-    int Server::GetSessionReadAverageLimit()
-    {
-        int byte = max_total_read_average_ / (sessions_.size() + 1);
-        byte = std::min(byte, max_session_read_average_);
-        
-        return byte;
-    }
-
-    int Server::max_total_read_average() const
-    {
-        return max_total_read_average_;
-    }
-
-    int Server::max_session_read_average() const
-    {
-        return max_session_read_average_;
-    }
-
-    int Server::min_session_read_average() const
-    {
-        return min_session_read_average_;
-    }
-
-    void Server::set_max_total_read_average(int byte)
-    {
-        max_total_read_average_ = byte;
-    }
-
-    void Server::set_max_session_read_average(int byte)
-    {
-        max_session_read_average_ = byte;
-    }
-
-    void Server::set_min_session_read_average(int byte)
-    {
-        min_session_read_average_ = byte;
-    }
-
 }

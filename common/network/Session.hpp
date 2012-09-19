@@ -16,7 +16,7 @@
 #include "Encrypter.hpp"
 #include "Command.hpp"
 
-#define BYTE_AVERAGE_REFRESH_SECONDS (10)
+#define BYTE_AVERAGE_REFRESH_SECONDS (30)
 #define COMPRESSED_FLAG (0x00010000)
 #define COMPRESS_MIN_LENGTH (100)
 

@@ -43,12 +43,7 @@ class Server {
         void SendUDPTestPacket(const std::string& ip_address, uint16_t port);
 		void SendUDP(const std::string& message, const boost::asio::ip::udp::endpoint endpoint);
 
-        int max_total_read_average() const;
-        int max_session_read_average() const;
-        int min_session_read_average() const;
-        void set_max_total_read_average(int byte);
-        void set_max_session_read_average(int byte);
-        void set_min_session_read_average(int byte);
+		bool IsBlockedAddress(const boost::asio::ip::address& address);
 
     private:
         void ReceiveSession(const SessionPtr&, const boost::system::error_code&);
@@ -73,11 +68,6 @@ class Server {
        unsigned char udp_packet_count_;
 
        CallbackFuncPtr callback_;
-
-       int max_total_read_average_;
-       int max_session_read_average_;
-       int min_session_read_average_;
-       int session_read_average_;
 
        boost::mutex mutex_;
        std::list<SessionWeakPtr> sessions_;
