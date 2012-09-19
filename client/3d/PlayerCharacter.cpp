@@ -232,7 +232,6 @@ public:
 					move_vec_y_ += (st_acc * stage_->map_scale() * timer_->DeltaSec() * (1.0f/flight_duration_ideal_) * (jump_height_ / 5.0f));
 					moved_pos.y = current_pos_.y + move_vec_y_ * timer_->DeltaSec() * (jump_height_ / 5.0f);
 				}
-				Logger::Debug(_T("move_vec_y %.3f"), move_vec_y_);
 
                 // 床へのめり込みを防止
                 float floor_y;

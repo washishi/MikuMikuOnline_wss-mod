@@ -27,10 +27,10 @@ void CommandManager::Update()
         auto command = client_->PopCommand();
 
 		// 移動コマンドが溜まっている場合は強制的に消費
-		while (client_->GetCommandSize() > 40 &&
-			command->header() == network::header::ClientUpdatePlayerPosition) {
-
-			command = client_->PopCommand();
+		if (client_->GetCommandSize() > 40) {
+			while (command && command->header() == network::header::ClientUpdatePlayerPosition) {
+				command = client_->PopCommand();
+			}
 		}
 		
 		if (command) {
