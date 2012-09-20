@@ -7,6 +7,7 @@
 #include <ctime>
 #include <boost/format.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <boost/foreach.hpp>
 #include "version.hpp"
 #include "Server.hpp"
@@ -77,6 +78,19 @@ int main(int argc, char* argv[])
 					Logger::Error(_T("Invalid session id"));
 					break;
 				}
+				
+				std::stringstream message_json(c.body());
+
+				using namespace boost::property_tree;
+				ptree message_tree;
+				json_parser::read_json(message_json, message_tree);
+
+				// プライベートメッセージの処理
+				std::list<uint32_t> destination_list;
+				auto private_list_tree =  message_tree.get_child("private", ptree());
+				BOOST_FOREACH(const auto& user_id, private_list_tree) {
+					destination_list.push_back(user_id.second.get_value<uint32_t>());
+				}
 
                 ptime now = second_clock::universal_time();
                 auto time_string = to_iso_extended_string(now);
@@ -87,11 +101,17 @@ int main(int argc, char* argv[])
                 info_json += (boost::format("\"time\":\"%s\"") % time_string).str();
                 info_json += "}";
 
-                std::string message_json = c.body();
+				auto send_command = network::ClientReceiveJSON(info_json, message_json.str());
 
-                server.SendAll(network::ClientReceiveJSON(info_json, message_json));
+				if (destination_list.size() > 0) {
+					BOOST_FOREACH(uint32_t user_id, destination_list) {
+						server.SendTo(send_command, user_id);
+					}
+				} else {
+					server.SendAll(send_command);
+				}
+
                 Logger::Info("Receive JSON: %s", message_json);
-                Logger::Info(msg);
             }
         }
             break;

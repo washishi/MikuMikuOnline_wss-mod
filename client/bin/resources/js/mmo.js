@@ -148,5 +148,11 @@
 	            return p.id() == Account.id();
 	        });
 	};
+	
+	Player.getFromName = function(name){
+	        return Player.all().find(function (p) {
+	            return p.name() == name;
+	        });
+	};
 
 })();

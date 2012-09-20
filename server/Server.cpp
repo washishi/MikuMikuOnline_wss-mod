@@ -161,6 +161,18 @@ namespace network {
             }
         }
     }
+	
+    void Server::SendTo(const Command& command, uint32_t user_id)
+	{
+		auto it = std::find_if(sessions_.begin(), sessions_.end(),
+			[user_id](SessionWeakPtr& ptr){
+				return ptr.lock()->id() == user_id;
+			});
+		
+		if (it != sessions_.end()) {
+			it->lock()->Send(command);
+		}
+	}
 
     void Server::SendOthers(const Command& command, SessionWeakPtr self_ptr)
     {

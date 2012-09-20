@@ -26,17 +26,17 @@ Network.onReceive = function (info, msg) {
 		})
 	    );
     }
+    
     if (msg.private) {
-        if (Account.name() == msg.private || info.player.name() == Account.name()) {
-            list.addItem(
-		new UI.Label({
-		    docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT,
-		    text: "[private:" + info.player.name() + "] " + msg.body,
-		    bgcolor: ((even_line = !even_line) ? "#add8e6CC" : "#87ceebCC")
-		})
-	    );
-        }
+        list.addItem(
+			new UI.Label({
+		   		docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT,
+		   		text: "[private:" + info.player.name() + "] " + msg.body,
+		    	bgcolor: ((even_line = !even_line) ? "#add8e6CC" : "#87ceebCC")
+			})
+		)
     }
+    
     if (msg.system) {
         list.addItem(
 		new UI.Label({
@@ -110,7 +110,7 @@ InputBox.onEnter = function (text) {
 	}
 
     // コマンドを解析
-    var parsed_text = text.match(/^\/(\w{1,8})(\s?(\S*))*/)
+    var parsed_text = text.match(/^\/(\w{1,8})\s?(\S*)/)
     if (parsed_text) {
 
         var command = parsed_text[1]
@@ -146,10 +146,13 @@ InputBox.onEnter = function (text) {
                 
             // プライベート
             case "private":
-                args.trim();
+                var tok = args.split(",");
                 var msgObject = {
-                    private: args.trim(),
-                    body: parsed_text[3].trim()
+                    private: [
+                    			Player.myself().id(),
+                    			Player.getFromName([tok[0]]).id()
+                    		 ],
+                    body: tok[1]
                     };
                 Network.sendAll(msgObject);
                 break;

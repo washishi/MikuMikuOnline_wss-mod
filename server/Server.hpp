@@ -31,6 +31,7 @@ class Server {
         void Stop();
         void Stop(int interrupt_type);
         void SendAll(const Command&);
+        void SendTo(const Command&, uint32_t);
         void SendOthers(const Command&, SessionWeakPtr);
 
         bool Empty() const;
