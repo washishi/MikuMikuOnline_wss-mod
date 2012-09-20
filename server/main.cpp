@@ -311,7 +311,7 @@ int main(int argc, char* argv[])
                                 account.GetUserRevision(user_id)));
 
                 Logger::Info("Logout User: %d", user_id);
-				// account.Remove(user_id);
+				account.Remove(user_id);
             }
         }
         Logger::Info(msg);

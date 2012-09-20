@@ -127,12 +127,13 @@ void Account::ApplyRevisionPatch(const std::string& patch)
 
 UserID Account::GetUserIdFromFingerPrint(const std::string& finger_print)
 {
-    FingerprintMap::iterator it;
-    if ((it = fingerprint_map_.find(finger_print)) != fingerprint_map_.end()) {
-        return it->second;
-    } else {
-        return 0;
-    }
+	return 0;
+    //FingerprintMap::iterator it;
+    //if ((it = fingerprint_map_.find(finger_print)) != fingerprint_map_.end()) {
+    //    return it->second;
+    //} else {
+    //    return 0;
+    //}
 }
 
 std::string Account::GetPublicKey(UserID user_id)
