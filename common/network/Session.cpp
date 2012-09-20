@@ -163,7 +163,7 @@ namespace network {
     std::string Session::Serialize(const Command& command)
     {
         assert(command.header() < 0xFF);
-        auto header = static_cast<unsigned char>(command.header());
+        auto header = static_cast<uint8_t>(command.header());
         std::string body = command.body();
 
         std::string msg = Utils::Serialize(header) + body;
@@ -171,17 +171,17 @@ namespace network {
         // 圧縮
         if (body.size() >= COMPRESS_MIN_LENGTH) {
             auto compressed = Utils::LZ4Compress(msg);
-            if (msg.size() > compressed.size() + sizeof(unsigned char)) {
+            if (msg.size() > compressed.size() + sizeof(uint8_t)) {
                 assert(msg.size() < 65535);
-                msg = Utils::Serialize(static_cast<unsigned char>(header::LZ4_COMPRESS_HEADER),
-                    static_cast<unsigned short>(msg.size()))
+                msg = Utils::Serialize(static_cast<uint8_t>(header::LZ4_COMPRESS_HEADER),
+                    static_cast<uint16_t>(msg.size()))
                     + compressed;
             }
         }
 
         // 暗号化
         if (encryption_) {
-            msg = Utils::Serialize(static_cast<unsigned char>(header::ENCRYPT_HEADER))
+            msg = Utils::Serialize(static_cast<uint8_t>(header::ENCRYPT_HEADER))
                 + encrypter_.Encrypt(msg);
         }
 
@@ -192,7 +192,7 @@ namespace network {
     {
         std::string decoded_msg = Utils::Decode(msg);
 
-        unsigned char header;
+        uint8_t header;
         Utils::Deserialize(decoded_msg, &header);
 
         // 復号
@@ -204,7 +204,7 @@ namespace network {
 
         // 伸長
         if (header == header::LZ4_COMPRESS_HEADER) {
-            unsigned short original_size;
+            uint16_t original_size;
             Utils::Deserialize(decoded_msg, &header, &original_size);
             decoded_msg.erase(0, sizeof(header) + sizeof(original_size));
             decoded_msg = Utils::LZ4Uncompress(decoded_msg, original_size);
@@ -298,7 +298,7 @@ namespace network {
 
     void Session::FetchTCP(const std::string& msg)
     {
-        if (msg.size() >= sizeof(unsigned char)) {
+        if (msg.size() >= sizeof(uint8_t)) {
             if (on_receive_) {
                 (*on_receive_)(Deserialize(msg));
             }

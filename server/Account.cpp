@@ -60,12 +60,12 @@ void Account::LoadInitializeData(UserID user_id, std::string data)
     }
 }
 
-unsigned int Account::GetCurrentRevision()
+uint32_t Account::GetCurrentRevision()
 {
     return revision_;
 }
 
-std::string Account::GetUserRevisionPatch(UserID user_id, unsigned int revision)
+std::string Account::GetUserRevisionPatch(UserID user_id, uint32_t revision)
 {
     auto user_revison = GetUserRevision(user_id);
     std::string patch;
@@ -111,16 +111,16 @@ void Account::ApplyRevisionPatch(const std::string& patch)
         assert(s.ok());
     }
 
-    std::tuple<unsigned int> result_tuple;
+    std::tuple<uint32_t> result_tuple;
     network::Utils::Deserialize(buffer, &result_tuple);
 
-    unsigned int new_revision = std::get<0>(result_tuple);
+    uint32_t new_revision = std::get<0>(result_tuple);
     assert(new_revision >= revision_);
 
     revision_ = new_revision;
 
     leveldb::Status s = db_revision_->Put(leveldb::WriteOptions(), "_MAX_",
-            std::string(reinterpret_cast<const char*>(&revision_), sizeof(unsigned int)));
+            std::string(reinterpret_cast<const char*>(&revision_), sizeof(uint32_t)));
     assert(s.ok());
 }
 */
@@ -172,7 +172,7 @@ void Account::LogOut(UserID user_id)
 
 void Account::LogOutAll()
 {
-    //for (unsigned int user_id = 1; user_id <= max_user_id_; user_id++) {
+    //for (uint32_t user_id = 1; user_id <= max_user_id_; user_id++) {
     //    Set(user_id, LOGIN, (char)0);
     //}
 }

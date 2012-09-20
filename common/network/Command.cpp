@@ -34,7 +34,7 @@ FatalConnectionError::FatalConnectionError() :
 
 }
 
-FatalConnectionError::FatalConnectionError(unsigned int user_id) :
+FatalConnectionError::FatalConnectionError(uint32_t user_id) :
         Command(header::FatalConnectionError, "")
 {
     body_ = Utils::Serialize(user_id);
@@ -60,19 +60,19 @@ ServerReceivePublicKey::ServerReceivePublicKey(const std::string& key) :
 
 ClientReceiveCommonKey::ClientReceiveCommonKey(const std::string& key,
         const std::string& sign,
-        unsigned int user_id) :
+        uint32_t user_id) :
         Command(header::ClientReceiveCommonKey, Utils::Serialize(key, sign, user_id))
 {
 }
 
 ClientUpdatePlayerPosition::ClientUpdatePlayerPosition
-(unsigned int id, short x, short y, short z, unsigned char theta, unsigned char vy) :
+(uint32_t id, int16_t x, int16_t y, int16_t z, uint8_t theta, uint8_t vy) :
 Command(header::ClientUpdatePlayerPosition, Utils::Serialize(id, x, y, z, theta, vy))
 {
 
 }
 
-ServerUpdatePlayerPosition::ServerUpdatePlayerPosition(short x, short y, short z, unsigned char theta, unsigned char vy) :
+ServerUpdatePlayerPosition::ServerUpdatePlayerPosition(int16_t x, int16_t y, int16_t z, uint8_t theta, uint8_t vy) :
         Command(header::ServerUpdatePlayerPosition, Utils::Serialize(x, y, z, theta, vy))
 {
 }
@@ -95,7 +95,7 @@ ClientRequestedClientInfo::ClientRequestedClientInfo() :
 
 }
 
-ServerRequestedAccountRevisionPatch::ServerRequestedAccountRevisionPatch(unsigned int user_id, int revision) :
+ServerRequestedAccountRevisionPatch::ServerRequestedAccountRevisionPatch(uint32_t user_id, int revision) :
                                            Command(header::ServerRequestedAccountRevisionPatch,
                                                    Utils::Serialize(user_id, revision))
 {
@@ -108,12 +108,12 @@ ClientReceiveAccountRevisionPatch::ClientReceiveAccountRevisionPatch(const std::
 }
 
 ClientReceiveAccountRevisionUpdateNotify::
-ClientReceiveAccountRevisionUpdateNotify(unsigned int user_id, int revision) :
+ClientReceiveAccountRevisionUpdateNotify(uint32_t user_id, int revision) :
         Command(header::ClientReceiveAccountRevisionUpdateNotify, Utils::Serialize(user_id, revision))
 {
 }
 
-ClientReceiveWriteAverageLimitUpdate::ClientReceiveWriteAverageLimitUpdate(unsigned short byte) :
+ClientReceiveWriteAverageLimitUpdate::ClientReceiveWriteAverageLimitUpdate(uint16_t byte) :
         Command(header::ClientReceiveWriteAverageLimitUpdate, Utils::Serialize(byte))
 {
 }

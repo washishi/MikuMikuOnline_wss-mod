@@ -174,7 +174,7 @@ std::string Encrypter::GetHash(const std::string& in)
 
 std::string Encrypter::GetTrip(const std::string& in)
 {
-    static const unsigned char trip_chars[] =
+    static const uint8_t trip_chars[] =
             "abcdefghijklmnopqrstuvwxyz"
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
             ".:;@#$%&_()=*{}~+-!?[]()^/";
@@ -185,7 +185,7 @@ std::string Encrypter::GetTrip(const std::string& in)
     std::string out;
 
     for (auto it = buffer.begin(); it != buffer.end(); ++it) {
-        const unsigned char & c = *it;
+        const uint8_t & c = *it;
         out += trip_chars[c % pattern_size];
     }
 

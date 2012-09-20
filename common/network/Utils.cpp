@@ -115,7 +115,7 @@ namespace network {
            string retval((((binlen + 2) / 3) * 4), '=');
            std::size_t outpos = 0;
            int bits_collected = 0;
-           unsigned int accumulator = 0;
+           uint32_t accumulator = 0;
            const string::const_iterator binend = bindata.end();
 
            for (string::const_iterator i = bindata.begin(); i != binend; ++i) {
@@ -145,7 +145,7 @@ namespace network {
            string retval;
            const string::const_iterator last = ascdata.end();
            int bits_collected = 0;
-           unsigned int accumulator = 0;
+           uint32_t accumulator = 0;
 
            BOOST_FOREACH(const int c, ascdata) {
               if (::std::isspace(c) || c == '=') {

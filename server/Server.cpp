@@ -247,9 +247,9 @@ namespace network {
 
     void Server::FetchUDP(const std::string& buffer, const boost::asio::ip::udp::endpoint endpoint)
     {
-        unsigned char header;
+        uint8_t header;
 		uint32_t user_id;
-        unsigned char count;
+        uint8_t count;
         std::string body;
         SessionPtr session;
 

@@ -65,7 +65,7 @@ class Server {
        udp::endpoint sender_endpoint_;
 
        char receive_buf_udp_[2048];
-       unsigned char udp_packet_count_;
+       uint8_t udp_packet_count_;
 
        CallbackFuncPtr callback_;
 

@@ -14,7 +14,7 @@
 #include "../common/Logger.hpp"
 #include <boost/thread.hpp>
 
-typedef unsigned int UserID;
+typedef uint32_t UserID;
 
 class Account {
     public:
@@ -23,8 +23,8 @@ class Account {
 
         void LoadInitializeData(UserID user_id, std::string data);
 
-        unsigned int GetCurrentRevision();
-        std::string GetUserRevisionPatch(UserID user_id, unsigned int revision);
+        uint32_t GetCurrentRevision();
+        std::string GetUserRevisionPatch(UserID user_id, uint32_t revision);
 
         UserID GetUserIdFromFingerPrint(const std::string&);
         std::string GetPublicKey(UserID);
@@ -114,7 +114,7 @@ class Account {
         typedef std::map<UserID, PlayerPosition> PositionMap;
         PositionMap position_map_;
 
-        unsigned int revision_;
+        uint32_t revision_;
         UserID max_user_id_;
 
 		boost::recursive_mutex mutex_;

@@ -14,7 +14,7 @@ class Config
         Config(const std::string& filename);
 
     private:
-		unsigned short port_;
+        uint16_t port_;
         std::string server_name_;
         std::string stage_;
 		int capacity_;
@@ -25,7 +25,7 @@ class Config
 		std::list<std::string> blocking_address_patterns_;
 
     public:
-        unsigned short port() const;
+        uint16_t port() const;
         const std::string& server_name() const;
         const std::string& stage() const;
         int capacity() const;

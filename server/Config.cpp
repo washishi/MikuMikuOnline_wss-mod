@@ -17,7 +17,7 @@ Config::Config(const std::string& filename)
         pt = ptree();
     }
 	
-    port_ =				pt.get<unsigned short>("port", 39390);
+    port_ =                pt.get<uint16_t>("port", 39390);
     server_name_ =		pt.get<std::string>("server_name", "MMO Server");
     stage_ =			pt.get<std::string>("stage", "stage:ケロリン町");
     capacity_ =			pt.get<int>("capacity", 20);
@@ -36,7 +36,7 @@ Config::Config(const std::string& filename)
 // アクセサ
 //
 
-unsigned short Config::port() const
+uint16_t Config::port() const
 {
 	return port_;
 }

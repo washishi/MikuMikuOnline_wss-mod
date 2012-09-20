@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
         case network::header::ServerReceiveJSON:
         {
             if (auto session = c.session().lock()) {
-                unsigned int id = static_cast<unsigned int>(session->id());
+                uint32_t id = static_cast<unsigned int>(session->id());
 				if (id == 0) {
 					Logger::Error(_T("Invalid session id"));
 					break;
@@ -135,12 +135,12 @@ int main(int argc, char* argv[])
                 // テスト送信
                 server.SendUDPTestPacket(session->global_ip(), session->udp_port());
 
-                long id = account.GetUserIdFromFingerPrint(finger_print);
+                uint32_t id = account.GetUserIdFromFingerPrint(finger_print);
                 if (id == 0) {
                     // 未登録の場合、公開鍵を要求
                     session->Send(network::ClientRequestedPublicKey());
                 } else {
-                    unsigned int user_id = static_cast<unsigned int>(id);
+                    uint32_t user_id = static_cast<uint32_t>(id);
                     // ログイン
                     session->set_id(user_id);
                     account.LogIn(user_id);
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
         case network::header::ServerReceivePublicKey:
         {
             if (auto session = c.session().lock()) {
-                unsigned int user_id = account.RegisterPublicKey(c.body());
+                uint32_t user_id = account.RegisterPublicKey(c.body());
 				assert(user_id > 0);
 
                 // ログイン
@@ -223,8 +223,8 @@ int main(int argc, char* argv[])
         case network::header::ServerRequestedAccountRevisionPatch:
         {
             if (auto session = c.session().lock()) {
-                unsigned int user_id;
-                unsigned int client_revision;
+                uint32_t user_id;
+                uint32_t client_revision;
                 network::Utils::Deserialize(c.body(), &user_id, &client_revision);
 
                 if (client_revision < account.GetUserRevision(user_id)) {

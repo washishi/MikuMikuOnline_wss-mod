@@ -47,7 +47,7 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
     class FatalConnectionError : public Command {
     public:
         FatalConnectionError();
-        FatalConnectionError(unsigned int user_id);
+        FatalConnectionError(uint32_t user_id);
     };
 
     // 暗号化通信を開始
@@ -73,19 +73,19 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
     public:
         ClientReceiveCommonKey(const std::string& key,
                 const std::string& sign,
-                unsigned int user_id);
+                uint32_t user_id);
     };
 
     // 他のプレイヤーの位置情報が更新された
     class ClientUpdatePlayerPosition : public Command {
     public:
-        ClientUpdatePlayerPosition(unsigned int id, short x, short y, short z, unsigned char theta, unsigned char vy);
+        ClientUpdatePlayerPosition(uint32_t id, int16_t x, int16_t y, int16_t z, uint8_t theta, uint8_t vy);
     };
 
     // プレイヤーの位置情報が更新された
     class ServerUpdatePlayerPosition : public Command {
     public:
-        ServerUpdatePlayerPosition(short x, short y, short z, unsigned char theta, unsigned char vy);
+        ServerUpdatePlayerPosition(int16_t x, int16_t y, int16_t z, uint8_t theta, uint8_t vy);
     };
 
     // クライアントの情報を受信した　（公開鍵のフィンガープリント, UDPポート）
@@ -108,7 +108,7 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
 
     class ServerRequestedAccountRevisionPatch : public Command {
     public:
-        ServerRequestedAccountRevisionPatch(unsigned int user_id, int revision);
+        ServerRequestedAccountRevisionPatch(uint32_t user_id, int revision);
     };
 
     // アカウントデータベースの更新データ
@@ -120,12 +120,12 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
     // アカウントデータベースの更新通知
     class ClientReceiveAccountRevisionUpdateNotify : public Command {
     public:
-        ClientReceiveAccountRevisionUpdateNotify(unsigned int user_id, int revision);
+        ClientReceiveAccountRevisionUpdateNotify(uint32_t user_id, int revision);
     };
 
     class ClientReceiveWriteAverageLimitUpdate : public Command {
     public:
-        ClientReceiveWriteAverageLimitUpdate(unsigned short byte);
+        ClientReceiveWriteAverageLimitUpdate(uint16_t byte);
     };
 
     class ClientReceiveServerCrowdedError : public Command {
@@ -145,7 +145,7 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
 
     class ServerUpdateAccountProperty : public Command {
     public:
-        ServerUpdateAccountProperty(AccountProperty propery, const std::string& value);
+        ServerUpdateAccountProperty(AccountProperty uint16_t, const std::string& value);
     };
 
     class ServerReceiveJSON : public Command {
