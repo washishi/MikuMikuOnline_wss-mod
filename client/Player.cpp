@@ -328,6 +328,22 @@ Handle<Value> Player::Function_Player_setBalloonContent(const Arguments& args)
     return Undefined();
 }
 
+Handle<Value> Player::Function_Player_position(const Arguments& args)
+{
+    assert(args.This()->InternalFieldCount() > 0);
+    auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+    assert(self);
+
+	const auto pos = self->position();
+
+	HandleScope scope;
+	auto array = Array::New(0);
+	array->Set(String::New("x"), Number::New(pos.x));
+	array->Set(String::New("y"), Number::New(pos.y));
+	array->Set(String::New("z"), Number::New(pos.z));
+	return array;
+}
+
 void Player::RegisterFunctionTemplate(Handle<FunctionTemplate>& func)
 {
 
@@ -378,6 +394,15 @@ void Player::RegisterFunctionTemplate(Handle<FunctionTemplate>& func)
     * @param {String} text 表示するテキスト
     */
     object->Set(String::New("setBalloonContent"), FunctionTemplate::New(Function_Player_setBalloonContent));
+
+    /**
+    * プレイヤーの座標を返します
+    *
+    * @method position
+	* @return {Array}
+    */
+    object->Set(String::New("position"), FunctionTemplate::New(Function_Player_position));
+
 
     ///**
     //* プレイヤーにタグを追加します
