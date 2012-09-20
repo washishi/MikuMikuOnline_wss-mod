@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 					server.SendAll(send_command);
 				}
 
-                Logger::Info("Receive JSON: %s", message_json);
+                Logger::Info("Receive JSON: %s", message_json.str());
             }
         }
             break;
