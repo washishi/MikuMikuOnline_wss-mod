@@ -40,7 +40,7 @@ int KeyChecker::GetKeyCount(size_t key_code) const
 }
 
 const float GameLoop::CAMERA_MIN_RADIUS = 2.0f;
-const float GameLoop::CAMERA_MAX_RADIUS = 20.0f;
+const float GameLoop::CAMERA_MAX_RADIUS = 40.0f;
 
 GameLoop::GameLoop(const StagePtr& stage)
     : stage_(stage),

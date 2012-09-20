@@ -7,6 +7,9 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <stdint.h>
 
+const int ConfigManager::MIN_SCREEN_WIDTH = 1024;
+const int ConfigManager::MIN_SCREEN_HEIGHT = 600;
+
 ConfigManager::ConfigManager(const ManagerAccessorPtr& manager_accessor) :
 manager_accessor_(manager_accessor)
 {
@@ -31,6 +34,8 @@ void ConfigManager::Load(const std::string& filename)
 	model_edge_size_ = pt.get<float>("edge_size",1.0f);
 	stage_ = pt.get<std::string>("stage","ÉPÉçÉäÉìí¨");
 
+	screen_width_ =  std::max(screen_width_, MIN_SCREEN_WIDTH);
+	screen_height_ = std::max(screen_height_, MIN_SCREEN_HEIGHT);
 }
 
 bool ConfigManager::fullscreen() const

@@ -60,6 +60,9 @@ class ConfigManager
 
     private:
         ManagerAccessorPtr manager_accessor_;
+
+		static const int MIN_SCREEN_WIDTH;
+		static const int MIN_SCREEN_HEIGHT;
 };
 
 typedef std::shared_ptr<ConfigManager> ConfigManagerPtr;
