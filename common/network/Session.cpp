@@ -24,6 +24,7 @@ namespace network {
       write_byte_sum_(0),
       serialized_byte_sum_(0),
       compressed_byte_sum_(0),
+	  write_average_limit_(999999),
       id_(0)
     {
 
@@ -44,6 +45,8 @@ namespace network {
         auto msg = Serialize(command);
         write_byte_sum_ += msg.size();
         UpdateWriteByteAverage();
+
+		Logger::Debug(_T("%d byte/s"), GetWriteByteAverage());
 
         io_service_tcp_.post(boost::bind(&Session::DoWriteTCP, this, msg, shared_from_this()));
     }
@@ -159,6 +162,16 @@ namespace network {
     {
         return !operator==(s);
     }
+
+	int Session::write_average_limit() const
+	{
+		return write_average_limit_;
+	}
+
+	void Session::set_write_average_limit(int limit)
+	{
+		write_average_limit_ = limit;
+	}
 
     std::string Session::Serialize(const Command& command)
     {

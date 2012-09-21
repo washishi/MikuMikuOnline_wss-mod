@@ -28,7 +28,8 @@ namespace header {
         ServerUpdateAccountProperty =               0x13,
         ServerReceiveJSON =                         0x14,
         ClientReceiveJSON =                         0x15,
-
+		
+		ServerReceiveWriteLimit =					0x20,
 		ServerRequstedStatus =						0xE0,
 
         LZ4_COMPRESS_HEADER =                       0xF0,

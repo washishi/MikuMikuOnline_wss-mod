@@ -161,6 +161,17 @@ namespace network {
             }
         }
     }
+
+    void Server::SendAllLimited(const Command& command)
+    {
+        BOOST_FOREACH(SessionWeakPtr& ptr, sessions_) {
+            if (auto session = ptr.lock()) {
+				if (session->write_average_limit() > session->GetWriteByteAverage()) {
+					session->Send(command);
+				}
+            }
+        }
+    }
 	
     void Server::SendTo(const Command& command, uint32_t user_id)
 	{
@@ -181,6 +192,21 @@ namespace network {
                 if (auto self = self_ptr.lock()) {
                     if (*session != *self) {
                         session->Send(command);
+                    }
+                }
+            }
+        }
+    }
+
+    void Server::SendOthersLimited(const Command& command, SessionWeakPtr self_ptr)
+    {
+        BOOST_FOREACH(SessionWeakPtr& ptr, sessions_) {
+            if (auto session = ptr.lock()) {
+                if (auto self = self_ptr.lock()) {
+                    if (*session != *self) {
+						if (session->write_average_limit() > session->GetWriteByteAverage()) {
+							session->Send(command);
+						}
                     }
                 }
             }
@@ -271,15 +297,18 @@ namespace network {
 		}
 
 		// 現在コマンドがひとつしか無いのでそれ以外は無視
-		if (header != network::header::ServerRequstedStatus) {
+		if (header == network::header::ServerRequstedStatus) {
+			SendUDP(GetStatusJSON(), endpoint);
+		}
+		else if(header != network::header::ServerReceiveWriteLimit) {
+			if (readed < buffer.size()) {
+				body = buffer.substr(readed);
+			}
+		} else {
 			return;
 		}
 
-        if (readed < buffer.size()) {
-            body = buffer.substr(readed);
-        }
-
-		SendUDP(GetStatusJSON(), endpoint);
+		
    //     if (callback_) {
 			//(*callback_)(Command(static_cast<network::header::CommandHeader>(header), body, endpoint));
    //     }

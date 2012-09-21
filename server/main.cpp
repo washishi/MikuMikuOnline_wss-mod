@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
                 PlayerPosition pos;
                 network::Utils::Deserialize(c.body(), &pos.x, &pos.y, &pos.z, &pos.theta, &pos.vy);
                 account.SetUserPosition(session->id(), pos);
-                server.SendOthers(network::ClientUpdatePlayerPosition(session->id(),
+                server.SendOthersLimited(network::ClientUpdatePlayerPosition(session->id(),
                         pos.x,pos.y,pos.z,pos.theta, pos.vy), c.session());
             }
         }

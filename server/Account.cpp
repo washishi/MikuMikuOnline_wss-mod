@@ -91,8 +91,18 @@ std::string Account::GetUserRevisionPatch(UserID user_id, uint32_t revision)
 
 void Account::Remove(UserID user_id)
 {
-	boost::unique_lock<boost::recursive_mutex> lock(mutex_);
-	user_map_.erase(user_id);
+	// 30分後に削除
+	boost::thread t([this, user_id](){
+
+		boost::this_thread::sleep(boost::posix_time::minutes(30));
+
+		char login;
+		Get(user_id, LOGIN, &login);
+		if (!login) {
+			boost::unique_lock<boost::recursive_mutex> lock(mutex_);
+			user_map_.erase(user_id);
+		}
+	});
 }
 
 /*

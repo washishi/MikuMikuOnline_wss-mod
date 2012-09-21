@@ -65,6 +65,9 @@ namespace network {
             int serialized_byte_sum() const;
             int compressed_byte_sum() const;
 
+			int write_average_limit() const;
+			void set_write_average_limit(int limit);
+
             bool operator==(const Session&);
             bool operator!=(const Session&);
 
@@ -108,6 +111,8 @@ namespace network {
             time_t read_start_time_, write_start_time_;
             int read_byte_sum_, write_byte_sum_;
             int serialized_byte_sum_, compressed_byte_sum_;
+			
+			int write_average_limit_;
 
             UserID id_;
     };
