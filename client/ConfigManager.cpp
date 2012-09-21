@@ -7,7 +7,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <stdint.h>
 
-const int ConfigManager::MIN_SCREEN_WIDTH = 1024;
+const int ConfigManager::MIN_SCREEN_WIDTH = 800;
 const int ConfigManager::MIN_SCREEN_HEIGHT = 600;
 
 ConfigManager::ConfigManager(const ManagerAccessorPtr& manager_accessor) :

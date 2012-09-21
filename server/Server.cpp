@@ -286,32 +286,44 @@ namespace network {
     void Server::FetchUDP(const std::string& buffer, const boost::asio::ip::udp::endpoint endpoint)
     {
         uint8_t header;
-		uint32_t user_id;
-        uint8_t count;
         std::string body;
-        SessionPtr session;
+        SessionWeakPtr session;
 
-		size_t readed = 0;
-        if (buffer.size() > network::Utils::Deserialize(buffer, &header)) {
-			readed = network::Utils::Deserialize(buffer, &user_id, &count);
+		// IPアドレスとポートからセッションを特定
+		auto it = std::find_if(sessions_.begin(), sessions_.end(),
+			[&endpoint](const SessionWeakPtr& session) -> bool {
+				if (auto session_ptr = session.lock()) {
+
+					const auto session_endpoint = session_ptr->tcp_socket().remote_endpoint();
+					const auto session_port = session_ptr->udp_port();
+
+					return (session_endpoint.address() == endpoint.address() &&
+						session_port == endpoint.port());
+
+				} else {
+					return false;
+				}
+			});
+
+		if (it != sessions_.end()) {
+			session = *it;
+			Logger::Debug("Receive UDP Command: %d", session.lock()->id());
+		} else {
+			Logger::Debug("Receive anonymous UDP Command");
 		}
 
-		// 現在コマンドがひとつしか無いのでそれ以外は無視
+        if (buffer.size() > network::Utils::Deserialize(buffer, &header)) {
+			body = buffer.substr(sizeof(header));
+		}
+
 		if (header == network::header::ServerRequstedStatus) {
 			SendUDP(GetStatusJSON(), endpoint);
-		}
-		else if(header != network::header::ServerReceiveWriteLimit) {
-			if (readed < buffer.size()) {
-				body = buffer.substr(readed);
-			}
 		} else {
-			return;
+			if (callback_) {
+				(*callback_)(Command(static_cast<network::header::CommandHeader>(header), body, session));
+			}
 		}
 
-		
-   //     if (callback_) {
-			//(*callback_)(Command(static_cast<network::header::CommandHeader>(header), body, endpoint));
-   //     }
     }
 
     void Server::ServerSession::Start()

@@ -37,7 +37,7 @@ namespace network {
                     void SendUDP(const std::string& data);
 
                     void ReceiveUDP(const boost::system::error_code& error, size_t bytes_recvd);
-                    void DoWriteUDP(std::string data, const udp::endpoint& endpoint);
+                    void DoWriteUDP(std::shared_ptr<std::string> data, const udp::endpoint& endpoint);
                     void WriteUDP(const boost::system::error_code& error);
 
                 private:

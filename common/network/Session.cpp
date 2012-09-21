@@ -276,8 +276,7 @@ namespace network {
         if (!write_in_progress && !send_queue_.empty())
         {
            
-          boost::shared_ptr<std::string> s = 
-              boost::make_shared<std::string>(msg.data(), msg.size());
+          auto s = boost::make_shared<std::string>(msg.data(), msg.size());
 
           boost::asio::async_write(socket_tcp_,
               boost::asio::buffer(s->data(), s->size()),

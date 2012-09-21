@@ -358,10 +358,8 @@ void Client::ClientSession::Connect(const boost::system::error_code& error)
 
 void Client::ClientSession::SendUDP(const std::string& message)
 {
-    static unsigned char cnt = 0;
-    auto data = Utils::Serialize(id_, cnt) + message;
-    io_service_.post(boost::bind(&Client::ClientSession::DoWriteUDP, this, data, *iterator_udp_));
-    cnt++;
+	auto holder = std::make_shared<std::string>(message.data(), message.size());
+    io_service_.post(boost::bind(&Client::ClientSession::DoWriteUDP, this, holder, *iterator_udp_));
 }
 
 void Client::ClientSession::ReceiveUDP(const boost::system::error_code& error, size_t bytes_recvd)
@@ -380,10 +378,10 @@ void Client::ClientSession::ReceiveUDP(const boost::system::error_code& error, s
     }
 }
 
-void Client::ClientSession::DoWriteUDP(std::string data, const udp::endpoint& endpoint)
+void Client::ClientSession::DoWriteUDP(std::shared_ptr<std::string> data, const udp::endpoint& endpoint)
 {
     socket_udp_.async_send_to(
-        boost::asio::buffer(data), endpoint,
+        boost::asio::buffer(data->data(), data->size()), endpoint,
         boost::bind(&Client::ClientSession::WriteUDP, this,
           boost::asio::placeholders::error));
 }
