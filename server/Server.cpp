@@ -279,9 +279,10 @@ namespace network {
             body = buffer.substr(readed);
         }
 
-        if (callback_) {
-			(*callback_)(Command(static_cast<network::header::CommandHeader>(header), body, endpoint));
-        }
+		SendUDP(GetStatusJSON(), endpoint);
+   //     if (callback_) {
+			//(*callback_)(Command(static_cast<network::header::CommandHeader>(header), body, endpoint));
+   //     }
     }
 
     void Server::ServerSession::Start()

@@ -111,10 +111,11 @@ int main(int argc, char* argv[])
 					server.SendAll(send_command);
 				}
 
-                Logger::Info("Receive JSON: %s", message_json.str());
+				Logger::Info("Receive JSON: %s", message_json.str());
             }
         }
             break;
+
 
         // 位置情報受信
         case network::header::ServerUpdatePlayerPosition:
