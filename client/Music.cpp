@@ -213,7 +213,7 @@ void Music::Update()
 			fade_out_ = false;
 			requested_bgm_ = -1;
 		}
-		ChangeVolumeSoundMem((int)((90.0-(double)fade_count_)/0.9),present_bgm_);
+		ChangeVolumeSoundMem((int)((90.0-(double)fadeout_count_)/0.9),present_bgm_);
 		++fadeout_count_;
 	}
 }
