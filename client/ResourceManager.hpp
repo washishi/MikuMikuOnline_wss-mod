@@ -19,9 +19,11 @@ using boost::property_tree::ptree;
 
 class ImageHandle;
 class ModelHandle;
+class Music;
 
 typedef std::shared_ptr<ImageHandle> ImageHandlePtr;
 typedef std::shared_ptr<ModelHandle> ModelHandlePtr;
+typedef std::shared_ptr<Music> MusicPtr;
 
 struct ReadFuncData {
 	ReadFuncData(){};
@@ -86,6 +88,9 @@ class ResourceManager {
 
 		static tstring NameToFullPath(const tstring& name);
 
+		//Musics
+		static MusicPtr& music();
+
     private:
         static int default_font_handle_;
         static std::unordered_map<tstring, ImageHandlePtr> graph_handles_;
@@ -96,6 +101,8 @@ class ResourceManager {
         static std::unordered_map<tstring, ModelHandle> model_handles_;
 		static std::vector<std::string> model_name_list_;
 		static float model_edge_size_;
+		//Musics
+		static MusicPtr music_;
 };
 
 class ImageHandle {

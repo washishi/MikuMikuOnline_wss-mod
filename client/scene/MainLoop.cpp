@@ -10,6 +10,7 @@
 #include "../Core.hpp"
 #include <shlwapi.h>
 #include "ServerChange.hpp"
+#include "../Music.hpp"
 
 namespace scene {
 MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
@@ -54,6 +55,7 @@ void MainLoop::Update()
     card_manager_->Update();
 	minimap_.Update();
     world_manager_->Update();
+	ResourceManager::music()->Update();
 }
 
 void MainLoop::ProcessInput(InputManager* input)
