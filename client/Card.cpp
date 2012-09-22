@@ -21,6 +21,8 @@
 #include "../common/database/AccountProperty.hpp"
 #include "Profiler.hpp"
 #include "GenerateJSON.hpp"
+#include "Music.hpp"
+
 
 char Card::STORAGE_DIR[] = "storage";
 char Card::SCRIPT_PATH[] = "resources/js";
@@ -78,6 +80,7 @@ Card::Card(
         context->Global()->Set(String::New("Player"),  script_object->Clone());
         context->Global()->Set(String::New("Model"),  script_object->Clone());
         context->Global()->Set(String::New("Account"), script_object->Clone());
+        context->Global()->Set(String::New("Music"),  script_object->Clone());
         context->Global()->Set(String::New("InputBox"),   script_object->Clone());
         context->Global()->Set(String::New("Card"),    script_object->Clone());
         context->Global()->Set(String::New("Screen"),  script_object->Clone());
@@ -222,6 +225,78 @@ Handle<Value> Card::Function_Player_stopMotion(const Arguments& args)
     return Undefined();
 }
 
+Handle<Value> Card::Function_Music_playBGM(const Arguments& args)
+{
+
+	if (args.Length() >= 2 && args[0]->IsString()) {
+		auto name = std::string(*String::Utf8Value(args[0]->ToString()));
+		auto fade = args[1]->ToBoolean()->BooleanValue();
+		ResourceManager::music()->Play(unicode::ToTString(name),fade);
+	}
+
+    return Undefined();
+}
+
+Handle<Value> Card::Function_Music_stopBGM(const Arguments& args)
+{
+
+	if (args.Length() == 1 && args[0]->IsBoolean()) {
+		auto fade = args[1]->ToBoolean()->BooleanValue();
+		ResourceManager::music()->Stop(fade);
+	}else if(args.Length() == 0) {
+		ResourceManager::music()->Stop(false);
+	}
+
+    return Undefined();
+}
+
+Handle<Value> Card::Function_Music_playME(const Arguments& args)
+{
+
+	if (args.Length() == 1 && args[0]->IsString()) {
+		auto name = std::string(*String::Utf8Value(args[0]->ToString()));
+		ResourceManager::music()->PlayME(unicode::ToTString(name));
+	}
+
+    return Undefined();
+}
+
+
+Handle<Value> Card::Function_Music_playSE(const Arguments& args)
+{
+
+	if (args.Length() == 1 && args[0]->IsString()) {
+		auto name = std::string(*String::Utf8Value(args[0]->ToString()));
+		ResourceManager::music()->PlaySE(unicode::ToTString(name));
+	}
+
+    return Undefined();
+}
+
+Handle<Value> Card::Function_Music_all(const Arguments& args)
+{
+    HandleScope handle;
+    auto array = Array::New();
+
+    int i = 0;
+	BOOST_FOREACH(const boost::filesystem::path& music_path, ResourceManager::music()->GetMusicList()) {
+		array->Set(i, String::New(music_path.stem().string().c_str()));
+        i++;
+    }
+    return array;
+}
+
+
+Handle<Value> Card::Function_Music_IsLoadingDone(const Arguments& args)
+{
+	if (args.Length() == 1 && args[0]->IsString()) {
+	auto name = std::string(*String::Utf8Value(args[0]->ToString()));
+	auto check = ResourceManager::music()->CheckLoadedBGM(unicode::ToTString(name));
+	return Boolean::New(check);
+	}
+	return Boolean::New(false);
+}
+
 Handle<Value> Card::Function_Account_id(const Arguments& args)
 {
     auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
@@ -284,6 +359,7 @@ Handle<Value> Card::Function_Account_updateModelName(const Arguments& args)
         auto name = std::string(*String::Utf8Value(args[0]->ToString()));
         if (auto world_manager = self->manager_accessor_->world_manager().lock()) {
             world_manager->myself()->LoadModel(unicode::ToTString(name));
+			world_manager->myself()->ResetMotion();
         }
         auto account_manager = self->manager_accessor_->account_manager().lock();
         auto command_manager = self->manager_accessor_->command_manager().lock();
@@ -683,7 +759,62 @@ void Card::SetFunctions()
      * @static
      */
     script_.SetFunction("Player.stopMotion", Function_Player_stopMotion);
+
     /**
+     * 音楽を再生します
+     *
+     * @method playMotion
+     * @param {String} name BGM名
+     * @static
+     */
+    script_.SetFunction("Music.play", Function_Music_playBGM);
+
+    /**
+     * 音楽を停止します
+     *
+     * @method playMotion
+     * @param
+     * @static
+     */
+    script_.SetFunction("Music.stop", Function_Music_stopBGM);
+
+    /**
+     * MEを再生します
+     *
+     * @method playMotion
+     * @param {String} name ME名
+     * @static
+     */
+    script_.SetFunction("Music.playME", Function_Music_playME);
+
+	/**
+     * SEを再生します
+     *
+     * @method playMotion
+     * @param {String} name SE名
+     * @static
+     */
+    script_.SetFunction("Music.playSE", Function_Music_playSE);
+
+    /**
+     * BGM,MEのロードが終了しているかチェックします
+     *
+     * @method playMotion
+     * @param {String} name BGM、ME名
+     * @static
+     */
+    script_.SetFunction("Music.loadCheck", Function_Music_IsLoadingDone);
+
+    /**
+     * BGMのリストを返します
+     *
+     * @method playMotion
+     * @param
+     * @static
+     */
+    script_.SetFunction("Music.all", Function_Music_all);
+
+	/**
      * アカウント
      *
      * @class Account

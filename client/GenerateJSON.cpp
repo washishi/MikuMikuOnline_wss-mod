@@ -175,8 +175,8 @@ JsonGen::JsonGen()
 	DxLib::VECTOR prePos = {0},curPos = {0},lclPos = {0};
 	DxLib::MATRIX chglcl = {0};
 
-	char pmd_model_name_[256] = {0};
-	TCHAR pmd_author_name_[256] = {0};
+	char pmd_model_name_[MAX_PATH] = {0};
+	TCHAR pmd_author_name_[MAX_PATH] = {0};
 
 	int exist_num_pmd_ = 0;
 

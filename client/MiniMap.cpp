@@ -196,7 +196,7 @@ void MiniMap::DrawPosAndCalc()
 		if(tmp_pos_x < absolute_x() + 12)tmp_pos_x = absolute_x() + 12;
 		if(tmp_pos_x > absolute_x() + absolute_width() - 12)tmp_pos_x = absolute_x() + absolute_width() - 12;
 		if(tmp_pos_z < absolute_y() + 12)tmp_pos_z = absolute_y() + 12;
-		if(tmp_pos_z > absolute_y() + absolute_height() -12)tmp_pos_z = absolute_y() + absolute_height() - 12;
+		if(tmp_pos_z > absolute_y() + absolute_height() -12 - 16)tmp_pos_z = absolute_y() + absolute_height() - 12 - 16;
 		DrawCircle( tmp_pos_x, tmp_pos_z, 2, GetColor(23,162,175),TRUE);
 	}
 	prev_myself_pos_on_map_ = player_manager->char_data_providers()[player_manager->charmgr()->my_character_id()]->position();
