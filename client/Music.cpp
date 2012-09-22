@@ -180,7 +180,7 @@ void Music::Update()
 	if(CheckHandleASyncLoad(requested_bgm_) == false && requested_bgm_ != -1)
 	{
 		if(fade_count_ == 0)PlaySoundMem(requested_bgm_,DX_PLAYTYPE_LOOP);
-		if(fade_count_ >= 120)
+		if(fade_count_ >= 90)
 		{
 			ChangeVolumeSoundMem(100,requested_bgm_);
 			StopSoundMem(present_bgm_);
@@ -190,8 +190,8 @@ void Music::Update()
 			fade_count_ = 0;
 			crossfade_now_ = false;
 		}
-		ChangeVolumeSoundMem((int)(fade_count_/1.2),requested_bgm_);
-		ChangeVolumeSoundMem((int)((120-fade_count_)/1.2),present_bgm_);
+		ChangeVolumeSoundMem((int)((double)fade_count_/0.9),requested_bgm_);
+		ChangeVolumeSoundMem((int)((90.0-(double)fade_count_)/0.9),present_bgm_);
 		++fade_count_;
 	}
 }

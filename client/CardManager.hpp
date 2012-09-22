@@ -37,6 +37,7 @@ class CardManager : public std::enable_shared_from_this<CardManager> {
         void OnLogin(const PlayerPtr& player);
         void OnLogout(const PlayerPtr& player);
 		void OnModelReload();
+		void OnMusicReload();
 
         bool IsGUIActive();
         void FocusPlayer();

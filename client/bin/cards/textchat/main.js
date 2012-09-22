@@ -94,68 +94,75 @@ Player.onLogout = function(player) {
 // チャットメッセージ送信
 InputBox.onEnter = function (text) {
 
-	//サイコロ用
-	var dice_parsed_text = text.match(/^\/(\d+)[Dd](\d+)/)
-	if (dice_parsed_text) {
-		var time = dice_parsed_text[1]
+    //サイコロ用
+    var dice_parsed_text = text.match(/^\/(\d+)[Dd](\d+)/)
+    if (dice_parsed_text) {
+        var time = dice_parsed_text[1]
         var size = dice_parsed_text[2]
         var msg = "【ダイス /" + time + "D" + size + "】\n "
         for (var i = 0; i < time; i++) {
-        	msg += Number.random(1, size) + ", "
+            msg += Number.random(1, size) + ", "
         }
-        
+
         var msgObject = { body: msg };
         Network.sendAll(msgObject);
-		return;
-	}
+        return;
+    }
 
     // コマンドを解析
-    var parsed_text = text.match(/^\/(\w{1,8})\s?(\S*)/)
-    if (parsed_text) {
+    var parsed_text = text.split(" ");  //.match(/^\/(\w{1,8})\s?(\S*)/)
+    var command = parsed_text[0].match(/^\/(\w*)/);
+    if (command) {
 
-        var command = parsed_text[1]
-        var args = parsed_text[2]
+        var args = parsed_text[1]
 
-        switch (command) {
+        switch (command[1]) {
 
-            // ニックネームを変更       
+            // ニックネームを変更             
             case "nick":
                 Account.updateName(args.trim());
                 break;
 
-            // モデルを変更       
+            // モデルを変更             
             case "model":
                 Account.updateModelName("char:" + args.trim());
                 break;
 
-            // プレイヤー位置をリセット       
+            // プレイヤー位置をリセット             
             case "escape":
                 Player.escape();
                 break;
-                
-            // リロード
+
+            // リロード      
             case "reload":
                 Model.rebuild();
+                Music.rebuild();
                 break;
-                
-            // システム
+
+            // システム      
             case "system":
                 var msgObject = { system: args.trim() };
                 Network.sendAll(msgObject);
                 break;
-                
-            // プライベート
+
+            // プライベート      
             case "private":
-                var tok = args.split(",");
                 var msgObject = {
                     private: [
                     			Player.myself().id(),
-                    			Player.getFromName([tok[0]]).id()
+                    			Player.getFromName([args.trim()]).id()
                     		 ],
-                    body: tok[1]
-                    };
+                    body: parsed_text[2].trim()
+                };
                 Network.sendAll(msgObject);
                 break;
+
+            case "dance":
+                Music.playME(parsed_text[2].trim());
+                Player.playMotion(args.trim());
+
+            case "bgm":
+                Music.play(args.trim(), true);
         }
 
     } else {

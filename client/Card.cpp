@@ -456,6 +456,19 @@ Handle<Value> Card::Function_Model_Rebuild(const Arguments& args)
 	return Undefined();
 }
 
+Handle<Value> Card::Function_Music_Rebuild(const Arguments& args)
+{
+	ResourceManager::music()->Init();
+
+    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    if (auto card_manager = self->manager_accessor_->card_manager().lock()) {
+		card_manager->OnMusicReload();
+    }
+
+	return Undefined();
+}
+
+
 
 Handle<Value> Card::Property_global(Local<String> property, const AccessorInfo &info)
 {
@@ -589,6 +602,22 @@ void Card::Property_set_Model_onReload(Local<String> property, Local<Value> valu
         assert(info.Holder()->InternalFieldCount() > 0);
         auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
         self->model.on_reload_ = Persistent<Function>::New(value.As<Function>());
+    }
+}
+
+Handle<Value> Card::Property_Music_onReload(Local<String> property, const AccessorInfo &info)
+{
+    assert(info.Holder()->InternalFieldCount() > 0);
+    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+	return self->music.on_reload_;
+}
+
+void Card::Property_set_Music_onReload(Local<String> property, Local<Value> value, const AccessorInfo& info)
+{
+    if (value->IsFunction()) {
+        assert(info.Holder()->InternalFieldCount() > 0);
+        auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+        self->music.on_reload_ = Persistent<Function>::New(value.As<Function>());
     }
 }
 
@@ -814,6 +843,15 @@ void Card::SetFunctions()
      */
     script_.SetFunction("Music.all", Function_Music_all);
 
+    /**
+     * 音楽の構造を再構築します
+     *
+     * @method rebuild
+     * @static
+     */
+	script_.SetFunction("Music.rebuild", Function_Music_Rebuild);
+
+    script_.SetProperty("Music.onReload", Property_Music_onReload, Property_set_Music_onReload);
 	/**
      * アカウント
      *
@@ -1412,6 +1450,17 @@ void Card::OnModelReload()
                 [&](const Handle<Context>& context)
                 {
                     model.on_reload_->Call(context->Global(), 0, nullptr);
+                });
+    }
+}
+
+void Card::OnMusicReload()
+{
+    if (!music.on_reload_.IsEmpty() && music.on_reload_->IsFunction()) {
+        script_.TimedWith(
+                [&](const Handle<Context>& context)
+                {
+                    music.on_reload_->Call(context->Global(), 0, nullptr);
                 });
     }
 }
