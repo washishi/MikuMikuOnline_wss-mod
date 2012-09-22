@@ -14,9 +14,7 @@ list = new UI.List({
 	docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT | UI.DOCKING_BOTTOM
 });
 Model.onReload = function() {
-
 	list.clearItems();
-
 	var even_line = false;
 	var model_names = Model.all();
 	for (var i = 0; i < model_names.length; i++) {
@@ -25,7 +23,7 @@ Model.onReload = function() {
 				list.addItem(
 					new UI.Label({
 						docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT,
-						text: model_name,
+						text: model_name.substring(5),
 						bgcolor: ((even_line = !even_line) ? "#EEAFEECC" : "#FFFFFFCC"),
 						onclick: function() {
 							Account.updateModelName(model_name)
