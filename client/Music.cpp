@@ -9,15 +9,16 @@
 
 extern int LoadFile(const TCHAR *FilePath, void **FileImageAddr, int *FileSize);
 
+
 Music::Music() :
 bgm_handle_(),
 se_handle_(),
-prev_bgm_(-1),
-present_bgm_(-1),
-requested_bgm_(-1),
-music_paths_(),
 crossfade_now_(false),
-fade_count_(0)
+fade_out_(false),
+fade_count_(-1),
+present_bgm_(-1),
+prev_bgm_(-1),
+requested_bgm_(-1)
 {
 }
 
@@ -137,8 +138,16 @@ void Music::Stop(bool fadeout)
 	{
 		StopSoundMem(present_bgm_);
 	}
-	crossfade_now_ = fadeout;
+	if(crossfade_now_)
+	{
+		StopSoundMem(present_bgm_);
+		present_bgm_ = requested_bgm_;
+	}
+	crossfade_now_ = false;
+	fade_out_ = fadeout;
+	fadeout_count_ = GetVolumeSoundMem(present_bgm_);
 	fade_count_ = 0;
+	requested_bgm_ = -1;
 }
 
 void Music::PlaySE(tstring name)
@@ -176,10 +185,12 @@ void Music::Update()
 			crossfade_now_ = true;
 		}
 	}
-	if(!crossfade_now_)return;
-	if(CheckHandleASyncLoad(requested_bgm_) == false && requested_bgm_ != -1)
+	if(CheckHandleASyncLoad(requested_bgm_) == false && requested_bgm_ != -1 && crossfade_now_)
 	{
 		if(fade_count_ == 0)PlaySoundMem(requested_bgm_,DX_PLAYTYPE_LOOP);
+		ChangeVolumeSoundMem((int)((90.0-(double)fade_count_)/0.9),present_bgm_);
+		ChangeVolumeSoundMem((int)((double)fade_count_/0.9),requested_bgm_);
+		++fade_count_;
 		if(fade_count_ >= 90)
 		{
 			ChangeVolumeSoundMem(100,requested_bgm_);
@@ -190,9 +201,20 @@ void Music::Update()
 			fade_count_ = 0;
 			crossfade_now_ = false;
 		}
-		ChangeVolumeSoundMem((int)((double)fade_count_/0.9),requested_bgm_);
+	}
+	if(fade_out_ == true)
+	{
+		if(fadeout_count_ >= 90)
+		{
+			StopSoundMem(present_bgm_);
+			ChangeVolumeSoundMem(100,present_bgm_);
+			present_bgm_ = -1;
+			fadeout_count_ = 0;
+			fade_out_ = false;
+			requested_bgm_ = -1;
+		}
 		ChangeVolumeSoundMem((int)((90.0-(double)fade_count_)/0.9),present_bgm_);
-		++fade_count_;
+		++fadeout_count_;
 	}
 }
 

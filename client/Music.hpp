@@ -30,7 +30,9 @@ public:
 
 private:
 	bool crossfade_now_;
+	bool fade_out_;
 	int fade_count_;
+	int fadeout_count_;
 	int present_bgm_;
 	int prev_bgm_;
 	int requested_bgm_;
