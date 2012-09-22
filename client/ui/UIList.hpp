@@ -24,6 +24,7 @@ class UIList : public UIBase {
         /* function */
         static Handle<Value> Function_addItem(const Arguments& args);
         static Handle<Value> Function_removeItem(const Arguments& args);
+        static Handle<Value> Function_clearItems(const Arguments& args);
 
         /* property */
         static Handle<Value> Property_scroll_y(Local<String> property, const AccessorInfo &info);

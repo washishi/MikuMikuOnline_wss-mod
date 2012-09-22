@@ -60,10 +60,15 @@ int GameLoop::Init(std::shared_ptr<CharacterManager> character_manager)
     return 0;
 }
 
-int GameLoop::Logic(InputManager* input)
+int GameLoop::ProcessInput(InputManager* input)
 {
     MoveCamera(input);
     myself_->UpdateInput(input);
+    return 0;
+}
+
+int GameLoop::Update()
+{
     for (auto it = charmgr_->GetAll().begin(); it != charmgr_->GetAll().end(); ++it) {
         auto character = *it;
         character.second->Update();

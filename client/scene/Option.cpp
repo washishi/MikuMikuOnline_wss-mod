@@ -63,7 +63,8 @@ void Option::End()
 
 BasePtr Option::NextScene()
 {
-    if (start_count_ > 30) {
+	InputManager input;
+    if (input.GetKeyCount(KEY_INPUT_F1) == 1) {
         return background_scene_;
     } else {
         return BasePtr();

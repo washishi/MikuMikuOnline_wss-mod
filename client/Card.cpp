@@ -76,6 +76,7 @@ Card::Card(
 
         context->Global()->Set(String::New("Network"),  script_object->Clone());
         context->Global()->Set(String::New("Player"),  script_object->Clone());
+        context->Global()->Set(String::New("Model"),  script_object->Clone());
         context->Global()->Set(String::New("Account"), script_object->Clone());
         context->Global()->Set(String::New("InputBox"),   script_object->Clone());
         context->Global()->Set(String::New("Card"),    script_object->Clone());
@@ -366,10 +367,16 @@ Handle<Value> Card::Function_Screen_player_focus(const Arguments& args)
     return Undefined();
 }
 
-Handle<Value> Card::Function_Rebuild_Modeltree(const Arguments& args)
+Handle<Value> Card::Function_Model_Rebuild(const Arguments& args)
 {
 	JsonGen jsongen;
 	ResourceManager::BuildModelFileTree();
+
+    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    if (auto card_manager = self->manager_accessor_->card_manager().lock()) {
+		card_manager->OnModelReload();
+    }
+
 	return Undefined();
 }
 
@@ -493,6 +500,22 @@ void Card::Property_set_InputBox_message(Local<String> property, Local<Value> va
     self->inputbox.message_ = *String::Utf8Value(value->ToString());
 }
 
+Handle<Value> Card::Property_Model_onReload(Local<String> property, const AccessorInfo &info)
+{
+    assert(info.Holder()->InternalFieldCount() > 0);
+    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+	return self->model.on_reload_;
+}
+
+void Card::Property_set_Model_onReload(Local<String> property, Local<Value> value, const AccessorInfo& info)
+{
+    if (value->IsFunction()) {
+        assert(info.Holder()->InternalFieldCount() > 0);
+        auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+        self->model.on_reload_ = Persistent<Function>::New(value.As<Function>());
+    }
+}
+
 void Card::SetFunctions()
 {
 
@@ -581,6 +604,16 @@ void Card::SetFunctions()
      * @static
      */
     script_.SetFunction("Model.all", Function_Model_all);
+
+    /**
+     * モデルファイルの構造を再構築します
+     *
+     * @method rebuild
+     * @static
+     */
+	script_.SetFunction("Model.rebuild", Function_Model_Rebuild);
+	
+    script_.SetProperty("Model.onReload", Property_Model_onReload, Property_set_Model_onReload);
 
     /**
      * プレイヤー
@@ -791,13 +824,6 @@ void Card::SetFunctions()
      */
     script_.SetFunction("Screen.player_focus", Function_Screen_player_focus);
 
-    /**
-     * モデルファイルの構造を再構築します
-     *
-     * @method player_focus
-     * @static
-     */
-	script_.SetFunction("Model.rebuild", Function_Rebuild_Modeltree);
 //    /**
 //     * ワールド座標をスクリーン座標に変換します
 //     *
@@ -1246,7 +1272,17 @@ void Card::OnClose()
             }
         }
     });
+}
 
+void Card::OnModelReload()
+{
+    if (!model.on_reload_.IsEmpty() && model.on_reload_->IsFunction()) {
+        script_.TimedWith(
+                [&](const Handle<Context>& context)
+                {
+                    model.on_reload_->Call(context->Global(), 0, nullptr);
+                });
+    }
 }
 
 void Card::LoadStorage()

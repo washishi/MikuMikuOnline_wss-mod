@@ -36,6 +36,7 @@ class CardManager : public std::enable_shared_from_this<CardManager> {
         void OnReceiveJSON(const std::string& info_json, const std::string& msg_json);
         void OnLogin(const PlayerPtr& player);
         void OnLogout(const PlayerPtr& player);
+		void OnModelReload();
 
         bool IsGUIActive();
         void FocusPlayer();

@@ -75,6 +75,23 @@ Handle<Value> UIList::Function_removeItem(const Arguments& args)
     return args.This();
 }
 
+Handle<Value> UIList::Function_clearItems(const Arguments& args)
+{
+    assert(args.This()->InternalFieldCount() > 0);
+    auto self = std::dynamic_pointer_cast<UIList>(
+            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+    );
+    assert(self);
+
+    BOOST_FOREACH(auto it, self->items_) {
+        UIBasePtr chid_ptr = *static_cast<UIBasePtr*>(it->GetPointerFromInternalField(0));
+        chid_ptr->set_parent(Handle<Object>());
+    }
+	self->items_.clear();
+
+    return args.This();
+}
+
 Handle<Value> UIList::Property_scroll_y(Local<String> property, const AccessorInfo &info)
 {
     assert(info.This()->InternalFieldCount() > 0);
@@ -121,6 +138,15 @@ void UIList::DefineInstanceTemplate(Handle<ObjectTemplate>* object)
      * @chainable
      */
     SetFunction(object, "removeItem", Function_removeItem);
+
+    /**
+     * アイテムをすべて削除します
+     *
+     * @method clearItem
+     * @return {UIObject}　自分自身
+     * @chainable
+     */
+    SetFunction(object, "clearItems", Function_clearItems);
 
     /**
      * スクロール量(px)
