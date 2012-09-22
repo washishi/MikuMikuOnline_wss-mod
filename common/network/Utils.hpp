@@ -59,8 +59,8 @@ namespace network {
         template<>
         inline std::string GetSerializedValue(const std::string& t)
         {
-            size_t size = t.size();
-            return ConvertEndian(std::string(reinterpret_cast<const char*>(&size), sizeof(size_t))) +
+            int size = t.size();
+            return ConvertEndian(std::string(reinterpret_cast<const char*>(&size), sizeof(int))) +
                     std::string(t);
         }
 
@@ -122,8 +122,8 @@ namespace network {
         template<>
         inline std::string GetDeserializedValue<std::string>(std::string& buffer)
         {
-            size_t size = *reinterpret_cast<const size_t*>(ConvertEndian(buffer.substr(0, sizeof(size_t))).data());
-            buffer.erase(0, sizeof(size_t));
+            int size = *reinterpret_cast<const int*>(ConvertEndian(buffer.substr(0, sizeof(int))).data());
+            buffer.erase(0, sizeof(int));
             std::string data(buffer.data(), size);
             buffer.erase(0, size);
             return data;
