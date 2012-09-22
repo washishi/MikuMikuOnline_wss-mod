@@ -20,6 +20,7 @@ class Title : public Base {
         ~Title();
         void Begin();
         void Update();
+		void ProcessInput(InputManager*);
         void Draw();
         void End();
         BasePtr NextScene();

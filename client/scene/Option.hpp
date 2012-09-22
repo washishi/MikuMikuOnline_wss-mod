@@ -1,22 +1,20 @@
 //
-// Connect.hpp
+// Option.hpp
 //
 
 #pragma once
 
-#include <memory>
 #include "Base.hpp"
-#include "../ui/UILabel.hpp"
-#include "../ui/UIButton.hpp"
+#include "../ManagerHeader.hpp"
 #include "../ManagerAccessor.hpp"
 
 namespace scene {
-
-class Connect : public Base {
+class Option : public Base {
 
     public:
-        Connect(const ManagerAccessorPtr&);
-        ~Connect();
+        Option(const ManagerAccessorPtr& manager_accessor,
+			const BasePtr& background_scene);
+        ~Option();
         void Begin();
         void Update();
 		void ProcessInput(InputManager*);
@@ -29,18 +27,12 @@ class Connect : public Base {
 
     private:
         ManagerAccessorPtr manager_accesor_;
+        ConfigManagerPtr config_manager_;
         CardManagerPtr card_manager_;
         AccountManagerPtr account_manager_;
-        ConfigManagerPtr config_manager_;
-		CommandManagerPtr command_manager_;
-		
-		UILabel message_;
-		UILabel button_label_;
-        UIButton button_;
 
-		bool return_flag_;
+		BasePtr background_scene_;
 
-        BasePtr next_scene_;
+        int start_count_;
 };
-
 }

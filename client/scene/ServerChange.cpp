@@ -32,6 +32,11 @@ void ServerChange::Update()
 {
 }
 
+void ServerChange::ProcessInput(InputManager* input)
+{
+
+}
+
 void ServerChange::Draw()
 {
 }

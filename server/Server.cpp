@@ -316,6 +316,14 @@ namespace network {
 			body = buffer.substr(sizeof(header));
 		}
 
+        // 復号
+        if (session.lock() && header == header::ENCRYPT_HEADER) {
+            body.erase(0, sizeof(header));
+			body = session.lock()->encrypter().Decrypt(body);
+            Utils::Deserialize(body, &header);
+			body = buffer.substr(sizeof(header));
+        }
+
 		if (header == network::header::ServerRequstedStatus) {
 			SendUDP(GetStatusJSON(), endpoint);
 		} else {

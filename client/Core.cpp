@@ -59,6 +59,9 @@ void Core::MainLoop()
             current_scene_) {
 
         InputManager::Update();
+		InputManager input;
+		
+        current_scene_->ProcessInput(&input);
         current_scene_->Update();
         current_scene_->Draw();
 

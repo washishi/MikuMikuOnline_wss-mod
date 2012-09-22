@@ -94,11 +94,14 @@ void Connect::Update()
 		break;
 	}
 
-    InputManager input;
-    button_.ProcessInput(&input);
     button_.Update();
     button_label_.Update();
     message_.Update();
+}
+
+void Connect::ProcessInput(InputManager* input)
+{
+    button_.ProcessInput(input);
 }
 
 void Connect::Draw()

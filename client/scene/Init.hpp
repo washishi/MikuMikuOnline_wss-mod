@@ -23,6 +23,7 @@ class Init : public Base {
         void Begin();
         void Update();
         void Draw();
+		void ProcessInput(InputManager*);
         void End();
         BasePtr NextScene();
 
@@ -30,7 +31,7 @@ class Init : public Base {
         void AsyncInitialize();
 
     private:
-        ManagerAccessorPtr manager_accesor_;
+        ManagerAccessorPtr manager_accessor_;
         ConfigManagerPtr config_manager_;
         CardManagerPtr card_manager_;
         AccountManagerPtr account_manager_;

@@ -44,6 +44,7 @@ class ConfigManager
         bool antialias() const;
         std::string host() const;
         int port() const;
+
         int max_script_execution_time() const;
         int max_local_storage_size() const;
         bool upnp() const;

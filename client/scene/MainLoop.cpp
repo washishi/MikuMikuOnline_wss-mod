@@ -3,6 +3,7 @@
 //
 
 #include "MainLoop.hpp"
+#include "Option.hpp"
 #include <vector>
 #include <algorithm>
 #include "../ResourceManager.hpp"
@@ -48,45 +49,21 @@ void MainLoop::Begin()
 void MainLoop::Update()
 {
     command_manager_->Update();
-
-    InputManager input;
-
-    inputbox_.ProcessInput(&input);
     inputbox_.Update();
-
-    player_manager_->ProcessInput(&input);
     player_manager_->Update();
-    
-    card_manager_->ProcessInput(&input);
     card_manager_->Update();
-
-	minimap_.ProcessInput(&input);
 	minimap_.Update();
-
-    world_manager_->ProcessInput(&input);
     world_manager_->Update();
-
 }
 
-void MainLoop::Draw()
+void MainLoop::ProcessInput(InputManager* input)
 {
-    world_manager_->Draw();
-    player_manager_->Draw();
-    card_manager_->Draw();
-    inputbox_.Draw();
-	minimap_.Draw();
+    inputbox_.ProcessInput(input);
+    player_manager_->ProcessInput(input);
+    card_manager_->ProcessInput(input);
+	minimap_.ProcessInput(input);
+    world_manager_->ProcessInput(input);
 
-    InputManager input;
-
-	ProcessInput(&input);
-}
-
-void MainLoop::End()
-{
-}
-
-void MainLoop::ProcessInput(InputManager *input)
-{
 	if(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) > 0 && !inputbox_.IsActive())
 	{
 		TCHAR tmp_str[MAX_PATH];
@@ -109,8 +86,22 @@ void MainLoop::ProcessInput(InputManager *input)
 	}
 }
 
+void MainLoop::Draw()
+{
+    world_manager_->Draw();
+    player_manager_->Draw();
+    card_manager_->Draw();
+    inputbox_.Draw();
+	minimap_.Draw();
+}
+
+void MainLoop::End()
+{
+}
+
 BasePtr MainLoop::NextScene()
 {
+	InputManager input;
 	if(world_manager_->stage()->host_change_flag())
 	{
 		//account_manager_->set_host(world_manager_->stage()->host_change_flag().second);

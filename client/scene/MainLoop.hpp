@@ -27,12 +27,12 @@ class MainLoop : public Base {
         void Begin();
         void Update();
         void Draw();
+		void ProcessInput(InputManager*);
         void End();
 		BasePtr NextScene();
 
     private:
         std::function<void(const tstring&)> push_message_;
-		void ProcessInput(InputManager *input);
 
     private:
         // アクセサ

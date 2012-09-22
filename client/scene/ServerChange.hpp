@@ -17,6 +17,7 @@ class ServerChange : public Base{
 		~ServerChange();
         void Begin();
         void Update();
+		void ProcessInput(InputManager*);
         void Draw();
         void End();
         BasePtr NextScene();
