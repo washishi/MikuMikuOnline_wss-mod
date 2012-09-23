@@ -34,6 +34,7 @@ public:
           prev_rot_(VGet(0, 0, 0)),
 		  move_vec_y_(0.0f),
 		  jump_flag_(false),
+		  jump_end_(false),
 		  flight_duration_ideal_(1.0f),
 		  model_height_(1.58f),
 		  jump_height_(sqrt(15.0f)*2.0f),
@@ -160,6 +161,7 @@ public:
 		if(current_target_pos != prev_target_pos_ )
 		{
 			time_now = 0.0f;
+			jump_end_ = false;
 		}
 		
 
@@ -191,8 +193,9 @@ public:
             //Logger::Debug("distance_to_target: %d %d", distance_to_target, current_speed_ * timer_->DeltaSec());
 
             // TODO: Y下方向については重力加速度
-            if (distance_to_target > 2.0){
+            if ((distance_to_target > 0.5 || (current_target_pos_ - current_pos_).y > 0 )&& !jump_end_){
                 auto direction = current_target_pos_ - current_pos_;
+				if(current_target_vec_y_ != 0)direction.y = 0;
                 const auto diff_pos = VAdjustLength(direction, current_speed_ * timer_->DeltaSec());
                 const float roty = atan2(-direction.x, -direction.z);
 				const auto time_entire = VSize(direction) / (current_speed_ * (float)timer_->DeltaSec());	// ターゲットまでの移動完了時間
@@ -207,13 +210,12 @@ public:
 					0.5f * -9.8f * (time_entire - time_now) * (time_entire - time_now) * (1.0f / flight_duration_ideal_) * (jump_height_ / 5.0f) * (jump_height_ / 5.0f);	// 今からジャンプした際の最終的な位置
 				*/
 				static auto st_acc = -9.8f;
-				auto acc = -6.5f;
+				auto acc = -20.0f;
 				auto prediction_vector = 0.0f;
 				
-				for(acc;acc < -11.0f;acc-=0.1f){
-					prediction_vector = jump_height_ * stage_->map_scale() + (acc) * (time_entire - time_now) * (jump_height_ / 5.0f) * (1.0f / flight_duration_ideal_ );
-					if( current_target_vec_y_ != 0 && jump_flag_ == false )
-					{
+				if(jump_flag_ == false && current_target_vec_y_ != 0){
+					for(acc;acc < -6.5f;acc+=0.1f){
+						prediction_vector = jump_height_ * stage_->map_scale() + (acc) * (time_entire - time_now) * (jump_height_ / 5.0f) * (1.0f / flight_duration_ideal_ );
 						// ターゲット座標ではジャンプを始めている
 						if( prediction_vector > current_target_vec_y_ - 1 && prediction_vector < current_target_vec_y_ + 1)
 						{
@@ -236,15 +238,8 @@ public:
                 // 床へのめり込みを防止
                 float floor_y;
 				std::pair<bool, VECTOR> floor_coll;
-				if(!jump_flag_)
-				{
-					// 延長線上で接地検査
-					floor_coll = stage_->FloorExists(moved_pos,model_height_,8.0f);
-				}else if(jump_flag_ && current_pos_.y >= moved_pos.y)
-				{
 					// 足で接地検査
 					floor_coll = stage_->FloorExists(moved_pos,model_height_,0);
-				}
                 //moved_pos.y = std::max(moved_pos.y, floor_y); // 床にあたっているときは床の方がyが高くなる
 				if(!jump_flag_){
 					// 登ったり下ったりできる段差の大きさの制限を求める
@@ -268,11 +263,11 @@ public:
 						{
 							moved_pos = current_pos_ + VSize(diff_pos) * VNorm(diff);
 						}
-
 					}
-					if( floor_coll.first )
+					auto floor_exists = stage_->FloorExists(moved_pos, model_height_, 50);
+					if( floor_exists.first )
 					{
-						if( floor_coll.second.y < moved_pos.y )
+						if( floor_exists.second.y < moved_pos.y && current_target_pos.y < moved_pos.y)
 						{
 							jump_flag_ = true;
 						}
@@ -285,6 +280,12 @@ public:
 						{
 							moved_pos = floor_coll.second;
 							move_vec_y_ = 0;
+							jump_flag_ = false;
+							st_acc = -9.8;
+							if( moved_pos.x > current_target_pos.x - 1 && moved_pos.x < current_target_pos.x + 1)
+							{
+								jump_end_ = true;
+							}
 						}
 					}else{
 						// 上昇している
@@ -305,7 +306,10 @@ public:
 				}
 
                 data_provider_.set_position(moved_pos);
-                data_provider_.set_theta(current_rot_.y);
+				if(distance_to_target > 2.0)
+				{
+					data_provider_.set_theta(current_rot_.y);
+				}
 
                 MV1SetPosition(model_handle_, moved_pos);
 				MV1SetRotationXYZ(model_handle_, current_rot_);
@@ -318,7 +322,7 @@ public:
 				{
 					current_motion_ = motion.walk_;
 				}
-            }else{
+			}else{
                 current_motion_ = motion.stand_;
             }
 
@@ -372,6 +376,7 @@ private:
     StagePtr stage_;
 	int shadow_handle_;
 	float shadow_size_;
+	bool jump_end_;
 
     struct {
         int stand_, walk_, run_;
