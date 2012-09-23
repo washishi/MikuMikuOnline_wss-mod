@@ -43,8 +43,9 @@ class MainLoop : public Base {
         WorldManagerPtr world_manager_;
         AccountManagerPtr account_manager_;
         ConfigManagerPtr config_manager_;
-		MiniMap minimap_;
-        InputBox inputbox_;
+        WindowManagerPtr window_manager_;
+		MiniMapPtr minimap_;
+        InputBoxPtr inputbox_;
 		int snapshot_number_;
 };
 

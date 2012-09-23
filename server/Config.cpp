@@ -17,10 +17,12 @@ Config::Config(const std::string& filename)
         pt = ptree();
     }
 	
-    port_ =                pt.get<uint16_t>("port", 39390);
+    port_ =             pt.get<uint16_t>("port", 39390);
     server_name_ =		pt.get<std::string>("server_name", "MMO Server");
     stage_ =			pt.get<std::string>("stage", "stage:ケロリン町");
     capacity_ =			pt.get<int>("capacity", 20);
+
+	public_ =			pt.get<bool>("public", false);
 
 	receive_limit_1_ =	pt.get<int>("receive_limit_1", 60);
 	receive_limit_2_ =	pt.get<int>("receive_limit_2", 100);

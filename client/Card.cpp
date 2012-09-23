@@ -541,8 +541,6 @@ void Card::Property_set_Card_board(Local<String> property, Local<Value> value, c
     assert(info.Holder()->InternalFieldCount() > 0);
     auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
     assert(ptr_set.find(self) != ptr_set.end());
-
-    self->ui_board_obj_ = Persistent<Object>::New(value->ToObject());
 }
 
 Handle<Value> Card::Property_InputBox_onEnter(Local<String> property, const AccessorInfo &info)
@@ -1256,31 +1254,15 @@ void Card::Update()
 {
 	MMO_PROFILE_FUNCTION;
 
-    //if (force_gc_flag) {
-    //    PROCESS_MEMORY_COUNTERS pmc = { 0 };
-    //    DWORD dwProcessID = GetCurrentProcessId();
-    //    HANDLE hProcess;
-
-    //    if ( (hProcess = OpenProcess(PROCESS_QUERY_INFORMATION,FALSE,dwProcessID)) != NULL ){
-    //        v8::V8::LowMemoryNotification();
-    //        if ( GetProcessMemoryInfo(hProcess,&pmc,sizeof(pmc)) ){
-    //            std::cout << "Using memory: " << pmc.WorkingSetSize << std::endl;
-    //        }
-    //        CloseHandle( hProcess );
-    //    }
-
-    //    force_gc_flag = false;
-    //}
-
     static int cnt = 0;
     if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
-			auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
-			if (ptr->children_size() > 0) {
-				ptr->Update();
-				if (cnt % 2 == 0) {
-					ptr->AsyncUpdate();
-				}
+		auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+		if (ptr->children_size() > 0) {
+			ptr->Update();
+			if (cnt % 2 == 0) {
+				ptr->AsyncUpdate();
 			}
+		}
     }
     cnt++;
 }
@@ -1293,39 +1275,38 @@ void Card::Draw()
         auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
 
         if (ptr->children_size() > 0) {
-				ptr->Draw();
-			
-			/*
-			if (folding_) {
-				DrawGraph(ptr->absolute_x() + ptr->absolute_width() - 28,
-					ptr->absolute_y() + 12, *icon_base_handle_, TRUE);
-			} else {
-				ptr->Draw();
-				DrawGraph(ptr->absolute_x() + ptr->absolute_width() - 28,
-					ptr->absolute_y() + 12, *icon_base_close_handle_, TRUE);
-			}
-			*/
-
+			ptr->Draw();
         }
     }
+}
+
+UIBasePtr Card::GetWindow() const
+{
+	if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
+		auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+		if (ptr->children_size() > 0) {
+			return ptr;
+		}
+	}
+	return UIBasePtr();
 }
 
 void Card::ProcessInput(InputManager* input)
 {
 	MMO_PROFILE_FUNCTION;
 
-    CheckFunctionKey(KEY_INPUT_F1,  "F1",  *input);
-    CheckFunctionKey(KEY_INPUT_F2,  "F2",  *input);
-    CheckFunctionKey(KEY_INPUT_F3,  "F3",  *input);
-    CheckFunctionKey(KEY_INPUT_F4,  "F4",  *input);
-    CheckFunctionKey(KEY_INPUT_F5,  "F5",  *input);
-    CheckFunctionKey(KEY_INPUT_F6,  "F6",  *input);
-    CheckFunctionKey(KEY_INPUT_F7,  "F7",  *input);
-    CheckFunctionKey(KEY_INPUT_F8,  "F8",  *input);
-    CheckFunctionKey(KEY_INPUT_F9,  "F9",  *input);
-    CheckFunctionKey(KEY_INPUT_F10, "F10", *input);
-    CheckFunctionKey(KEY_INPUT_F11, "F11", *input);
-    CheckFunctionKey(KEY_INPUT_F12, "F12", *input);
+ //   CheckFunctionKey(KEY_INPUT_F1,  "F1",  *input);
+ //   CheckFunctionKey(KEY_INPUT_F2,  "F2",  *input);
+ //   CheckFunctionKey(KEY_INPUT_F3,  "F3",  *input);
+ //   CheckFunctionKey(KEY_INPUT_F4,  "F4",  *input);
+ //   CheckFunctionKey(KEY_INPUT_F5,  "F5",  *input);
+ //   CheckFunctionKey(KEY_INPUT_F6,  "F6",  *input);
+ //   CheckFunctionKey(KEY_INPUT_F7,  "F7",  *input);
+ //   CheckFunctionKey(KEY_INPUT_F8,  "F8",  *input);
+ //   CheckFunctionKey(KEY_INPUT_F9,  "F9",  *input);
+ //   CheckFunctionKey(KEY_INPUT_F10, "F10", *input);
+ //   CheckFunctionKey(KEY_INPUT_F11, "F11", *input);
+ //   CheckFunctionKey(KEY_INPUT_F12, "F12", *input);
 
 	script_.With([&](const Handle<Context>& context){
 		if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {

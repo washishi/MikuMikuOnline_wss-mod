@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include "../ResourceManager.hpp"
+#include "../WindowManager.hpp"
 #include "../Core.hpp"
 #include <shlwapi.h>
 #include "ServerChange.hpp"
@@ -21,16 +22,21 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
       world_manager_(std::make_shared<WorldManager>(manager_accessor_)),
       account_manager_(manager_accessor->account_manager().lock()),
       config_manager_(manager_accessor->config_manager().lock()),
-      inputbox_(manager_accessor_),
-	  minimap_(manager_accessor_),
+      window_manager_(std::make_shared<WindowManager>(manager_accessor_)),
+      inputbox_(std::make_shared<InputBox>(manager_accessor_)),
+	  minimap_(std::make_shared<MiniMap>(manager_accessor)),
 	  snapshot_number_(0)
 {
     manager_accessor_->set_player_manager(player_manager_);
     manager_accessor_->set_world_manager(world_manager_);
+    manager_accessor_->set_window_manager(window_manager_);
 
-    inputbox_.ReloadTabs();
+    inputbox_->ReloadTabs();
+	window_manager_->AddWindow(inputbox_);
 
-	minimap_.UIPlacement(config_manager_->screen_width() - MINIMAP_MINSIZE - 12, 12);
+	minimap_->UIPlacement(config_manager_->screen_width() - MINIMAP_MINSIZE - 12, 12);
+	window_manager_->AddWindow(minimap_);
+
     player_manager_->Init();
     world_manager_->Init();	
 
@@ -49,24 +55,22 @@ void MainLoop::Begin()
 
 void MainLoop::Update()
 {
+	window_manager_->Update();
     command_manager_->Update();
-    inputbox_.Update();
     player_manager_->Update();
     card_manager_->Update();
-	minimap_.Update();
     world_manager_->Update();
 	ResourceManager::music()->Update();
 }
 
 void MainLoop::ProcessInput(InputManager* input)
 {
-    inputbox_.ProcessInput(input);
+	window_manager_->ProcessInput(input);
     player_manager_->ProcessInput(input);
     card_manager_->ProcessInput(input);
-	minimap_.ProcessInput(input);
     world_manager_->ProcessInput(input);
 
-	if(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) > 0 && !inputbox_.IsActive())
+	if(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) > 0 && !inputbox_->IsActive())
 	{
 		TCHAR tmp_str[MAX_PATH];
 		_stprintf( tmp_str , _T(".\\screenshot\\ss%03d.png") , snapshot_number_ );
@@ -93,8 +97,7 @@ void MainLoop::Draw()
     world_manager_->Draw();
     player_manager_->Draw();
     card_manager_->Draw();
-    inputbox_.Draw();
-	minimap_.Draw();
+	window_manager_->Draw();
 }
 
 void MainLoop::End()
@@ -109,7 +112,7 @@ BasePtr MainLoop::NextScene()
 		//account_manager_->set_host(world_manager_->stage()->host_change_flag().second);
 		return BasePtr(new scene::ServerChange(manager_accessor_));
 	} else if (input.GetKeyCount(KEY_INPUT_F1) == 1) {
-		inputbox_.Inactivate();
+		inputbox_->Inactivate();
 		return BasePtr(new scene::Option(manager_accessor_, shared_from_this()));
 	} else{
 		return nullptr;

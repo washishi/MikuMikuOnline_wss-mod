@@ -31,3 +31,7 @@ typedef std::weak_ptr<AccountManager> AccountManagerWeakPtr;
 class ConfigManager;
 typedef std::shared_ptr<ConfigManager> ConfigManagerPtr;
 typedef std::weak_ptr<ConfigManager> ConfigManagerWeakPtr;
+
+class WindowManager;
+typedef std::shared_ptr<WindowManager> WindowManagerPtr;
+typedef std::weak_ptr<WindowManager> WindowManagerWeakPtr;

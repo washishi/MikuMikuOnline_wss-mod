@@ -19,6 +19,8 @@ class Config
         std::string stage_;
 		int capacity_;
 
+		bool public_;
+
 		int receive_limit_1_;
 		int receive_limit_2_;
 		

@@ -223,13 +223,20 @@ void UIBoard::UpdateDrag(InputManager* input, bool resizeable)
 
 void UIBoard::ProcessInput(InputManager* input)
 {
-    ProcessInputChildren(input);
+    if (!visible_) {
+        return;
+    }
 
+    ProcessInputChildren(input);
     UpdateDrag(input, resizable_);
 }
 
 void UIBoard::Update()
 {
+    if (!visible_) {
+        return;
+    }
+
     UpdatePosition();
     UpdateChildren();
 }

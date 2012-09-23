@@ -104,6 +104,10 @@ void MiniMap::ProcessInput(InputManager* input)
 {
 	MMO_PROFILE_FUNCTION;
 
+    if (!visible_) {
+        return;
+    }
+
 	UpdateDrag(input, resizable_);
 }
 
@@ -217,6 +221,10 @@ void MiniMap::DrawPosAndCalc()
 void MiniMap::Update()
 {
 	MMO_PROFILE_FUNCTION;
+
+    if (!visible_) {
+        return;
+    }
 
 	UpdatePosition();
 }

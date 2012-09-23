@@ -35,6 +35,7 @@ class Init : public Base {
         ConfigManagerPtr config_manager_;
         CardManagerPtr card_manager_;
         AccountManagerPtr account_manager_;
+		WindowManagerPtr window_manager_;
 
         int start_count_;
 

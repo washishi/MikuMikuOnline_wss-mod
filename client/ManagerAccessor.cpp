@@ -76,3 +76,13 @@ void ManagerAccessor::set_config_manager(ConfigManagerWeakPtr config_manager)
 {
     config_manager_ = config_manager;
 }
+
+const WindowManagerWeakPtr& ManagerAccessor::window_manager()
+{
+    return window_manager_;
+}
+
+void ManagerAccessor::set_window_manager(WindowManagerWeakPtr window_manager)
+{
+    window_manager_ = window_manager;
+}

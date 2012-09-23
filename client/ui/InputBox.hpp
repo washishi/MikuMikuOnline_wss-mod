@@ -13,8 +13,12 @@
 #include "../ResourceManager.hpp"
 #include "../Card.hpp"
 #include "Input.hpp"
+#include "UISuper.hpp"
 
-class InputBox {
+class InputBox;
+typedef std::shared_ptr<InputBox> InputBoxPtr;
+
+class InputBox : public UISuper {
     public:
         InputBox(const ManagerAccessorPtr& manager_accessor);
         ~InputBox();

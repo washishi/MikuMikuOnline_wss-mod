@@ -44,7 +44,7 @@ class CardManager : public std::enable_shared_from_this<CardManager> {
 
         v8::Handle<v8::Object> GetGlobal();
 
-        std::vector<CardPtr>& cards();
+        const std::vector<CardPtr>& cards();
 
     private:
         ManagerAccessorPtr manager_accessor_;

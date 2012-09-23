@@ -9,6 +9,7 @@
 #include <iostream>
 #include <vector>
 
+class InputManager;
 
 struct Rect {
     Rect(int x_ = 0, int y_ = 0, int width_ = 0, int height_ = 0) : x(x_), y(y_), width(width_), height(height_) {}
@@ -45,6 +46,9 @@ class UISuper : public std::enable_shared_from_this<UISuper> {
         int absolute_width() const;
         int absolute_height() const;
 
+		virtual void Draw() {}
+		virtual void Update() {}
+		virtual void ProcessInput(InputManager* input) {}
 
         int height() const;
         void set_height(int height);
@@ -110,3 +114,6 @@ class UISuper : public std::enable_shared_from_this<UISuper> {
 
 
 };
+
+typedef std::shared_ptr<UISuper> UISuperPtr;
+typedef std::weak_ptr<UISuper> UISuperWeakPtr;
