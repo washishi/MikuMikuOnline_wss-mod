@@ -7,12 +7,12 @@
 #include "../../common/Logger.hpp"
 
 namespace scene {
-ServerChange::ServerChange(const ManagerAccessorPtr& manager_accesor) :
-	manager_accessor_(manager_accesor),
-	card_manager_(manager_accesor->card_manager().lock()),
-	account_manager_(manager_accesor->account_manager().lock()),
-	config_manager_(manager_accesor->config_manager().lock()),
-    world_manager_(manager_accesor->world_manager().lock())
+ServerChange::ServerChange(const ManagerAccessorPtr& manager_accessor) :
+	manager_accessor_(manager_accessor),
+	card_manager_(manager_accessor->card_manager().lock()),
+	account_manager_(manager_accessor->account_manager().lock()),
+	config_manager_(manager_accessor->config_manager().lock()),
+    world_manager_(manager_accessor->world_manager().lock())
 {
 }
 

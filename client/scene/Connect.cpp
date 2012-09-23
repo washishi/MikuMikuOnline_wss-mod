@@ -11,15 +11,15 @@
 #include "../../common/Logger.hpp"
 
 namespace scene {
-Connect::Connect(const ManagerAccessorPtr& manager_accesor) :
-              manager_accesor_(manager_accesor),
-              card_manager_(manager_accesor->card_manager().lock()),
-              account_manager_(manager_accesor->account_manager().lock()),
-              config_manager_(manager_accesor->config_manager().lock()),
-			  command_manager_(std::make_shared<CommandManager>(manager_accesor_)),
+Connect::Connect(const ManagerAccessorPtr& manager_accessor) :
+              manager_accessor_(manager_accessor),
+              card_manager_(manager_accessor->card_manager().lock()),
+              account_manager_(manager_accessor->account_manager().lock()),
+              config_manager_(manager_accessor->config_manager().lock()),
+			  command_manager_(std::make_shared<CommandManager>(manager_accessor_)),
 			  return_flag_(false)
 {
-    manager_accesor_->set_command_manager(command_manager_);
+    manager_accessor_->set_command_manager(command_manager_);
 }
 
 Connect::~Connect()
@@ -123,9 +123,9 @@ BasePtr Connect::NextScene()
 {
     InputManager input;
     if (command_manager_->status() == CommandManager::STATUS_READY) {
-        return BasePtr(new scene::MainLoop(manager_accesor_));
+        return BasePtr(new scene::MainLoop(manager_accessor_));
 	} else if (return_flag_) {
-		return BasePtr(new scene::Title(manager_accesor_));
+		return BasePtr(new scene::Title(manager_accessor_));
     } else {
       return BasePtr();
     }

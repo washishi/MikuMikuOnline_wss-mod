@@ -112,16 +112,18 @@ void CommandManager::FetchCommand(const network::Command& command)
 
 	case ClientReceiveAccountRevisionUpdateNotify:
 	{
-		uint32_t user_id;
-		uint32_t server_revision;
-		network::Utils::Deserialize(command.body(), &user_id, &server_revision);
+		if (player_manager) {
+			uint32_t user_id;
+			uint32_t server_revision;
+			network::Utils::Deserialize(command.body(), &user_id, &server_revision);
 
-		auto current_revision = player_manager->GetCurrentUserRevision(user_id);
+			auto current_revision = player_manager->GetCurrentUserRevision(user_id);
 
-		Logger::Info(_T("Receive account database update notify　%d %d [%d]"), user_id, server_revision, current_revision);
+			Logger::Info(_T("Receive account database update notify　%d %d [%d]"), user_id, server_revision, current_revision);
 
-		if (server_revision > current_revision) {
-			client_->Write(network::ServerRequestedAccountRevisionPatch(user_id, current_revision));
+			if (server_revision > current_revision) {
+				client_->Write(network::ServerRequestedAccountRevisionPatch(user_id, current_revision));
+			}
 		}
 	}
 		break;
@@ -192,4 +194,22 @@ CommandManager::Status CommandManager::status() const
 std::string CommandManager::stage() const
 {
 	return stage_;
+}
+
+double CommandManager::GetReadByteAverage() const
+{
+    if (client_) {
+        return client_->GetReadByteAverage();
+    } else {
+        return 0;
+    }
+}
+
+double CommandManager::GetWriteByteAverage() const
+{
+    if (client_) {
+        return client_->GetWriteByteAverage();
+    } else {
+        return 0;
+    }
 }

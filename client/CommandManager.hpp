@@ -31,8 +31,10 @@ class CommandManager {
         void Update();
         void Write(const network::Command& command);
         void WriteUDP(const network::Command& command);
-
         void SendJSON(const std::string&);
+
+		double GetReadByteAverage() const;
+		double GetWriteByteAverage() const;
 
         void set_client(ClientUniqPtr client);
         unsigned int user_id();

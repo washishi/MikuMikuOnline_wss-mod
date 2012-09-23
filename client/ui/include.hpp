@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "UISuper.hpp"
 #include "UIBoard.hpp"
 #include "UIButton.hpp"
 #include "UILabel.hpp"

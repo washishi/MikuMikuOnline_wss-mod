@@ -29,7 +29,7 @@ class Title : public Base {
         void AsyncInitialize();
 
     private:
-        ManagerAccessorPtr manager_accesor_;
+        ManagerAccessorPtr manager_accessor_;
         CardManagerPtr card_manager_;
         AccountManagerPtr account_manager_;
         ConfigManagerPtr config_manager_;

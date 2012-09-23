@@ -7,8 +7,11 @@
 #include <fstream>
 #include <string>
 #include <iostream>
+#include <boost/property_tree/json_parser.hpp>
 #include "../common/unicode.hpp"
 #include "ManagerAccessor.hpp"
+
+using namespace boost::property_tree;
 
 class ConfigManager
 {
@@ -38,6 +41,7 @@ class ConfigManager
 		std::string stage_;
 
     public:
+
         bool fullscreen() const;
         int screen_width() const;
         int screen_height() const;
@@ -61,6 +65,7 @@ class ConfigManager
 
     private:
         ManagerAccessorPtr manager_accessor_;
+		ptree pt_;
 
 		static const int MIN_SCREEN_WIDTH;
 		static const int MIN_SCREEN_HEIGHT;

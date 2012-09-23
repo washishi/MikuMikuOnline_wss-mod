@@ -31,6 +31,8 @@ class Stage {
         const ModelHandle& map_handle() const;
         float map_scale() const;
         float min_height() const;
+		void set_perspective(int value);
+		int perspective() const;
 
         const std::vector<VECTOR>& start_points() const;
 		const std::vector<VECTOR>& warp_points() const;
@@ -50,6 +52,7 @@ class Stage {
 		std::vector<VECTOR> warp_points_;
 
 		bool host_change_flag_;
+		int perspective_;
 };
 
 typedef std::shared_ptr<Stage> StagePtr;

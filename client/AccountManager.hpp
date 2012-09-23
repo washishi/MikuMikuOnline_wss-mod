@@ -7,13 +7,17 @@
 #include "ManagerHeader.hpp"
 #include <string>
 #include <stdint.h>
+#include <boost/property_tree/xml_parser.hpp>
 
 class AccountManager {
     public:
         AccountManager(const ManagerAccessorPtr& manager_accessor);
 
         void Load(const std::string& filename);
-        void Save(const std::string& filename) const;
+        void Save(const std::string& filename);
+		
+		boost::property_tree::ptree Get(const std::string& name) const;
+		void Set(const std::string& name, const boost::property_tree::ptree& value);
 
         std::string GetSerializedData() const;
 
@@ -30,6 +34,9 @@ class AccountManager {
 
         std::string host() const;
         void set_host(const std::string& host);
+		
+		int show_nametag() const;
+		int perspective() const;
 
     private:
         ManagerAccessorPtr manager_accessor_;
@@ -42,8 +49,9 @@ class AccountManager {
         std::string model_name_;
 
         std::string host_;
-
         uint16_t udp_port_;
+
+		boost::property_tree::ptree pt_;
 };
 
 typedef std::shared_ptr<AccountManager> AccountManagerPtr;

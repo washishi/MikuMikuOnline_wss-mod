@@ -109,37 +109,38 @@ void GameLoop::FixCameraPosition()
 
     const auto target_pos = myself_->current_stat().pos +
         VGet(0, myself_->model_height() * camera.target_height + 0.2f, 0) * stage_->map_scale();
-    auto camera_pos = target_pos +
+
+	auto camera_pos = target_pos +
 		VGet(cos(camera.phi) * sin(camera.theta),
 			sin(camera.phi >= TORADIAN(180.0f) ? camera.phi + TORADIAN(90.0f) : camera.phi ),
 			cos(camera.phi) * cos(camera.theta)) * (camera.radius * stage_->map_scale());	
 
-    const auto coll_info = MV1CollCheck_Line(stage_->map_handle().handle(), -1, target_pos, camera_pos);
-    static int wallcamera_cnt = 0;
+	const auto coll_info = MV1CollCheck_Line(stage_->map_handle().handle(), -1, target_pos, camera_pos);
+	static int wallcamera_cnt = 0;
 	auto model_coll_size = (myself_->model_height() * (camera.target_height < 0.5f ? 1.0f - camera.target_height : camera.target_height) + 0.25f) * stage_->map_scale();
 
 	if (coll_info.HitFlag &&
 		VSize(camera_pos - myself_->current_stat().pos) > CAMERA_MIN_RADIUS + 2.0)
-    {
-        wallcamera_cnt++;
+	{
+		wallcamera_cnt++;
 		if (wallcamera_cnt > 15 && VSize(camera_pos - myself_->current_stat().pos) < CAMERA_MIN_RADIUS + 4.0f + 1.0f) {
 			camera_pos.x = coll_info.HitPosition.x;
 			camera_pos.z = coll_info.HitPosition.z;
-        }else{
+		}else{
 			camera_pos = coll_info.HitPosition - VScale(coll_info.HitPosition - target_pos,0.2f);
 		}
-    } else {
-        wallcamera_cnt = 0;
-    }
+	} else {
+		wallcamera_cnt = 0;
+	}
 	if(VSize(camera_pos - target_pos) <= model_coll_size)
 	{
 		camera_pos = target_pos + VScale(camera_pos - target_pos,(model_coll_size)/(VSize(camera_pos - target_pos) <= 0 ? 0.000001f : VSize(camera_pos - target_pos)));
 	}
 
 	auto camera_pos_delta = VScale(camera_pos - GetCameraPosition(),(float)0.3);
-    // if (VSize(camera_pos_delta) > 10) {
-    //    camera_pos_delta = VNorm(camera_pos_delta) * 10;
-    //}
+	// if (VSize(camera_pos_delta) > 10) {
+	//    camera_pos_delta = VNorm(camera_pos_delta) * 10;
+	//}
 
 	SetCameraPositionAndTarget_UpVecY(
 		GetCameraPosition() + camera_pos_delta, target_pos);

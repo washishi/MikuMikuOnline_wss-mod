@@ -108,7 +108,10 @@ BasePtr MainLoop::NextScene()
 	{
 		//account_manager_->set_host(world_manager_->stage()->host_change_flag().second);
 		return BasePtr(new scene::ServerChange(manager_accessor_));
-	}else{
+	} else if (input.GetKeyCount(KEY_INPUT_F1) == 1) {
+		inputbox_.Inactivate();
+		return BasePtr(new scene::Option(manager_accessor_, shared_from_this()));
+	} else{
 		return nullptr;
 	}
 }
