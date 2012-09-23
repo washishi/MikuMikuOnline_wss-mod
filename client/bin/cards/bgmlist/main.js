@@ -2,7 +2,7 @@
 /***MetaData***
 
 {
-	"name": "BGMƒŠƒXƒg",
+	"name": "BGMãƒªã‚¹ãƒˆ",
 	"icon": "icon.png",
 	"api_version": 1
 }
@@ -17,7 +17,6 @@ list = new UI.List({
 Music.onReload = function () {
 
     list.clearItems();
-
     var even_line = false;
     var music_names = Music.all();
     for (var i = 0; i < music_names.length; i++) {
@@ -33,7 +32,17 @@ Music.onReload = function () {
 				})
 			);
         })(music_names[i])
-    }
+}
+    list.addItem(
+			new UI.Label({
+			    docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT,
+			    text: "å†ç”Ÿåœæ­¢",
+			    bgcolor: ((even_line = !even_line) ? "#EEAFEECC" : "#FFFFFFCC"),
+			    onclick: function () {
+			        Music.stop(true)
+			    }
+			})
+		);
 }
 
 Music.onReload();

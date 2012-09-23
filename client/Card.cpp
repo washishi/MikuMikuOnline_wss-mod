@@ -241,10 +241,10 @@ Handle<Value> Card::Function_Music_stopBGM(const Arguments& args)
 {
 
 	if (args.Length() == 1 && args[0]->IsBoolean()) {
-		auto fade = args[1]->ToBoolean()->BooleanValue();
+		auto fade = args[0]->ToBoolean()->BooleanValue();
 		ResourceManager::music()->Stop(fade);
 	}else if(args.Length() == 0) {
-		ResourceManager::music()->Stop(false);
+		ResourceManager::music()->Stop(true);
 	}
 
     return Undefined();
