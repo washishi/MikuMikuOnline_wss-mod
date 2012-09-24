@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include "../ResourceManager.hpp"
 
 class InputManager;
 
@@ -80,6 +81,9 @@ class UISuper : public std::enable_shared_from_this<UISuper> {
 
 		int focus_index() const;
 
+		ImageHandlePtr icon_image_handle() const;
+		void set_icon_image_handle(const ImageHandlePtr& handle);
+
         enum {
             DOCKING_NONE = 0,
             DOCKING_TOP = 1,
@@ -112,7 +116,7 @@ class UISuper : public std::enable_shared_from_this<UISuper> {
         bool visible_;
         std::string base_image_;
 
-
+		ImageHandlePtr icon_image_handle_;
 };
 
 typedef std::shared_ptr<UISuper> UISuperPtr;

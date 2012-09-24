@@ -54,7 +54,6 @@ class InputBox : public UISuper {
         void SetScriptMode();
 
     private:
-        int x_, y_, width_, height_;
         int multiline_;
 
     private:

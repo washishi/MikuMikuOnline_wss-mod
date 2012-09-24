@@ -106,6 +106,9 @@ Card::Card(
 				assert(!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject());
             });
 
+	auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+	ptr->set_icon_image_handle(
+		ResourceManager::LoadCachedGraph(unicode::ToTString(source_folder_ + "/" + icon_)));
 }
 
 Card::~Card()
@@ -1254,30 +1257,30 @@ void Card::Update()
 {
 	MMO_PROFILE_FUNCTION;
 
-    static int cnt = 0;
-    if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
-		auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
-		if (ptr->children_size() > 0) {
-			ptr->Update();
-			if (cnt % 2 == 0) {
-				ptr->AsyncUpdate();
-			}
-		}
-    }
-    cnt++;
+  //  static int cnt = 0;
+  //  if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
+		//auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+		//if (ptr->children_size() > 0) {
+		//	ptr->Update();
+		//	if (cnt % 2 == 0) {
+		//		ptr->AsyncUpdate();
+		//	}
+		//}
+  //  }
+  //  cnt++;
 }
 
 void Card::Draw()
 {
 	MMO_PROFILE_FUNCTION;
 
-    if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
-        auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+   // if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
+   //     auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
 
-        if (ptr->children_size() > 0) {
-			ptr->Draw();
-        }
-    }
+   //     if (ptr->children_size() > 0) {
+			//ptr->Draw();
+   //     }
+   // }
 }
 
 UIBasePtr Card::GetWindow() const
@@ -1308,14 +1311,14 @@ void Card::ProcessInput(InputManager* input)
  //   CheckFunctionKey(KEY_INPUT_F11, "F11", *input);
  //   CheckFunctionKey(KEY_INPUT_F12, "F12", *input);
 
-	script_.With([&](const Handle<Context>& context){
-		if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
-			auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
-			if (ptr->children_size() > 0) {
-				ptr->ProcessInput(input);
-			}
-		}
-	});
+	//script_.With([&](const Handle<Context>& context){
+	//	if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
+	//		auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+	//		if (ptr->children_size() > 0) {
+	//			ptr->ProcessInput(input);
+	//		}
+	//	}
+	//});
 }
 
 void Card::CheckFunctionKey(int keynum, const std::string& name, const InputManager& input)
@@ -1591,6 +1594,11 @@ int Card::focus_index() const
         return ptr->focus_index();
     }
     return -1;
+}
+
+ScriptEnvironment& Card::script()
+{
+	return script_;
 }
 
 void Card::set_max_local_storage_size(int size)

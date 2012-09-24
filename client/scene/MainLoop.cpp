@@ -4,6 +4,7 @@
 
 #include "MainLoop.hpp"
 #include "Option.hpp"
+#include "Dashboard.hpp"
 #include <vector>
 #include <algorithm>
 #include "../ResourceManager.hpp"
@@ -32,9 +33,15 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
     manager_accessor_->set_window_manager(window_manager_);
 
     inputbox_->ReloadTabs();
+	inputbox_->Activate();
+	inputbox_->set_icon_image_handle(
+		ResourceManager::LoadCachedGraph(_T("resources/images/gui/gui_icon_input.png")));
+
 	window_manager_->AddWindow(inputbox_);
 
 	minimap_->UIPlacement(config_manager_->screen_width() - MINIMAP_MINSIZE - 12, 12);
+	minimap_->set_icon_image_handle(
+		ResourceManager::LoadCachedGraph(_T("resources/images/gui/gui_icon_map.png")));
 	window_manager_->AddWindow(minimap_);
 
     player_manager_->Init();
@@ -55,7 +62,9 @@ void MainLoop::Begin()
 
 void MainLoop::Update()
 {
-	window_manager_->Update();
+	if (auto window_manager = manager_accessor_->window_manager().lock()) {
+		window_manager->Update();
+	}
     command_manager_->Update();
     player_manager_->Update();
     card_manager_->Update();
@@ -65,7 +74,9 @@ void MainLoop::Update()
 
 void MainLoop::ProcessInput(InputManager* input)
 {
-	window_manager_->ProcessInput(input);
+	if (auto window_manager = manager_accessor_->window_manager().lock()) {
+		window_manager->ProcessInput(input);
+	}
     player_manager_->ProcessInput(input);
     card_manager_->ProcessInput(input);
     world_manager_->ProcessInput(input);
@@ -97,7 +108,9 @@ void MainLoop::Draw()
     world_manager_->Draw();
     player_manager_->Draw();
     card_manager_->Draw();
-	window_manager_->Draw();
+	if (auto window_manager = manager_accessor_->window_manager().lock()) {
+		window_manager->Draw();
+	}
 }
 
 void MainLoop::End()
@@ -114,6 +127,9 @@ BasePtr MainLoop::NextScene()
 	} else if (input.GetKeyCount(KEY_INPUT_F1) == 1) {
 		inputbox_->Inactivate();
 		return BasePtr(new scene::Option(manager_accessor_, shared_from_this()));
+	} else if (input.GetKeyCount(KEY_INPUT_F2) == 1) {
+		inputbox_->Inactivate();
+		return BasePtr(new scene::Dashboard(manager_accessor_, shared_from_this()));
 	} else{
 		return nullptr;
 	}

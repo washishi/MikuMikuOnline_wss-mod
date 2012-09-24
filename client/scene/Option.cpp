@@ -92,7 +92,7 @@ void Option::ProcessInput(InputManager* input)
 
 	if (input->GetKeyCount(KEY_INPUT_F1) == 1 ||
 		input->GetKeyCount(KEY_INPUT_ESCAPE) == 1 ||
-		(!hover && input->GetMouseLeftCount() == 1)) {
+		(!hover && (input->GetMouseLeftCount() == 1 || input->GetMouseRightCount() == 1))) {
 		end_count_++;
 	}
 

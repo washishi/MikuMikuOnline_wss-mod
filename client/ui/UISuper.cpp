@@ -217,3 +217,13 @@ int UISuper::focus_index() const
 {
     return focus_index_;
 }
+
+ImageHandlePtr UISuper::icon_image_handle() const
+{
+	return icon_image_handle_;
+}
+
+void UISuper::set_icon_image_handle(const ImageHandlePtr& handle)
+{
+	icon_image_handle_ = handle;
+}

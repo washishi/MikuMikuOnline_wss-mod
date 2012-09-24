@@ -33,10 +33,6 @@ const int InputBox::IME_MAX_PAGE_SIZE = 6;
 const int InputBox::IME_MIN_WIDTH = 120;
 
 InputBox::InputBox(const ManagerAccessorPtr& manager_accessor) :
-                x_(100),
-                y_(100),
-                width_(800),
-                height_(100),
                 multiline_(true),
                 font_height_(ResourceManager::default_font_size()),
                 drag_offset_x_(-1),
@@ -50,6 +46,8 @@ InputBox::InputBox(const ManagerAccessorPtr& manager_accessor) :
                             std::vector<std::string>(), false, false))
 
 {
+	absolute_rect_ = Rect(100, 100, 800, 100);
+
     font_handle_ = ResourceManager::default_font_handle();
     bg_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
             _T("resources/images/gui/gui_inputbox_bg.png"), 2, 2, 24, 24);
@@ -64,10 +62,10 @@ InputBox::InputBox(const ManagerAccessorPtr& manager_accessor) :
 
     int screen_width, screen_height;
     GetScreenState(&screen_width, &screen_height, nullptr);
-    width_ = std::min(DEFAULT_MAX_WIDTH + 0, (int)(screen_width * 0.4));
-    height_ = input_.height() + BOX_TOP_MARGIN + BOX_BOTTOM_MARGIN;
-    x_ = (screen_width - width_) / 2;
-    y_ = screen_height - height_ - BOX_BOTTOM_MARGIN;
+    absolute_rect_.width = std::min(DEFAULT_MAX_WIDTH + 0, (int)(screen_width * 0.4));
+    absolute_rect_.height = input_.height() + BOX_TOP_MARGIN + BOX_BOTTOM_MARGIN;
+    absolute_rect_.x = (screen_width - absolute_rect_.width) / 2;
+    absolute_rect_.y = screen_height - absolute_rect_.height - BOX_BOTTOM_MARGIN;
 
     selecting_tab_index_ = 0;
 
@@ -115,7 +113,7 @@ void InputBox::DrawTabs()
 
     {
         int tab_index = 0;
-        SetDrawArea(x_, script_tab_.y, script_tab_.x, script_tab_.y + script_tab_.height);
+        SetDrawArea(absolute_rect_.x, script_tab_.y, script_tab_.x, script_tab_.y + script_tab_.height);
         BOOST_FOREACH(auto& tab, tabs_) {
 
             std::array<ImageHandlePtr, 4>* image_handle;
@@ -155,11 +153,11 @@ void InputBox::DrawTabs()
                     TRUE);
 
             SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
-            DrawStringToHandle(tab_x + 9, y_ + TAB_TOP_MARGIN + 1, unicode::ToTString(tab.name).c_str(),
+            DrawStringToHandle(tab_x + 9, absolute_rect_.y + TAB_TOP_MARGIN + 1, unicode::ToTString(tab.name).c_str(),
                     GetColor(255, 255, 255), font_handle_);
             SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-            DrawStringToHandle(tab_x + 9, y_ + TAB_TOP_MARGIN, unicode::ToTString(tab.name).c_str(),
+            DrawStringToHandle(tab_x + 9, absolute_rect_.y + TAB_TOP_MARGIN, unicode::ToTString(tab.name).c_str(),
                     GetColor(0, 0, 0), font_handle_);
 
             tab_index++;
@@ -207,7 +205,7 @@ void InputBox::DrawTabs()
 
         SetDrawBright(255, 255, 255);
 
-        DrawGraph(x_ + width_ - TAB_SIDE_MARGIN - 16, y_ + TAB_TOP_MARGIN,
+        DrawGraph(absolute_rect_.x + absolute_rect_.width - TAB_SIDE_MARGIN - 16, absolute_rect_.y + TAB_TOP_MARGIN,
                 *script_icon_image_handle_, TRUE);
     }
 }
@@ -220,29 +218,29 @@ void InputBox::DrawBase()
         SetDrawBlendMode(DX_BLENDMODE_ADD, 150);
     }
 
-    DrawGraph(x_, y_, *bg_image_handle_[0], TRUE);
-    DrawGraph(x_ + width_ - 24, y_, *bg_image_handle_[1], TRUE);
-    DrawGraph(x_, y_ + height_ - 24, *bg_image_handle_[2], TRUE);
-    DrawGraph(x_ + width_ - 24, y_ + height_ - 24, *bg_image_handle_[3], TRUE);
+    DrawGraph(absolute_rect_.x, absolute_rect_.y, *bg_image_handle_[0], TRUE);
+    DrawGraph(absolute_rect_.x + absolute_rect_.width - 24, absolute_rect_.y, *bg_image_handle_[1], TRUE);
+    DrawGraph(absolute_rect_.x, absolute_rect_.y + absolute_rect_.height - 24, *bg_image_handle_[2], TRUE);
+    DrawGraph(absolute_rect_.x + absolute_rect_.width - 24, absolute_rect_.y + absolute_rect_.height - 24, *bg_image_handle_[3], TRUE);
 
-    DrawRectExtendGraphF(x_ + 24, y_,
-                         x_ + width_ - 24, y_ + 24,
+    DrawRectExtendGraphF(absolute_rect_.x + 24, absolute_rect_.y,
+                         absolute_rect_.x + absolute_rect_.width - 24, absolute_rect_.y + 24,
                          0, 0, 1, 24, *bg_image_handle_[1], TRUE);
 
-    DrawRectExtendGraphF(x_ + 24, y_ + height_ - 24,
-                         x_ + width_ - 24, y_ + height_,
+    DrawRectExtendGraphF(absolute_rect_.x + 24, absolute_rect_.y + absolute_rect_.height - 24,
+                         absolute_rect_.x + absolute_rect_.width - 24, absolute_rect_.y + absolute_rect_.height,
                          0, 0, 1, 24, *bg_image_handle_[3], TRUE);
 
-    DrawRectExtendGraphF(x_, y_ + 24,
-                         x_ + 24, y_ + height_ - 24,
+    DrawRectExtendGraphF(absolute_rect_.x, absolute_rect_.y + 24,
+                         absolute_rect_.x + 24, absolute_rect_.y + absolute_rect_.height - 24,
                          0, 0, 24, 1, *bg_image_handle_[2], TRUE);
 
-    DrawRectExtendGraphF(x_ + width_ - 24, y_ + 24,
-                         x_ + width_, y_ + height_ - 24,
+    DrawRectExtendGraphF(absolute_rect_.x + absolute_rect_.width - 24, absolute_rect_.y + 24,
+                         absolute_rect_.x + absolute_rect_.width, absolute_rect_.y + absolute_rect_.height - 24,
                          0, 0, 24, 1, *bg_image_handle_[3], TRUE);
 
-    DrawRectExtendGraphF(x_ +  24, y_ + 24,
-                         x_ + width_ - 24, y_ + height_ - 24,
+    DrawRectExtendGraphF(absolute_rect_.x +  24, absolute_rect_.y + 24,
+                         absolute_rect_.x + absolute_rect_.width - 24, absolute_rect_.y + absolute_rect_.height - 24,
                          0, 0, 1, 1, *bg_image_handle_[3], TRUE);
 
     SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
@@ -360,16 +358,16 @@ void InputBox::ProcessInput(InputManager* input)
 
     int screen_height;
     GetScreenState(nullptr, &screen_height, nullptr);
-    if (y_ + height_ > screen_height - BOX_TOP_MARGIN) {
-        y_ -= new_height - height_;
+    if (absolute_rect_.y + absolute_rect_.height > screen_height - BOX_TOP_MARGIN) {
+        absolute_rect_.y -= new_height - absolute_rect_.height;
         // input_.set_y(y_ + BOX_TOP_MARGIN);
     }
 
-    height_ = new_height;
+    absolute_rect_.height = new_height;
         
-    input_.set_y(y_ + BOX_TOP_MARGIN);
-    input_.set_x(x_ + INPUT_MARGIN_X);
-    input_.set_width(width_ - INPUT_MARGIN_X * 2);
+    input_.set_y(absolute_rect_.y + BOX_TOP_MARGIN);
+    input_.set_x(absolute_rect_.x + INPUT_MARGIN_X);
+    input_.set_width(absolute_rect_.width - INPUT_MARGIN_X * 2);
 
         //line_buffer.clear();
         //line_width = 0;
@@ -404,8 +402,8 @@ void InputBox::ReloadTabs()
                 tab.card = card;
                 tab.name = unicode::ToTString(card->name());
 
-                tab.x = x_ + TAB_SIDE_MARGIN + tab_offset_x - 9;
-                tab.y = y_ - 3;
+                tab.x = absolute_rect_.x + TAB_SIDE_MARGIN + tab_offset_x - 9;
+                tab.y = absolute_rect_.y - 3;
                 tab.height = font_height_ + TAB_TOP_MARGIN * 2 + 3 * 2;
 
                 auto name = unicode::ToTString(tab.name);
@@ -463,8 +461,8 @@ void InputBox::UpdateTabs()
     // タブ選択
     int tab_offset_x = 0;
     BOOST_FOREACH(auto& tab, tabs_) {
-        tab.x = x_ + TAB_SIDE_MARGIN + tab_offset_x - 9;
-        tab.y = y_ - 3;
+        tab.x = absolute_rect_.x + TAB_SIDE_MARGIN + tab_offset_x - 9;
+        tab.y = absolute_rect_.y - 3;
         tab.height = font_height_ + TAB_TOP_MARGIN * 2 + 3 * 2;
 
         auto name = unicode::ToTString(tab.name);
@@ -474,8 +472,8 @@ void InputBox::UpdateTabs()
         tab_offset_x += tab.width - 3;
     }
 
-    script_tab_.x = x_ + width_ - TAB_SIDE_MARGIN - 16 - 9;
-    script_tab_.y = y_ - 3;
+    script_tab_.x = absolute_rect_.x + absolute_rect_.width - TAB_SIDE_MARGIN - 16 - 9;
+    script_tab_.y = absolute_rect_.y - 3;
     script_tab_.width = 16 + 18;
     script_tab_.height = font_height_ + TAB_TOP_MARGIN * 2 + 3 * 2;
 }
@@ -486,30 +484,30 @@ void InputBox::UpdateBase(InputManager* input)
     int screen_width, screen_height;
     GetScreenState(&screen_width, &screen_height, nullptr);
 
-    bool hover = (x_ <= input->GetMouseX() && input->GetMouseX() <= x_ + width_
-            && y_ <= input->GetMouseY() && input->GetMouseY() <= y_ + height_);
+    bool hover = (absolute_rect_.x <= input->GetMouseX() && input->GetMouseX() <= absolute_rect_.x + absolute_rect_.width
+            && absolute_rect_.y <= input->GetMouseY() && input->GetMouseY() <= absolute_rect_.y + absolute_rect_.height);
 
     //bool input_hover = (input_x_ <= input->GetMouseX()
     //        && input->GetMouseX() <= input_x_ + input_width_
     //        && input_y_ <= input->GetMouseY()
     //        && input->GetMouseY() <= input_y_ + input_height_);
 
-    bool corner_hover = (x_ + width_ - 18 <= input->GetMouseX()
-            && input->GetMouseX() <= x_ + width_
-            && y_ + height_ - 18 <= input->GetMouseY()
-            && input->GetMouseY() <= y_ + height_);
+    bool corner_hover = (absolute_rect_.x + absolute_rect_.width - 18 <= input->GetMouseX()
+            && input->GetMouseX() <= absolute_rect_.x + absolute_rect_.width
+            && absolute_rect_.y + absolute_rect_.height - 18 <= input->GetMouseY()
+            && input->GetMouseY() <= absolute_rect_.y + absolute_rect_.height);
 
     // ドラッグ処理
     if (input->GetMouseLeft()) {
         if (input->GetPrevMouseLeft() == 0 && drag_offset_x_ < 0 && hover
                  && !corner_hover) {
-            drag_offset_x_ = input->GetMouseX() - x_;
-            drag_offset_y_ = input->GetMouseY() - y_;
+            drag_offset_x_ = input->GetMouseX() - absolute_rect_.x;
+            drag_offset_y_ = input->GetMouseY() - absolute_rect_.y;
         }
         if (input->GetPrevMouseLeft() == 0 && drag_resize_offset_x_ < 0
                 && corner_hover) {
-            drag_resize_offset_x_ = x_ + width_ - input->GetMouseX();
-            drag_resize_offset_y_ = y_ + height_ - input->GetMouseY();
+            drag_resize_offset_x_ = absolute_rect_.x + absolute_rect_.width - input->GetMouseX();
+            drag_resize_offset_y_ = absolute_rect_.y + absolute_rect_.height - input->GetMouseY();
         }
         if (hover && !IsActive()) {
             Activate();
@@ -525,16 +523,16 @@ void InputBox::UpdateBase(InputManager* input)
     }
 
     if (drag_offset_x_ >= 0) {
-        x_ = input->GetMouseX() - drag_offset_x_;
-        y_ = input->GetMouseY() - drag_offset_y_;
-        x_ = std::max(0, x_); x_ = std::min(screen_width - width_, x_);
-        y_ = std::max(0, y_); y_ = std::min(screen_height - height_, y_);
+        absolute_rect_.x = input->GetMouseX() - drag_offset_x_;
+        absolute_rect_.y = input->GetMouseY() - drag_offset_y_;
+        absolute_rect_.x = std::max(0, absolute_rect_.x); absolute_rect_.x = std::min(screen_width - absolute_rect_.width, absolute_rect_.x);
+        absolute_rect_.y = std::max(0, absolute_rect_.y); absolute_rect_.y = std::min(screen_height - absolute_rect_.height, absolute_rect_.y);
         input->CancelMouseLeft();
     } else if (drag_resize_offset_x_ >= 0) {
-        int new_width = input->GetMouseX() - x_ + drag_resize_offset_x_;
+        int new_width = input->GetMouseX() - absolute_rect_.x + drag_resize_offset_x_;
         new_width = std::max(new_width, (BOX_MIN_WIDTH + 0));
-        new_width = std::min(new_width, screen_width - x_);
-        width_ = new_width;
+        new_width = std::min(new_width, screen_width - absolute_rect_.x);
+        absolute_rect_.width = new_width;
         input->CancelMouseLeft();
     }
 }
