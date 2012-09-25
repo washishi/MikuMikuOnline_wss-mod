@@ -28,7 +28,7 @@ UIList::UIList() :
                 drag_offset_y_(-1)
 {
     scrollbar_base_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
-            _T("resources/images/gui/gui_button_base.png"), 2, 2, 12, 12);
+            _T("system/images/gui/gui_button_base.png"), 2, 2, 12, 12);
 }
 
 UIList::~UIList()

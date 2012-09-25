@@ -24,7 +24,7 @@ typedef std::shared_ptr<Player> PlayerPtr;
 class CardManager : public std::enable_shared_from_this<CardManager> {
     public:
         CardManager(const ManagerAccessorPtr& manager_accessor = ManagerAccessorPtr());
-        void Load();
+        void Load(const std::string& dir);
 
         void ProcessInput(InputManager* input);
         void Update();

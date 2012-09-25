@@ -108,9 +108,9 @@ _error:
 		// ディレクトリ名の保存（終端に'\'がないなら付ける）
 		TCHAR szDirectoryPathName[_MAX_PATH];
 		_tcsncpy_s( szDirectoryPathName, _MAX_PATH, lpPathName, _TRUNCATE );
-		if( '\\' != szDirectoryPathName[_tcslen(szDirectoryPathName) - 1] )
+		if( '/' != szDirectoryPathName[_tcslen(szDirectoryPathName) - 1] )
 		{	// 一番最後に'\'がないなら付加する。
-			_tcsncat_s( szDirectoryPathName, _MAX_PATH, _T("\\"), _TRUNCATE );
+			_tcsncat_s( szDirectoryPathName, _MAX_PATH, _T("/"), _TRUNCATE );
 		}
 
 		// ディレクトリ内のファイル走査用のファイル名作成
@@ -185,7 +185,7 @@ JsonGen::JsonGen()
 	FILE *json_file = 0;
 
 	// resources/models/内検索　列挙
-	hFind = FindFirstFile(_T(".\\resources\\models\\?*"), &win32fd_dir);
+	hFind = FindFirstFile(_T("./models/?*"), &win32fd_dir);
 
 	if (hFind == INVALID_HANDLE_VALUE) {
 		return;
@@ -196,9 +196,9 @@ JsonGen::JsonGen()
 			_tcscmp(win32fd_dir.cFileName,_T("."))!=0 &&
 			_tcscmp(win32fd_dir.cFileName,_T(".."))!=0 &&
 			_tcscmp(win32fd_dir.cFileName,_T(".svn"))!=0) {
-			_tcscpy_s(tcsTmpDir,_T(".\\resources\\models\\"));
+			_tcscpy_s(tcsTmpDir,_T("./models/"));
 			_tcscat_s(tcsTmpDir,win32fd_dir.cFileName);
-			_tcscat_s(tcsTmpDir,_T("\\"));
+			_tcscat_s(tcsTmpDir,_T("/"));
 
 			ZeroMemory(tcsTmpPath,MAX_PATH);
 			_tcscpy_s(tcsTmpPath,tcsTmpDir);
@@ -223,7 +223,7 @@ JsonGen::JsonGen()
 				bool flag = false;
 				/*for(int k = MAX_PATH - 1;k != 0;--k)
 				{
-					if( cur_dir[k] == _T('\\') )
+					if( cur_dir[k] == _T('/') )
 					{
 						cur_dir[k] = 0;
 						break;
@@ -231,9 +231,9 @@ JsonGen::JsonGen()
 				}*/
 				do {
 					std::wstring tmp_path = cur_dir;
-					tmp_path += _T("\\resources\\models\\");
+					tmp_path += _T("/models/");
 					tmp_path += win32fd_dir.cFileName;
-					tmp_path += _T("\\");
+					tmp_path += _T("/");
 					tmp_path += win32fd_pmd.cFileName;
 					pmd_paths.push_back(tmp_path);
 				} while (FindNextFile(hPmdFind, &win32fd_pmd));
@@ -308,11 +308,11 @@ JsonGen::JsonGen()
 					prejson += tmp_f;
 					prejson += _T(",\n\t\t\t\"motions\":\n\t\t\t\t{\n\t\t\t\t\t\"stand\":\"basic_stand.vmd\",\n\t\t\t\t\t\"walk\": \t\"basic_walk.vmd\",\n\t\t\t\t\t\"run\":\t\"basic_run.vmd\"\n\t\t\t\t}\n\t\t}\n}");
 					TCHAR tmp_dir[MAX_PATH];
-					_tcscpy_s(tmp_dir,_T(".\\resources\\models\\"));
+					_tcscpy_s(tmp_dir,_T("./models/"));
 					_tcscat_s(tmp_dir,pmd_author_name_);
 					_tcscat_s(tmp_dir,_T("式"));
 					_tcscat_s(tmp_dir,tmp_w_m);
-					_tcscat_s(tmp_dir,_T("\\"));
+					_tcscat_s(tmp_dir,_T("/"));
 					_wmkdir(tmp_dir);
 					delete [] tmp_w_m;
 					//delete [] tmp_w_a;

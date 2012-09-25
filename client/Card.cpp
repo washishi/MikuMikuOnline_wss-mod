@@ -25,7 +25,7 @@
 
 
 char Card::STORAGE_DIR[] = "storage";
-char Card::SCRIPT_PATH[] = "resources/js";
+char Card::SCRIPT_PATH[] = "system/js";
 int Card::max_local_storage_size;
 std::set<Card*> Card::ptr_set;
 
@@ -59,8 +59,8 @@ Card::Card(
 
     using namespace v8;
     // icon_handle_ = ResourceManager::LoadCachedGraph((source_folder_ + "/" + icon_).c_str());
-	icon_base_handle_  = ResourceManager::LoadCachedGraph(_T("resources/images/gui/gui_icon_base.png"));
-	icon_base_close_handle_  = ResourceManager::LoadCachedGraph(_T("resources/images/gui/gui_icon_base_close.png"));
+	icon_base_handle_  = ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_base.png"));
+	icon_base_close_handle_  = ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_base_close.png"));
 
     // 入力ウィンドウのセットアップ
     inputbox.enable_ = true;

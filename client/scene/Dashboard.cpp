@@ -34,10 +34,10 @@ Dashboard::Dashboard(const ManagerAccessorPtr& manager_accessor,
     manager_accessor_->set_account_manager(account_manager_);
 
     base_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
-            _T("resources/images/gui/gui_option_base.png"), 2, 2, 96, 96);
+            _T("system/images/gui/gui_option_base.png"), 2, 2, 96, 96);
 
     tab_base_image_handle_ = ResourceManager::LoadCachedDivGraph<3>(
-            _T("resources/images/gui/gui_option_tab_base.png"), 1, 3, 128, 32);
+            _T("system/images/gui/gui_option_tab_base.png"), 1, 3, 128, 32);
 
 }
 

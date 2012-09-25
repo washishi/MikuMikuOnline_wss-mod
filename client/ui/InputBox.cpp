@@ -50,15 +50,15 @@ InputBox::InputBox(const ManagerAccessorPtr& manager_accessor) :
 
     font_handle_ = ResourceManager::default_font_handle();
     bg_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
-            _T("resources/images/gui/gui_inputbox_bg.png"), 2, 2, 24, 24);
+            _T("system/images/gui/gui_inputbox_bg.png"), 2, 2, 24, 24);
     tab_bg_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
-            _T("resources/images/gui/gui_inputbox_tab_bg.png"), 2, 2, 12, 12);
+            _T("system/images/gui/gui_inputbox_tab_bg.png"), 2, 2, 12, 12);
     tab_bg_inactive_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
-            _T("resources/images/gui/gui_inputbox_tab_inactive_bg.png"), 2, 2, 12, 12);
+            _T("system/images/gui/gui_inputbox_tab_inactive_bg.png"), 2, 2, 12, 12);
     ime_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
-            _T("resources/images/gui/gui_inputbox_ime_bg.png"), 2, 2, 12, 12);
+            _T("system/images/gui/gui_inputbox_ime_bg.png"), 2, 2, 12, 12);
 
-    script_icon_image_handle_ = ResourceManager::LoadCachedGraph(_T("resources/images/gui/gui_inputbox_tab_script_icon.png"));
+    script_icon_image_handle_ = ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_inputbox_tab_script_icon.png"));
 
     int screen_width, screen_height;
     GetScreenState(&screen_width, &screen_height, nullptr);

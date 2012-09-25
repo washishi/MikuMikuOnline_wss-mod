@@ -11,7 +11,7 @@
 #include "resource.h"
 
 const TCHAR* Core::CONFIG_PATH = _T("config.json");
-const TCHAR* Core::FONT_FILE_PATH = _T("resources/fonts/umeplus-p-gothic.ttf");
+const TCHAR* Core::FONT_FILE_PATH = _T("system/fonts/umeplus-p-gothic.ttf");
 
 #ifdef _DEBUG
 #define EXCEPTION_LOG(e) (e)

@@ -13,9 +13,9 @@ WindowManager::WindowManager(const ManagerAccessorPtr& manager_accessor) :
 manager_accessor_(manager_accessor)
 {
 	close_button_image_handle_ = 
-		ResourceManager::LoadCachedGraph(_T("resources/images/gui/gui_close_button.png"));
+		ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_close_button.png"));
 	icon_base_image_handle_ = 
-		ResourceManager::LoadCachedGraph(_T("resources/images/gui/gui_icon_base.png"));
+		ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_base.png"));
 }
 
 void WindowManager::Init()

@@ -24,10 +24,10 @@ Input::Input() :
     reverse_color_(false)
 {
     input_bg_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
-            _T("resources/images/gui/gui_inputbox_input_bg.png"), 2, 2, 12, 12);
+            _T("system/images/gui/gui_inputbox_input_bg.png"), 2, 2, 12, 12);
 
     ime_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
-            _T("resources/images/gui/gui_inputbox_ime_bg.png"), 2, 2, 12, 12);
+            _T("system/images/gui/gui_inputbox_ime_bg.png"), 2, 2, 12, 12);
 
     input_handle_ = MakeKeyInput(400, FALSE, FALSE, FALSE);
     font_handle_ = ResourceManager::default_font_handle();

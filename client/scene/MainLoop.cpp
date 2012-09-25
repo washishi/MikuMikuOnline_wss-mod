@@ -35,13 +35,13 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
     inputbox_->ReloadTabs();
 	inputbox_->Activate();
 	inputbox_->set_icon_image_handle(
-		ResourceManager::LoadCachedGraph(_T("resources/images/gui/gui_icon_input.png")));
+		ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_input.png")));
 
 	window_manager_->AddWindow(inputbox_);
 
 	minimap_->UIPlacement(config_manager_->screen_width() - MINIMAP_MINSIZE - 12, 12);
 	minimap_->set_icon_image_handle(
-		ResourceManager::LoadCachedGraph(_T("resources/images/gui/gui_icon_map.png")));
+		ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_map.png")));
 	window_manager_->AddWindow(minimap_);
 
     player_manager_->Init();
@@ -52,7 +52,7 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
 
 MainLoop::~MainLoop()
 {
-    account_manager_->Save("account.xml");
+    account_manager_->Save("./user/account.xml");
 }
 
 void MainLoop::Begin()

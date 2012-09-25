@@ -21,7 +21,7 @@ MiniMap::MiniMap(const ManagerAccessorPtr& manager_accessor) :
 				font_handle_(ResourceManager::default_font_handle())
 {
 	base_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
-		_T("resources/images/gui/gui_board_bg.png"), 2, 2, 24, 24);
+		_T("system/images/gui/gui_board_bg.png"), 2, 2, 24, 24);
 }
 
 void MiniMap::UpdateDrag(InputManager* input, bool resizeable)

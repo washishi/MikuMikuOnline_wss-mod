@@ -29,7 +29,7 @@ void Music::Init()
 
 	music_paths_.clear();
 
-	path p("./resources/music");
+	path p("./system/music");
 
 	try{
 		if (exists(p) && is_directory(p)) {
@@ -51,7 +51,7 @@ void Music::Init()
 
 	se_paths_.clear();
 
-	p = "./resources/se";
+	p = "./system/se";
 
 	try{
 		if (exists(p) && is_directory(p)) {

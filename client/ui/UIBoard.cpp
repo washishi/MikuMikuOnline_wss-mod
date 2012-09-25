@@ -28,7 +28,7 @@ UIBoard::UIBoard() :
                 drag_resize_offset_rect_(-1, -1, -1, -1)
 {
     base_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
-            _T("resources/images/gui/gui_board_bg.png"), 2, 2, 24, 24);
+            _T("system/images/gui/gui_board_bg.png"), 2, 2, 24, 24);
 }
 
 Handle<Value> UIBoard::Property_max_width(Local<String> property, const AccessorInfo &info)

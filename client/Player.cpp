@@ -36,10 +36,10 @@ login_(false),
 revision_(0)
 {
     name_tip_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
-            _T("resources/images/gui/gui_name_tip_base.png"), 2, 2, 12, 12);
+            _T("system/images/gui/gui_name_tip_base.png"), 2, 2, 12, 12);
 
     balloon_base_image_handle_ = ResourceManager::LoadCachedDivGraph<9>(
-            _T("resources/images/gui/gui_balloon_base.png"), 3, 3, 24, 24);
+            _T("system/images/gui/gui_balloon_base.png"), 3, 3, 24, 24);
 
 }
 

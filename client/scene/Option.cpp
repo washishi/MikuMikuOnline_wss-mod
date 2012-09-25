@@ -31,10 +31,10 @@ Option::Option(const ManagerAccessorPtr& manager_accessor,
     manager_accessor_->set_account_manager(account_manager_);
 
     base_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
-            _T("resources/images/gui/gui_option_base.png"), 2, 2, 96, 96);
+            _T("system/images/gui/gui_option_base.png"), 2, 2, 96, 96);
 
     tab_base_image_handle_ = ResourceManager::LoadCachedDivGraph<3>(
-            _T("resources/images/gui/gui_option_tab_base.png"), 1, 3, 128, 32);
+            _T("system/images/gui/gui_option_tab_base.png"), 1, 3, 128, 32);
 
 }
 
@@ -407,7 +407,7 @@ RadioButtonItem::RadioButtonItem(const tstring& name,
 		selecting_index_(0)
 {
     selecting_bg_image_handle_ = ResourceManager::LoadCachedDivGraph<3>(
-            _T("resources/images/gui/gui_option_selecting_bg.png"), 3, 1, 16, 20);
+            _T("system/images/gui/gui_option_selecting_bg.png"), 3, 1, 16, 20);
 
 	ptree item_array;
 	read_json(std::stringstream(unicode::ToString(items)), item_array);
