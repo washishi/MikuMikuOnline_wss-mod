@@ -44,10 +44,10 @@ const float GameLoop::CAMERA_MAX_RADIUS = 40.0f;
 
 GameLoop::GameLoop(const StagePtr& stage)
     : stage_(stage),
-      camera_default_stat(CameraStatus(7.0f, 0.8f, 0.0f, 20 * PHI_F / 180, false)),
+      camera_default_stat(CameraStatus(7.0f, 0.8f, 0.0f, 20 * DX_PI_F / 180, false)),
       camera(camera_default_stat)
 {
-    SetupCamera_Perspective(PHI_F * 60.0f / 180.0f); // 視野角60度
+    SetupCamera_Perspective(DX_PI_F * 60.0f / 180.0f); // 視野角60度
     SetCameraNearFar(1.0f * stage_->map_scale(), 700.0f * stage_->map_scale());
 }
 
@@ -199,12 +199,12 @@ void GameLoop::MoveCamera(InputManager* input)
 			camera.theta += diff_x * 0.005f;
 			camera.phi += diff_y * 0.005f;
 		}
-		if(camera.phi < (-40.0f * PHI_F)/180.0f)
+		if(camera.phi < (-40.0f * DX_PI_F)/180.0f)
 		{
-			camera.phi = (-39.9f * PHI_F)/180.0f;
-		}else if(camera.phi > (220.0f * PHI_F)/180.0f)
+			camera.phi = (-39.9f * DX_PI_F)/180.0f;
+		}else if(camera.phi > (220.0f * DX_PI_F)/180.0f)
 		{
-			camera.phi = (219.0f * PHI_F)/180.0f;
+			camera.phi = (219.0f * DX_PI_F)/180.0f;
 		}
     }
     else

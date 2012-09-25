@@ -5,12 +5,17 @@
 
 MotionPlayer::MotionPlayer(int model_handle)
     : model_handle_(model_handle), prev_attach_index_(-1), current_attach_index_(-1),
-      connect_prev_(false), prev_blend_rate_(0), blend_time_(0),prev_anim_index_(-1),isloop_(true)
+      connect_prev_(false), prev_blend_rate_(0), blend_time_(0),prev_anim_index_(-1),isloop_(true),isloopcheck_(false)
 {}
 
-void MotionPlayer::Play(int anim_index, bool connect_prev, int blend_time, int anim_src_model_handle, bool check_name, bool isloop)
+void MotionPlayer::Play(int anim_index, bool connect_prev, int blend_time, int anim_src_model_handle, bool check_name, bool isloop, int nextanim_handle, bool isloopcheck)
 {
- 	prev_anim_index_ = MV1GetAttachAnim(model_handle_,current_attach_index_);
+ 	if(nextanim_handle != -1)
+	{
+		prev_anim_index_ = nextanim_handle;
+	}else{
+		prev_anim_index_ = MV1GetAttachAnim(model_handle_,current_attach_index_);
+	}
 
 	// まだ前回の移行期間の最中なら、移行を中止する
     DetachPrevMotionIfExist();
@@ -19,6 +24,8 @@ void MotionPlayer::Play(int anim_index, bool connect_prev, int blend_time, int a
     prev_blend_rate_ = blend_time;
     blend_time_ = blend_time;
 	isloop_ = isloop;
+	isloopcheck_ = isloopcheck;
+	if(!isloopcheck_)isplayend_ = false;
 
     prev_attach_index_ = current_attach_index_;
     if (blend_time_ <= 0)
@@ -100,7 +107,8 @@ void MotionPlayer::AdvancePlayTime(int diff_time)
 		if(!isloop_)
 		{
 			Stop();
-			Play(prev_anim_index_,connect_prev_,200,-1,false);
+			isplayend_ = true;
+			Play(prev_anim_index_,connect_prev_,200,-1,false,true,-1,isloopcheck_);
 			return;
 		}
         anim_time -= anim_total_time;
@@ -123,4 +131,12 @@ void MotionPlayer::AdvancePlayTime(int diff_time)
     }
 }
 
-
+bool MotionPlayer::GetPlayEnd()
+{
+	if(isplayend_)
+	{
+		isplayend_ = false;
+		return true;
+	}
+	return false;
+}

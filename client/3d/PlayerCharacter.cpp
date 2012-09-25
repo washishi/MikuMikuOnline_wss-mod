@@ -243,8 +243,8 @@ public:
                 //moved_pos.y = std::max(moved_pos.y, floor_y); // 床にあたっているときは床の方がyが高くなる
 				if(!jump_flag_){
 					// 登ったり下ったりできる段差の大きさの制限を求める
-					static const float y_max_limit_factor = sin(45 * PHI_F / 180);
-					static const float y_min_limit_factor = sin(-45 * PHI_F / 180);
+					static const float y_max_limit_factor = sin(45 * DX_PI_F / 180);
+					static const float y_min_limit_factor = sin(-45 * DX_PI_F / 180);
 					const float y_max_limit = y_max_limit_factor * VSize(diff_pos);
 					const float y_min_limit = y_min_limit_factor * VSize(diff_pos);
 

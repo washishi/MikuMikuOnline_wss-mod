@@ -196,7 +196,7 @@ std::pair<bool,VECTOR> Stage::FrontCollides(float collision_length, const VECTOR
 			{
 				for(int j = 0; j < slide_coll_info.HitNum; ++j)
 				{
-					auto angle = (acos(VDot(slide_coll_info.Dim[j].Normal,current_pos - prev_pos) / (VSize(slide_coll_info.Dim[j].Normal) * VSize(current_pos - prev_pos)))*180.0f)/PHI_F;
+					auto angle = (acos(VDot(slide_coll_info.Dim[j].Normal,current_pos - prev_pos) / (VSize(slide_coll_info.Dim[j].Normal) * VSize(current_pos - prev_pos)))*180.0f)/DX_PI_F;
 					if(angle < 90.0f || angle > 270.0f)
 					{
 						NowPos += VScale(slide_coll_info.Dim[j].Normal, 0.1f * map_scale_);
