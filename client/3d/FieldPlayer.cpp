@@ -42,6 +42,7 @@ FieldPlayer::FieldPlayer(CharacterDataProvider& data_provider, const StagePtr& s
         any_move_(),
 		dummy_move_count_(0),
         data_provider_(data_provider),
+		jump_wait_(false),
         camera_roty_(nullptr)
 {
 	shadow_handle_ = LoadGraph( _T(".\\resources\\textures\\shadow.tga") );
@@ -150,7 +151,6 @@ void FieldPlayer::Init(tstring model_name)
 void FieldPlayer::ResetPosition()
 {
     const auto& points = stage_->start_points();
-
     std::mt19937 engine(time(nullptr));
     std::uniform_int_distribution<int> distribution(0, points.size() - 1);
 
@@ -161,7 +161,6 @@ void FieldPlayer::ResetPosition()
 void FieldPlayer::RescuePosition()
 {
     const auto& points = stage_->start_points();
-
     const auto& new_pos =
             std::min_element(points.begin(), points.end(),
             [this](const VECTOR& a, const VECTOR& b){
@@ -195,9 +194,24 @@ void FieldPlayer::SetModel(const ModelHandle& model)
     model_height_ = model_handle_.property().get<float>("character.height", 1.58f);
 	flight_duration_ideal_ = sqrt((model_height_*2.0f)/9.8f) + sqrt((model_height_*0.8f)/9.8);
 	jump_height_ = sqrt(15.0f)*2.0f;
+	//Loop Motions
     motion.stand_ = MV1GetAnimIndex(model_handle_.handle(), _T("stand"));
     motion.walk_ = MV1GetAnimIndex(model_handle_.handle(), _T("walk"));
     motion.run_ = MV1GetAnimIndex(model_handle_.handle(), _T("run"));
+	//Noloop Motions
+    motion.pre_jmp_ = MV1GetAnimIndex(model_handle_.handle(), _T("jmp_pre"));
+	motion.jmp_ = MV1GetAnimIndex(model_handle_.handle(), _T("jmp"));
+	motion.end_jmp_ = MV1GetAnimIndex(model_handle_.handle(), _T("jmp_end"));
+    motion.sync_n1_ = MV1GetAnimIndex(model_handle_.handle(), _T("1"));
+    motion.sync_n2_ = MV1GetAnimIndex(model_handle_.handle(), _T("2"));
+    motion.sync_n3_ = MV1GetAnimIndex(model_handle_.handle(), _T("3"));
+    motion.sync_n4_ = MV1GetAnimIndex(model_handle_.handle(), _T("4"));
+    motion.sync_n5_ = MV1GetAnimIndex(model_handle_.handle(), _T("5"));
+    motion.sync_n6_ = MV1GetAnimIndex(model_handle_.handle(), _T("6"));
+    motion.sync_n7_ = MV1GetAnimIndex(model_handle_.handle(), _T("7"));
+    motion.sync_n8_ = MV1GetAnimIndex(model_handle_.handle(), _T("8"));
+    motion.sync_n9_ = MV1GetAnimIndex(model_handle_.handle(), _T("9"));
+    motion.sync_n0_ = MV1GetAnimIndex(model_handle_.handle(), _T("0"));
 
     motion_player_.reset(new MotionPlayer(model_handle_.handle()));
 	dummy_move_count_ = 2;
@@ -240,8 +254,10 @@ void FieldPlayer::Update()
 	}else if(additional_motion_.flag_)
 	{
 		bool connect_prev = true;
-		motion_player_->Play(additional_motion_.handle_, connect_prev, 400, -1, false,additional_motion_.isloop_);
+		motion_player_->Play(additional_motion_.handle_, connect_prev, 400, -1, false,additional_motion_.isloop_,additional_motion_.nextanim_handle_,additional_motion_.loopcheck_);
+		additional_motion_.loopcheck_ = false;
 		additional_motion_.flag_ = false;
+		additional_motion_.nextanim_handle_ = -1;
 	}
     // モーション再生時刻更新
     motion_player_->Next(timer_->Delta());
@@ -324,12 +340,13 @@ void FieldPlayer::Move()
         // 前回キャラが接地していたなら、今回もキャラを地面に接地させる
         if (prev_stat_.acc.y == 0)
         {
+			jump_wait_ = false;
             // 前回接地していた
             // std::cout << "  previous on the ground" << std::endl;
 
 			// 登ったり下ったりできる段差の大きさの制限を求める
-			static const float y_max_limit_factor = sin(45 * PHI_F / 180);
-			static const float y_min_limit_factor = sin(-45 * PHI_F / 180);
+			static const float y_max_limit_factor = sin(45 * DX_PI_F / 180);
+			static const float y_min_limit_factor = sin(-45 * DX_PI_F / 180);
 			const float y_max_limit = y_max_limit_factor * pos_diff_length;
 			const float y_min_limit = y_min_limit_factor * pos_diff_length;
 
@@ -406,10 +423,14 @@ void FieldPlayer::Move()
                 {
                     // 地面に到達した
                     // std::cout << "    current on the ground" << std::endl;
-
+					additional_motion_.handle_ = motion.end_jmp_;
+					additional_motion_.isloop_ = false;
+					additional_motion_.nextanim_handle_ = motion.stand_;
+					additional_motion_.flag_ = true;
                     current_stat_.pos = foot_floor_exists.second;
                     current_stat_.acc.y = 0;
                     current_stat_.vel.y = 0;
+					jump_wait_ = false;
                 }
             }
             else
@@ -459,7 +480,7 @@ void FieldPlayer::InputFromUser()
         : 0;
     auto rot_speed = (prev_stat_.motion == motion.walk_ ? 90.0f
         : prev_stat_.motion == motion.run_ ? 180.0f
-        : 90.0f) * PHI_F / 180;
+        : 90.0f) * DX_PI_F / 180;
 
 	/*
 	auto warp_chk = stage_->CheckWarpPoint(current_stat_.pos);
@@ -560,10 +581,10 @@ void FieldPlayer::InputFromUser()
 
     if(input.GetGamepadAnalogX() > 0) {
         ++rot_dir;
-        rot_speed = fabs(input.GetGamepadAnalogX()) * 90.0f * PHI_F / 180;
+        rot_speed = fabs(input.GetGamepadAnalogX()) * 90.0f * DX_PI_F / 180;
     } else if (input.GetGamepadAnalogX() < 0) {
         --rot_dir;
-        rot_speed = fabs(input.GetGamepadAnalogX()) * 90.0f * PHI_F / 180;
+        rot_speed = fabs(input.GetGamepadAnalogX()) * 90.0f * DX_PI_F / 180;
     }
 
     if (rot_dir != 0)
@@ -576,14 +597,27 @@ void FieldPlayer::InputFromUser()
         current_stat_.roty_speed = 0;
     }
 
-    if (current_stat_.acc.y == 0 &&
+    if (!jump_wait_ &&
             (input.GetKeyCount(InputManager::KEYBIND_JUMP) > 0 ||
                     input.GetGamepadCount(InputManager::PADBIND_JUMP) > 0))
     {
-        any_move_ = true;
-        current_stat_.acc.y = -9.8 * stage_->map_scale();
-        current_stat_.vel += VGet(0, jump_height_ * stage_->map_scale(), 0);
+		jump_wait_ = true;
+		additional_motion_.handle_ = motion.pre_jmp_;
+		additional_motion_.isloop_ = false;
+		additional_motion_.flag_ = true;
+		additional_motion_.nextanim_handle_ = motion.jmp_;
+		additional_motion_.loopcheck_ = true;
     }
+
+	if (current_stat_.acc.y == 0 && jump_wait_)
+	{
+		if(motion_player_->GetPlayEnd())
+		{
+			any_move_ = true;
+			current_stat_.acc.y = -9.8 * stage_->map_scale();
+			current_stat_.vel += VGet(0, jump_height_ * stage_->map_scale(), 0);
+		}
+	}
 }
 
 void FieldPlayer::PlayMotion(const tstring& name,bool isloop)
