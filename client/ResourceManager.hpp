@@ -103,6 +103,8 @@ class ResourceManager {
 		static float model_edge_size_;
 		//Musics
 		static MusicPtr music_;
+
+		static const ptree& GetDefaultInfoJSON();
 };
 
 class ImageHandle {
