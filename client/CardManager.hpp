@@ -31,6 +31,7 @@ class CardManager : public std::enable_shared_from_this<CardManager> {
         void Draw();
 
         void AddCard(const CardPtr& card);
+        void AddNativeCard(const std::string& name, UISuperPtr ptr);
 
         void SendJSON(const std::string& json);
         void OnReceiveJSON(const std::string& info_json, const std::string& msg_json);
@@ -51,6 +52,8 @@ class CardManager : public std::enable_shared_from_this<CardManager> {
 
         std::vector<CardPtr> cards_;
         ScriptEnvironment global_;
+
+		std::map<std::string, CardPtr> native_cards_;
 
         bool focus_player_flag;
         int icon_base_handle_;

@@ -11,13 +11,16 @@
 #include "../common/unicode.hpp"
 #include "ManagerAccessor.hpp"
 
-using namespace boost::property_tree;
-
 class ConfigManager
 {
     public:
         ConfigManager(const ManagerAccessorPtr& manager_accessor = ManagerAccessorPtr());
+		~ConfigManager();
+
+	private:
+        void LoadConfigure();
         void Load(const std::string&);
+		void Save(const std::string&);
 
     private:
         bool fullscreen_;
@@ -63,12 +66,30 @@ class ConfigManager
 
 		std::string stage() const;
 
+	private:
+		int show_nametag_,
+			show_modelname_,
+			gamepad_type_,
+			bouyomi_chan_;
+
+	public:
+		int show_nametag() const;
+		void set_show_nametag(int value);
+		int show_modelname() const;
+		void set_show_modelname(int value);
+
+		int gamepad_type() const;
+		void set_gamepad_type(int value);
+		
+		int bouyomi_chan() const;
+		void set_bouyomi_chan(int value);
+
     private:
         ManagerAccessorPtr manager_accessor_;
-		ptree pt_;
 
 		static const int MIN_SCREEN_WIDTH;
 		static const int MIN_SCREEN_HEIGHT;
+		static const char* CONFIG_JSON_PATH;
 };
 
 typedef std::shared_ptr<ConfigManager> ConfigManagerPtr;

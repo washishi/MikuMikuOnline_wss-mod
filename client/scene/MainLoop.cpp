@@ -36,13 +36,12 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
 	inputbox_->Activate();
 	inputbox_->set_icon_image_handle(
 		ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_input.png")));
-
-	window_manager_->AddWindow(inputbox_);
+	card_manager_->AddNativeCard("inputbox", inputbox_);
 
 	minimap_->UIPlacement(config_manager_->screen_width() - MINIMAP_MINSIZE - 12, 12);
 	minimap_->set_icon_image_handle(
 		ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_map.png")));
-	window_manager_->AddWindow(minimap_);
+	card_manager_->AddNativeCard("rader", minimap_);
 
     player_manager_->Init();
     world_manager_->Init();	
@@ -81,7 +80,7 @@ void MainLoop::ProcessInput(InputManager* input)
     card_manager_->ProcessInput(input);
     world_manager_->ProcessInput(input);
 
-	if(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) > 0 && !inputbox_->IsActive())
+	if(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) == 1)
 	{
 		TCHAR tmp_str[MAX_PATH];
 		_stprintf( tmp_str , _T(".\\screenshot\\ss%03d.png") , snapshot_number_ );
@@ -96,10 +95,6 @@ void MainLoop::ProcessInput(InputManager* input)
 		}
 		SaveDrawScreenToPNG( 0, 0, config_manager_->screen_width(), config_manager_->screen_height(),tmp_str);
 		snapshot_number_++;
-		while(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) > 0)
-		{
-			input->CancelKeyCount(InputManager::KEYBIND_SCREEN_SHOT);
-		}
 	}
 }
 

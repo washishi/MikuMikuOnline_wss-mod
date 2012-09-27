@@ -27,6 +27,9 @@ Dashboard::Dashboard(const ManagerAccessorPtr& manager_accessor,
       start_count_(0),
 	  end_count_(0)
 {
+
+	// TODO: •`‰æ‚ðDashbord‚ÉˆÚŠÇ‚·‚é‚½‚ß‚ÉNull‚É‚µ‚Ä‚¢‚é‚ªA
+	// •´‚ç‚í‚µ‚¢‚Ì‚ÅC³—\’è
 	manager_accessor_->set_window_manager(WindowManagerWeakPtr());
 
     manager_accessor_->set_config_manager(config_manager_);

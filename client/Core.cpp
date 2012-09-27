@@ -84,7 +84,6 @@ int Core::SetUpDxLib()
     SetWindowIconID(100);
 
     ConfigManager config;
-    config.Load("config.json");
 
     if (config.fullscreen() == 0) {
         ChangeWindowMode(TRUE);

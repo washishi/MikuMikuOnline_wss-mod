@@ -184,7 +184,7 @@ JsonGen::JsonGen()
 
 	FILE *json_file = 0;
 
-	// resources/models/“àŒŸõ@—ñ‹“
+	// system/models/“àŒŸõ@—ñ‹“
 	hFind = FindFirstFile(_T("./models/?*"), &win32fd_dir);
 
 	if (hFind == INVALID_HANDLE_VALUE) {

@@ -5,6 +5,7 @@
 #include "MainLoop.hpp"
 #include "ServerChange.hpp"
 #include "../../common/Logger.hpp"
+#include "../3d/Stage.hpp"
 
 namespace scene {
 ServerChange::ServerChange(const ManagerAccessorPtr& manager_accessor) :

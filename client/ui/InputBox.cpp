@@ -42,8 +42,8 @@ InputBox::InputBox(const ManagerAccessorPtr& manager_accessor) :
                 min_input_height_(font_height_ + INPUT_MARGIN_Y * 2),
                 selecting_tab_index_(0),
                 manager_accessor_(manager_accessor),
-                card_(std::make_shared<Card>(manager_accessor_, "", "immo", "", "", "",
-                            std::vector<std::string>(), false, false))
+                card_(std::make_shared<Card>(manager_accessor_, "", "immo", "",
+                            std::vector<std::string>()))
 
 {
 	absolute_rect_ = Rect(100, 100, 800, 100);

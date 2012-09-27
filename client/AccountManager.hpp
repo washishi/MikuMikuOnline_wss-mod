@@ -34,9 +34,6 @@ class AccountManager {
 
         std::string host() const;
         void set_host(const std::string& host);
-		
-		int show_nametag() const;
-		int perspective() const;
 
     private:
         ManagerAccessorPtr manager_accessor_;

@@ -278,11 +278,3 @@ const bool& Stage::host_change_flag() const
 {
 	return host_change_flag_;
 }
-
-void Stage::set_perspective(int value) {
-	perspective_ = value;
-}
-
-int Stage::perspective() const {
-	return perspective_;
-}

@@ -65,9 +65,9 @@ class OptionTabBase {
 		OptionTabBase(const tstring name,
 			const ManagerAccessorPtr& manager_accessor);
 
-		virtual void Update() = 0;
-		virtual void ProcessInput(InputManager*) = 0;
-		virtual void Draw() = 0;
+		virtual void Update();
+		virtual void ProcessInput(InputManager*);
+		virtual void Draw();
 
 		tstring name() const;
 		void set_base_rect(const Rect& rect);
@@ -85,20 +85,24 @@ class OptionTabBase {
 class StatusTab : public OptionTabBase {
 	public:
 		StatusTab(const ManagerAccessorPtr& manager_accessor);
-
-		void Update();
-		void ProcessInput(InputManager*);
-		void Draw();
 };
 
-// カメラ
-class CameraTab : public OptionTabBase {
+// 表示設定タブ
+class DisplayTab : public OptionTabBase {
 	public:
-		CameraTab(const ManagerAccessorPtr& manager_accessor);
+		DisplayTab(const ManagerAccessorPtr& manager_accessor);
+};
 
-		void Update();
-		void ProcessInput(InputManager*);
-		void Draw();
+// 操作設定タブ
+class InputTab : public OptionTabBase {
+	public:
+		InputTab(const ManagerAccessorPtr& manager_accessor);
+};
+
+// その他タブ
+class OtherTab : public OptionTabBase {
+	public:
+		OtherTab(const ManagerAccessorPtr& manager_accessor);
 };
 
 class OptionItemBase {
@@ -135,11 +139,31 @@ class TextItem : public OptionItemBase {
 		TextItemCallbackPtr callback_;
 };
 
+class DescriptionItem : public OptionItemBase {
+	public:
+		DescriptionItem(const tstring& text,
+			const ManagerAccessorPtr& manager_accessor);
+
+		void Update();
+		void ProcessInput(InputManager*);
+		void Draw();
+		int height() const;
+
+	private:
+		tstring text_;
+		TextItemCallbackPtr callback_;
+};
+
+typedef std::function<int(void)> RadioButtonItemGetter;
+typedef std::function<void(int)> RadioButtonItemSetter;
+typedef std::shared_ptr<RadioButtonItemGetter> RadioButtonItemGetterPtr;
+typedef std::shared_ptr<RadioButtonItemSetter> RadioButtonItemSetterPtr;
 class RadioButtonItem : public OptionItemBase {
 	public:
 		RadioButtonItem(const tstring& name,
-			const std::string& path,
 			const tstring& items,
+			const RadioButtonItemGetterPtr& getter,
+			const RadioButtonItemSetterPtr& setter,
 			const ManagerAccessorPtr& manager_accessor);
 
 		void Update();
@@ -149,18 +173,19 @@ class RadioButtonItem : public OptionItemBase {
 
 	private:
 		struct Item{
-			Item(tstring _name, ptree _value, int _width) :
+			Item(tstring _name, int _value, int _width) :
 				name(_name), value(_value), width(_width) {}
 			tstring name;
-			ptree value;
-			int width;
+			int value, width;
 		};
 
 	private:
 		tstring name_;
-		std::string path_;
 		std::vector<Item> items_;
 		int selecting_index_;
+
+		RadioButtonItemGetterPtr getter_;
+		RadioButtonItemSetterPtr setter_;
 
 		std::array<ImageHandlePtr,3> selecting_bg_image_handle_;
 };

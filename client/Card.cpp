@@ -35,30 +35,23 @@ Card::Card(
     const ManagerAccessorPtr& manager_accessor,
     std::string source_folder,
     std::string name,
-    std::string author,
-    std::string caption,
     std::string icon,
-    std::vector<std::string> scripts,
-    bool group,
-    bool autorun) :
+    const std::vector<std::string>& scripts,
+	bool native) :
     manager_accessor_(manager_accessor),
     source_folder_(source_folder),
     name_(name),
-    author_(author),
-    caption_(caption),
     icon_(icon),
     scripts_(scripts),
-    group_(group),
-    autorun_(autorun),
 	folding_(false),
+	native_(native),
     event_id_(0),
     icon_handle_(-1),
     running_(false),
     close_flag_(false)
 {
-
     using namespace v8;
-    // icon_handle_ = ResourceManager::LoadCachedGraph((source_folder_ + "/" + icon_).c_str());
+
 	icon_base_handle_  = ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_base.png"));
 	icon_base_close_handle_  = ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_base_close.png"));
 
@@ -100,14 +93,17 @@ Card::Card(
     LoadStorage();
 
     // UIBoardをセット
-    script_.Execute("(new UI.Board)", "",
-            [&](const Handle<Value>& value, const std::string error) {
-                ui_board_obj_ = Persistent<Object>::New(value->ToObject());
-				assert(!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject());
-            });
+	if (!ui_board_) {
+		script_.Execute("(new UI.Board)", "",
+				[&](const Handle<Value>& value, const std::string error) {
+					ui_board_obj_ = Persistent<Object>::New(value->ToObject());
+					assert(!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject());
+				});
 
-	auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
-	ptr->set_icon_image_handle(
+		ui_board_ = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+	}
+	
+	ui_board_->set_icon_image_handle(
 		ResourceManager::LoadCachedGraph(unicode::ToTString(source_folder_ + "/" + icon_)));
 }
 
@@ -1283,15 +1279,19 @@ void Card::Draw()
    // }
 }
 
-UIBasePtr Card::GetWindow() const
+UISuperPtr Card::GetWindow() const
 {
-	if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
-		auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
-		if (ptr->children_size() > 0) {
-			return ptr;
-		}
+	if (native_) {
+		return ui_board_;
+	} else {
+	    if (ui_board_obj_->IsObject()) {
+		    auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+		    if (ptr->children_size() > 0) {
+				return ptr;
+		    }
+	    }
 	}
-	return UIBasePtr();
+	return UISuperPtr();
 }
 
 void Card::ProcessInput(InputManager* input)
@@ -1606,3 +1606,7 @@ void Card::set_max_local_storage_size(int size)
     max_local_storage_size = size;
 }
 
+void Card::set_ui_board(const UISuperPtr& ui_board)
+{
+	ui_board_ = ui_board;
+}

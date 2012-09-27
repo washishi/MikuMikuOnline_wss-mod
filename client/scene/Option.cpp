@@ -4,7 +4,7 @@
 
 #include "Option.hpp"
 #include "../ManagerAccessor.hpp"
-#include "../AccountManager.hpp"
+#include "../ConfigManager.hpp"
 #include "../CommandManager.hpp"
 #include "../PlayerManager.hpp"
 #include "../AccountManager.hpp"
@@ -45,7 +45,9 @@ Option::~Option()
 void Option::Begin()
 {
 	tabs_.push_back(std::make_shared<StatusTab>(manager_accessor_));
-	tabs_.push_back(std::make_shared<CameraTab>(manager_accessor_));
+	tabs_.push_back(std::make_shared<DisplayTab>(manager_accessor_));
+	tabs_.push_back(std::make_shared<InputTab>(manager_accessor_));
+	tabs_.push_back(std::make_shared<OtherTab>(manager_accessor_));
 }
 
 void Option::Update()
@@ -235,6 +237,31 @@ void OptionTabBase::set_base_rect(const Rect& rect)
 	base_rect_ = rect;
 }
 
+void OptionTabBase::Update()
+{
+	int left = base_rect_.x + 128 + 64;
+	int top = base_rect_.y + 80 + 32;
+
+	BOOST_FOREACH(const auto& item, items_) {
+		item->set_base_rect(Rect(left, top));
+		top += item->height();
+	}
+}
+
+void OptionTabBase::ProcessInput(InputManager* input)
+{
+	BOOST_FOREACH(const auto& item, items_) {
+		item->ProcessInput(input);
+	}
+}
+
+void OptionTabBase::Draw()
+{
+	BOOST_FOREACH(const auto& item, items_) {
+		item->Draw();
+	}
+}
+
 // ステータスタブ
 
 StatusTab::StatusTab(const ManagerAccessorPtr& manager_accessor) :
@@ -288,66 +315,97 @@ StatusTab::StatusTab(const ManagerAccessorPtr& manager_accessor) :
 		}), manager_accessor_));
 }
 
-void StatusTab::Update()
-{
-	int left = base_rect_.x + 128 + 64;
-	int top = base_rect_.y + 80 + 32;
 
-	BOOST_FOREACH(const auto& item, items_) {
-		item->set_base_rect(Rect(left, top));
-		top += item->height();
-	}
-}
+// 表示設定タブ
 
-void StatusTab::ProcessInput(InputManager* input)
-{
-	BOOST_FOREACH(const auto& item, items_) {
-		item->ProcessInput(input);
-	}
-}
-
-void StatusTab::Draw()
-{
-	BOOST_FOREACH(const auto& item, items_) {
-		item->Draw();
-	}
-}
-
-
-// カメラタブ
-
-CameraTab::CameraTab(const ManagerAccessorPtr& manager_accessor) :
+DisplayTab::DisplayTab(const ManagerAccessorPtr& manager_accessor) :
 	OptionTabBase(_T("表示設定"), manager_accessor)
 {
-	items_.push_back(std::make_shared<RadioButtonItem>(_T("ネームタグと吹き出し"),
-		"show_nametag", _T("{\"表示する\":1, \"表示しない\":0}"), manager_accessor_));
+	items_.push_back(std::make_shared<RadioButtonItem>(
+		_T("ネームタグと吹き出し"),
+		_T("{\"表示する\":1,\"表示しない\":0}"),
+		std::make_shared<RadioButtonItemGetter>(
+		[manager_accessor]() -> int{
+			auto config_manager = 
+				manager_accessor->config_manager().lock();
+			return config_manager->show_nametag();
+		}),
+		std::make_shared<RadioButtonItemSetter>(
+		[manager_accessor](int value){
+			if (auto config_manager = 
+				manager_accessor->config_manager().lock()) {
+				return config_manager->set_show_nametag(value);
+			}
+		}),
+		manager_accessor_));
+
+
+	items_.push_back(std::make_shared<RadioButtonItem>(
+		_T("相手のモデル名"),
+		_T("{\"表示する\":1,\"表示しない\":0}"),
+		std::make_shared<RadioButtonItemGetter>(
+		[manager_accessor]() -> int{
+			auto config_manager = 
+				manager_accessor->config_manager().lock();
+			return config_manager->show_modelname();
+		}),
+		std::make_shared<RadioButtonItemSetter>(
+		[manager_accessor](int value){
+			if (auto config_manager = 
+				manager_accessor->config_manager().lock()) {
+				return config_manager->set_show_modelname(value);
+			}
+		}),
+		manager_accessor_));
 }
 
-void CameraTab::Update()
+// 操作設定タブ
+
+InputTab::InputTab(const ManagerAccessorPtr& manager_accessor) :
+	OptionTabBase(_T("操作設定"), manager_accessor)
 {
-	int left = base_rect_.x + 128 + 64;
-	int top = base_rect_.y + 80 + 32;
-
-	BOOST_FOREACH(const auto& item, items_) {
-		item->set_base_rect(Rect(left, top));
-		top += item->height();
-	}
+	items_.push_back(std::make_shared<RadioButtonItem>(
+		_T("コントローラタイプ"),
+		_T("{\"タイプ1\":0,\"タイプ2\":1,\"タイプ3\":2}"),
+		std::make_shared<RadioButtonItemGetter>(
+		[manager_accessor]() -> int{
+			auto config_manager = 
+				manager_accessor->config_manager().lock();
+			return config_manager->gamepad_type();
+		}),
+		std::make_shared<RadioButtonItemSetter>(
+		[manager_accessor](int value){
+			if (auto config_manager = 
+				manager_accessor->config_manager().lock()) {
+				return config_manager->set_gamepad_type(value);
+			}
+		}),
+		manager_accessor_));
 }
 
-void CameraTab::ProcessInput(InputManager* input)
+// その他設定タブ
+
+OtherTab::OtherTab(const ManagerAccessorPtr& manager_accessor) :
+	OptionTabBase(_T("その他"), manager_accessor)
 {
-	BOOST_FOREACH(const auto& item, items_) {
-		item->ProcessInput(input);
-	}
+	//items_.push_back(std::make_shared<RadioButtonItem>(
+	//	_T("棒読みちゃんと連携"),
+	//	_T("{\"オフ\":0,\"オン\":1}"),
+	//	std::make_shared<RadioButtonItemGetter>(
+	//	[manager_accessor]() -> int{
+	//		auto config_manager = 
+	//			manager_accessor->config_manager().lock();
+	//		return config_manager->bouyomi_chan();
+	//	}),
+	//	std::make_shared<RadioButtonItemSetter>(
+	//	[manager_accessor](int value){
+	//		if (auto config_manager = 
+	//			manager_accessor->config_manager().lock()) {
+	//			return config_manager->set_bouyomi_chan(value);
+	//		}
+	//	}),
+	//	manager_accessor_));
 }
-
-void CameraTab::Draw()
-{
-	BOOST_FOREACH(const auto& item, items_) {
-		item->Draw();
-	}
-}
-
 
 OptionItemBase::OptionItemBase(const ManagerAccessorPtr& manager_accessor) :
 	manager_accessor_(manager_accessor)
@@ -397,13 +455,47 @@ int TextItem::height() const
 	return 24;
 }
 
+
+DescriptionItem::DescriptionItem(const tstring& text,
+	const ManagerAccessorPtr& manager_accessor) :
+		OptionItemBase(manager_accessor),
+		text_(text)
+{
+
+}
+
+void DescriptionItem::Update()
+{
+
+}
+
+void DescriptionItem::ProcessInput(InputManager* input)
+{
+
+}
+
+void DescriptionItem::Draw()
+{
+	DrawStringToHandle(base_rect_.x + 192, base_rect_.y,
+		text_.c_str(),
+		GetColor(180, 180, 180), ResourceManager::default_font_handle());
+}
+
+int DescriptionItem::height() const
+{
+	return 24;
+}
+
+
 RadioButtonItem::RadioButtonItem(const tstring& name,
-	const std::string& path,
 	const tstring& items,
+	const RadioButtonItemGetterPtr& getter,
+	const RadioButtonItemSetterPtr& setter,
 	const ManagerAccessorPtr& manager_accessor) :
 		OptionItemBase(manager_accessor),
 		name_(name),
-		path_(path),
+		getter_(getter),
+		setter_(setter),
 		selecting_index_(0)
 {
     selecting_bg_image_handle_ = ResourceManager::LoadCachedDivGraph<3>(
@@ -412,19 +504,12 @@ RadioButtonItem::RadioButtonItem(const tstring& name,
 	ptree item_array;
 	read_json(std::stringstream(unicode::ToString(items)), item_array);
 
-	auto account_manager = manager_accessor_->account_manager().lock();
-	auto value = account_manager->Get(path_);
-
 	int index = 0;
 	BOOST_FOREACH(const auto& item, item_array) {
 		auto text = unicode::ToTString(item.first);
 		int width = GetDrawStringWidthToHandle(
 			text.c_str(), text.size(), ResourceManager::default_font_handle());
-		items_.push_back(Item(text, item.second, width));
-
-		if (value == item.second) {
-			selecting_index_ = index;
-		}
+		items_.push_back(Item(text, item.second.get_value<int>(), width));
 
 		index++;
 	}
@@ -447,9 +532,7 @@ void RadioButtonItem::ProcessInput(InputManager* input)
 			&& base_rect_.y <= input->GetMouseY() && input->GetMouseY() <= base_rect_.y + height());
 
 		if (hover && input->GetMouseLeftCount() == 1) {
-			auto account_manager = manager_accessor_->account_manager().lock();
-			account_manager->Set(path_, item.value);
-			selecting_index_ = index;
+			(*setter_)(item.value);
 		}
 
 		item_left += item.width + 20;
@@ -463,13 +546,14 @@ void RadioButtonItem::Draw()
 		name_.c_str(), GetColor(58, 133, 86), ResourceManager::default_font_handle());
 
 	int item_left = base_rect_.x + 192;
+	int value = (*getter_)();
 	int index = 0;
 	BOOST_FOREACH(const auto& item, items_) {
 
 		int left = item_left;
 		int right = left + item.width;
 
-		if (index != selecting_index_) {
+		if (value != item.value) {
 			SetDrawBlendMode(DX_BLENDMODE_SUB, 40);
 		}
 
