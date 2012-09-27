@@ -14,6 +14,8 @@ class InputManager;
 class WindowManager {
     public:
         WindowManager(const ManagerAccessorPtr& manager_accessor = ManagerAccessorPtr());
+		~WindowManager();
+
         void Init();
         void ProcessInput(InputManager* input);
         void Update();
@@ -25,6 +27,9 @@ class WindowManager {
 
 		void AddWindow(const UISuperPtr& window);
 
+		void RestorePosition();
+		void SavePosition();
+
     private:
         ManagerAccessorPtr manager_accessor_;
 
@@ -32,6 +37,8 @@ class WindowManager {
 		ImageHandlePtr icon_base_image_handle_;
 		std::vector<UISuperWeakPtr> windows_;
 		std::vector<UISuperWeakPtr> closed_windows_;
+
+		static const char* LAYOUT_XML_PATH;
 };
 
 typedef std::shared_ptr<WindowManager> WindowManagerPtr;

@@ -43,6 +43,8 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
 		ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_map.png")));
 	card_manager_->AddNativeCard("rader", minimap_);
 
+	window_manager_->RestorePosition();
+
     player_manager_->Init();
     world_manager_->Init();	
 
@@ -51,6 +53,7 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
 
 MainLoop::~MainLoop()
 {
+	window_manager_->SavePosition();
     account_manager_->Save("./user/account.xml");
 }
 

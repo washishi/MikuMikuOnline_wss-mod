@@ -2,7 +2,7 @@
 /***MetaData***
 
 {
-	"name": "ƒ‚ƒfƒ‹ƒŠƒXƒg",
+	"name": "ãƒ¢ãƒ‡ãƒ«ãƒªã‚¹ãƒˆ",
 	"icon": "icon.png",
 	"api_version": 1
 }

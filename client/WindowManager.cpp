@@ -8,6 +8,10 @@
 #include "CardManager.hpp"
 #include "AccountManager.hpp"
 #include "ManagerAccessor.hpp"
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/filesystem.hpp>
+
+const char* WindowManager::LAYOUT_XML_PATH = "./user/layout.xml";
 
 WindowManager::WindowManager(const ManagerAccessorPtr& manager_accessor) :
 manager_accessor_(manager_accessor)
@@ -16,6 +20,10 @@ manager_accessor_(manager_accessor)
 		ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_close_button.png"));
 	icon_base_image_handle_ = 
 		ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_base.png"));
+}
+
+WindowManager::~WindowManager()
+{
 }
 
 void WindowManager::Init()
@@ -94,15 +102,23 @@ void WindowManager::DrawButtons()
 void WindowManager::DrawIcons(const Rect& rect)
 {
 	int x = 32;
-	BOOST_FOREACH(const auto& window, closed_windows_) {
-		if (auto ptr = window.lock()) {
+	auto card_manager = manager_accessor_->card_manager().lock();
+	BOOST_FOREACH(const auto& card, card_manager->cards()) {
+
+		if (auto ptr = card->GetWindow()) {
 			ImageHandlePtr image_handle;
 			if (auto custom_icon = ptr->icon_image_handle()) {
 				image_handle = custom_icon;
 			} else {
 				image_handle = icon_base_image_handle_;
 			}
+
+			if (ptr->visible()) {
+				SetDrawBlendMode(DX_BLENDMODE_SUB, 40);
+			}
 			DrawGraph(rect.x + x, rect.y + 100 + 4, *image_handle, TRUE);
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+
 			x += 64;
 		}
 	}
@@ -111,8 +127,9 @@ void WindowManager::DrawIcons(const Rect& rect)
 void WindowManager::ProcessInputIcons(const Rect& rect, InputManager* input)
 {
 	int x = 32;
-	BOOST_FOREACH(const auto& window, closed_windows_) {
-		if (auto ptr = window.lock()) {
+	auto card_manager = manager_accessor_->card_manager().lock();
+	BOOST_FOREACH(const auto& card, card_manager->cards()) {
+		if (auto ptr = card->GetWindow()) {
 
 			int icon_x = rect.x + x;
 			int icon_y = rect.y + 100 + 4;
@@ -121,7 +138,7 @@ void WindowManager::ProcessInputIcons(const Rect& rect, InputManager* input)
 				&& icon_y <= input->GetMouseY() && input->GetMouseY() <= icon_y + 48);
 
 			if (hover && input->GetMouseLeftCount() == 1) {
-				ptr->set_visible(true);
+				ptr->set_visible(!(ptr->visible()));
 				input->CancelMouseLeft();
 			}
 			x += 64;
@@ -133,4 +150,55 @@ void WindowManager::ProcessInputIcons(const Rect& rect, InputManager* input)
 void WindowManager::AddWindow(const UISuperPtr& window)
 {
 	windows_.push_back(window);
+}
+
+void WindowManager::RestorePosition()
+{
+	if (boost::filesystem::exists(LAYOUT_XML_PATH)) {
+		ptree tree;
+		read_xml(LAYOUT_XML_PATH, tree);
+
+		auto card_manager = manager_accessor_->card_manager().lock();
+		BOOST_FOREACH(const auto& card, card_manager->cards()) {
+			if (auto ptr = card->GetWindow()) {
+				auto child = tree.get_child_optional(card->name());
+				if (child) {
+					ptr->set_top			(child->get<int>("top", 0));
+					ptr->set_left			(child->get<int>("left", 0));
+					ptr->set_right			(child->get<int>("right", 0));
+					ptr->set_bottom			(child->get<int>("bottom", 0));
+					ptr->set_offset_x		(child->get<int>("offset_x", 0));
+					ptr->set_offset_y		(child->get<int>("offset_y", 0));
+					ptr->set_offset_width	(child->get<int>("offset_width", 0));
+					ptr->set_offset_height	(child->get<int>("offset_height", 0));
+					ptr->set_visible		(child->get<bool>("visible", true));
+				}
+			}
+		}
+	}
+}
+
+void WindowManager::SavePosition()
+{
+	ptree tree;
+	auto card_manager = manager_accessor_->card_manager().lock();
+	BOOST_FOREACH(const auto& card, card_manager->cards()) {
+		if (auto ptr = card->GetWindow()) {
+			ptree child_tree;
+			
+			child_tree.put("top",			ptr->top());
+			child_tree.put("right",			ptr->right());
+			child_tree.put("left",			ptr->left());
+			child_tree.put("bottom",		ptr->bottom());
+			child_tree.put("offset_x",		ptr->offset_x());
+			child_tree.put("offset_y",		ptr->offset_y());
+			child_tree.put("offset_width",	ptr->offset_width());
+			child_tree.put("offset_height",	ptr->offset_height());
+			child_tree.put("visible",		ptr->visible());
+
+			tree.put_child(card->name(), child_tree);
+		}
+	}
+
+	write_xml(LAYOUT_XML_PATH, tree);
 }
