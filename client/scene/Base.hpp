@@ -21,7 +21,11 @@ class Base : public std::enable_shared_from_this<Base> {
 		virtual void ProcessInput(InputManager*) = 0;
 	    virtual void Draw() = 0;
 	    virtual void End() = 0;
-	    virtual BasePtr NextScene() {return BasePtr();};
+	    virtual BasePtr NextScene() {return next_scene_;};
+
+	protected:
+		BasePtr next_scene_;
+
 };
 
 }

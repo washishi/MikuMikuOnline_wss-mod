@@ -97,6 +97,12 @@ void Connect::Update()
     button_.Update();
     button_label_.Update();
     message_.Update();
+
+    if (command_manager_->status() == CommandManager::STATUS_READY) {
+        next_scene_= std::make_shared<scene::MainLoop>(manager_accessor_);
+	} else if (return_flag_) {
+		next_scene_= std::make_shared<scene::Title>(manager_accessor_);
+    }
 }
 
 void Connect::ProcessInput(InputManager* input)
@@ -117,18 +123,6 @@ void Connect::Draw()
 
 void Connect::End()
 {
-}
-
-BasePtr Connect::NextScene()
-{
-    InputManager input;
-    if (command_manager_->status() == CommandManager::STATUS_READY) {
-        return BasePtr(new scene::MainLoop(manager_accessor_));
-	} else if (return_flag_) {
-		return BasePtr(new scene::Title(manager_accessor_));
-    } else {
-      return BasePtr();
-    }
 }
 
 }

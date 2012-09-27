@@ -23,7 +23,6 @@ class Title : public Base {
 		void ProcessInput(InputManager*);
         void Draw();
         void End();
-        BasePtr NextScene();
 
     private:
         void AsyncInitialize();
@@ -41,7 +40,6 @@ class Title : public Base {
         bool connect_flag_;
         int screen_count_;
 
-        BasePtr next_scene_;
 };
 
 }

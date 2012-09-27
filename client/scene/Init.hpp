@@ -25,7 +25,6 @@ class Init : public Base {
         void Draw();
 		void ProcessInput(InputManager*);
         void End();
-        BasePtr NextScene();
 
     private:
         void AsyncInitialize();
@@ -40,8 +39,6 @@ class Init : public Base {
         int start_count_;
 
         boost::thread loading_thread_;
-        std::shared_ptr<BasePtr> next_scene_;
-
         std::array<ImageHandlePtr, 5> loading_image_handle_;
 
         boost::mutex mutex_;

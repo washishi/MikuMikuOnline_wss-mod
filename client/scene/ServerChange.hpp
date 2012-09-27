@@ -20,15 +20,13 @@ class ServerChange : public Base{
 		void ProcessInput(InputManager*);
         void Draw();
         void End();
-        BasePtr NextScene();
+
     private:
         ManagerAccessorPtr manager_accessor_;
         CardManagerPtr card_manager_;
         AccountManagerPtr account_manager_;
         ConfigManagerPtr config_manager_;
 		WorldManagerPtr world_manager_;
-
-		BasePtr next_scene_;
 };
 
 }

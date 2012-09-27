@@ -31,6 +31,11 @@ void ServerChange::End()
 
 void ServerChange::Update()
 {
+	if(world_manager_->stage()->host_change_flag())
+	{
+		//account_manager_->set_host(world_manager_->stage()->host_change_flag().second);
+		next_scene_ = std::make_shared<scene::MainLoop>(manager_accessor_);
+	}
 }
 
 void ServerChange::ProcessInput(InputManager* input)
@@ -41,17 +46,5 @@ void ServerChange::ProcessInput(InputManager* input)
 void ServerChange::Draw()
 {
 }
-
-BasePtr ServerChange::NextScene()
-{
-	if(world_manager_->stage()->host_change_flag())
-	{
-		//account_manager_->set_host(world_manager_->stage()->host_change_flag().second);
-		return BasePtr(new scene::MainLoop(manager_accessor_));
-	}else{
-		return nullptr;
-	}
-}
-
 
 }

@@ -72,10 +72,23 @@ void MainLoop::Update()
     card_manager_->Update();
     world_manager_->Update();
 	ResourceManager::music()->Update();
+
 }
 
 void MainLoop::ProcessInput(InputManager* input)
 {
+	if(world_manager_->stage()->host_change_flag())
+	{
+		//account_manager_->set_host(world_manager_->stage()->host_change_flag().second);
+		next_scene_ = std::make_shared<scene::ServerChange>(manager_accessor_);
+	} else if (input->GetKeyCount(KEY_INPUT_F1) == 1) {
+		inputbox_->Inactivate();
+		next_scene_ = std::make_shared<scene::Option>(manager_accessor_, shared_from_this());
+	} else if (input->GetKeyCount(KEY_INPUT_F2) == 1) {
+		inputbox_->Inactivate();
+		next_scene_ = std::make_shared<scene::Dashboard>(manager_accessor_, shared_from_this());
+	}
+
 	if (auto window_manager = manager_accessor_->window_manager().lock()) {
 		window_manager->ProcessInput(input);
 	}
@@ -99,6 +112,7 @@ void MainLoop::ProcessInput(InputManager* input)
 		SaveDrawScreenToPNG( 0, 0, config_manager_->screen_width(), config_manager_->screen_height(),tmp_str);
 		snapshot_number_++;
 	}
+
 }
 
 void MainLoop::Draw()
@@ -113,24 +127,7 @@ void MainLoop::Draw()
 
 void MainLoop::End()
 {
-}
-
-BasePtr MainLoop::NextScene()
-{
-	InputManager input;
-	if(world_manager_->stage()->host_change_flag())
-	{
-		//account_manager_->set_host(world_manager_->stage()->host_change_flag().second);
-		return BasePtr(new scene::ServerChange(manager_accessor_));
-	} else if (input.GetKeyCount(KEY_INPUT_F1) == 1) {
-		inputbox_->Inactivate();
-		return BasePtr(new scene::Option(manager_accessor_, shared_from_this()));
-	} else if (input.GetKeyCount(KEY_INPUT_F2) == 1) {
-		inputbox_->Inactivate();
-		return BasePtr(new scene::Dashboard(manager_accessor_, shared_from_this()));
-	} else{
-		return nullptr;
-	}
+	next_scene_ = BasePtr();
 }
 
 }

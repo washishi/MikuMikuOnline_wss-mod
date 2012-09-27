@@ -36,13 +36,25 @@ def make_full_package():
 	zip.write(os.path.join(bin_path, 'config.json'), 'config.json')
 	zip.write(os.path.join(bin_path, 'server/server.exe'), 'server/server.exe')
 
-	for root, dirs, files in os.walk(os.path.join(bin_path, 'cards')):
+	for root, dirs, files in os.walk(os.path.join(bin_path, 'widgets')):
 	    for file in files:
 	    	absolute_path = os.path.join(root, file)
 	        relative_path = os.path.relpath(absolute_path, bin_path)
 	        zip.write(absolute_path, relative_path)
 	        
-	for root, dirs, files in os.walk(os.path.join(bin_path, 'resources')):
+	for root, dirs, files in os.walk(os.path.join(bin_path, 'models')):
+	    for file in files:
+	    	absolute_path = os.path.join(root, file)
+	        relative_path = os.path.relpath(absolute_path, bin_path)
+	        zip.write(absolute_path, relative_path)
+	        
+	for root, dirs, files in os.walk(os.path.join(bin_path, 'motions')):
+	    for file in files:
+	    	absolute_path = os.path.join(root, file)
+	        relative_path = os.path.relpath(absolute_path, bin_path)
+	        zip.write(absolute_path, relative_path)
+	        
+	for root, dirs, files in os.walk(os.path.join(bin_path, 'system')):
 	    for file in files:
 	    	absolute_path = os.path.join(root, file)
 	        relative_path = os.path.relpath(absolute_path, bin_path)

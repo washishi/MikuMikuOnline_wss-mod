@@ -3,6 +3,7 @@
 //
 
 #include "Dashboard.hpp"
+#include "Option.hpp"
 #include "../ManagerAccessor.hpp"
 #include "../AccountManager.hpp"
 #include "../CommandManager.hpp"
@@ -27,11 +28,6 @@ Dashboard::Dashboard(const ManagerAccessorPtr& manager_accessor,
       start_count_(0),
 	  end_count_(0)
 {
-
-	// TODO: •`‰æ‚ðDashbord‚ÉˆÚŠÇ‚·‚é‚½‚ß‚ÉNull‚É‚µ‚Ä‚¢‚é‚ªA
-	// •´‚ç‚í‚µ‚¢‚Ì‚ÅC³—\’è
-	manager_accessor_->set_window_manager(WindowManagerWeakPtr());
-
     manager_accessor_->set_config_manager(config_manager_);
     manager_accessor_->set_card_manager(card_manager_);
     manager_accessor_->set_account_manager(account_manager_);
@@ -50,6 +46,9 @@ Dashboard::~Dashboard()
 
 void Dashboard::Begin()
 {
+	// TODO: •`‰æ‚ðDashbord‚ÉˆÚŠÇ‚·‚é‚½‚ß‚ÉNull‚É‚µ‚Ä‚¢‚é‚ªA
+	// •´‚ç‚í‚µ‚¢‚Ì‚ÅC³—\’è
+	manager_accessor_->set_window_manager(WindowManagerWeakPtr());
 }
 
 void Dashboard::Update()
@@ -101,6 +100,13 @@ void Dashboard::ProcessInput(InputManager* input)
 		(!hover && (input->GetMouseLeftCount() == 1 || input->GetMouseRightCount() == 1))) {
 		end_count_++;
 	}
+
+    if (end_count_ > 10) {
+        next_scene_ = background_scene_;
+	} else if(input->GetKeyCount(KEY_INPUT_F1) == 1) {
+		next_scene_ = std::make_shared<Option>(manager_accessor_, background_scene_); 
+	}
+
 }
 
 void Dashboard::Draw()
@@ -161,16 +167,7 @@ void Dashboard::Draw()
 
 void Dashboard::End()
 {
-
+	manager_accessor_->set_window_manager(window_manager_);
 }
 
-BasePtr Dashboard::NextScene()
-{
-    if (end_count_ > 10) {
-		manager_accessor_->set_window_manager(window_manager_);
-        return background_scene_;
-    } else {
-        return BasePtr();
-    }
-}
 }

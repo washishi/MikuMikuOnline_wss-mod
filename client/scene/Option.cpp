@@ -3,6 +3,7 @@
 //
 
 #include "Option.hpp"
+#include "Dashboard.hpp"
 #include "../ManagerAccessor.hpp"
 #include "../ConfigManager.hpp"
 #include "../CommandManager.hpp"
@@ -89,6 +90,12 @@ void Option::Update()
 
 void Option::ProcessInput(InputManager* input)
 {
+    if (end_count_ > 10) {
+        next_scene_ = background_scene_;
+	} else if(input->GetKeyCount(KEY_INPUT_F2) == 1) {
+		next_scene_ = std::make_shared<Dashboard>(manager_accessor_, background_scene_); 
+	}
+
 	bool hover = (base_rect_.x <= input->GetMouseX() && input->GetMouseX() <= base_rect_.x + base_rect_.width
         && base_rect_.y <= input->GetMouseY() && input->GetMouseY() <= base_rect_.y + base_rect_.height);
 
@@ -120,6 +127,7 @@ void Option::ProcessInput(InputManager* input)
 	}
 	
 	tabs_[selecting_tab_index]->ProcessInput(input);
+
 }
 
 void Option::Draw()
@@ -209,15 +217,6 @@ void Option::Draw()
 void Option::End()
 {
 
-}
-
-BasePtr Option::NextScene()
-{
-    if (end_count_ > 10) {
-        return background_scene_;
-    } else {
-        return BasePtr();
-    }
 }
 
 OptionTabBase::OptionTabBase(const tstring name, const ManagerAccessorPtr& manager_accessor) :

@@ -22,7 +22,6 @@ class Connect : public Base {
 		void ProcessInput(InputManager*);
         void Draw();
         void End();
-        BasePtr NextScene();
 
     private:
         void AsyncInitialize();
@@ -40,7 +39,6 @@ class Connect : public Base {
 
 		bool return_flag_;
 
-        BasePtr next_scene_;
 };
 
 }

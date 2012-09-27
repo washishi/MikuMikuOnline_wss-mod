@@ -29,7 +29,6 @@ class MainLoop : public Base {
         void Draw();
 		void ProcessInput(InputManager*);
         void End();
-		BasePtr NextScene();
 
     private:
         std::function<void(const tstring&)> push_message_;

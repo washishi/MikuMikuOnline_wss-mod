@@ -25,7 +25,6 @@ class Dashboard : public Base {
 		void ProcessInput(InputManager*);
         void Draw();
         void End();
-        BasePtr NextScene();
 
     private:
         ManagerAccessorPtr manager_accessor_;

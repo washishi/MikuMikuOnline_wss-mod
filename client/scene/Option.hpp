@@ -31,7 +31,6 @@ class Option : public Base {
 		void ProcessInput(InputManager*);
         void Draw();
         void End();
-        BasePtr NextScene();
 
     private:
         void AsyncInitialize();

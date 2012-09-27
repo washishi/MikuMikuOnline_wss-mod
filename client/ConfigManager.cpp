@@ -64,6 +64,12 @@ void ConfigManager::Load(const std::string& filename)
 
 void ConfigManager::Save(const std::string& filename)
 {
+    namespace fs = boost::filesystem;
+	auto dir_path = fs::path(filename).parent_path();
+	if (!fs::exists(dir_path)) {
+		fs::create_directory(dir_path);
+    }
+
 	ptree pt;
 
     pt.put("show_nametag", show_nametag_);
