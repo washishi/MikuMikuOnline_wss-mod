@@ -9,4 +9,11 @@ Base::~Base()
 {
 
 }
+
+BasePtr Base::NextScene() {
+	BasePtr ptr;
+	std::swap(ptr, next_scene_);
+	return ptr;
+}
+
 }

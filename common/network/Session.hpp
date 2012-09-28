@@ -48,6 +48,9 @@ namespace network {
             double GetReadByteAverage() const;
             double GetWriteByteAverage() const;
 
+			void ResetReadByteAverage();
+			void ResetWriteByteAverage();
+
             tcp::socket& tcp_socket();
             Encrypter& encrypter();
 

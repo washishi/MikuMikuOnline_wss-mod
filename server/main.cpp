@@ -187,6 +187,9 @@ int main(int argc, char* argv[])
                 uint32_t user_id = account.RegisterPublicKey(c.body());
 				assert(user_id > 0);
 
+				// 公開鍵で大量データを受信するので受信量制限をリセット
+				session->ResetReadByteAverage();
+
                 // ログイン
                 session->set_id(user_id);
                 account.LogIn(user_id);

@@ -94,6 +94,18 @@ namespace network {
         }
     }
 
+	void Session::ResetReadByteAverage()
+	{
+		read_start_time_ = time(nullptr);
+		read_byte_sum_ = 0;
+	}
+
+	void Session::ResetWriteByteAverage()
+	{
+		write_start_time_ = time(nullptr);
+		write_byte_sum_ = 0;
+	}
+
     void Session::EnableEncryption()
     {
         encryption_ = true;
