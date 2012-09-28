@@ -376,7 +376,8 @@ InputTab::InputTab(const ManagerAccessorPtr& manager_accessor) :
 		[manager_accessor](int value){
 			if (auto config_manager = 
 				manager_accessor->config_manager().lock()) {
-				return config_manager->set_gamepad_type(value);
+				InputManager::SetGamepadType(value);
+				config_manager->set_gamepad_type(value);
 			}
 		}),
 		manager_accessor_));

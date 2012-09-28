@@ -253,7 +253,7 @@ void GameLoop::MoveCamera(InputManager* input)
         }
     }
 
-    float pad_rz = input->GetGamepadSlider1();
+    float pad_rz = input->GetGamepadManagedAnalogRy();
     if (pad_rz > 0) {
         if (camera.radius > CAMERA_MIN_RADIUS) {
             camera.radius -= 0.5f * pad_rz;
