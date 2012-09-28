@@ -135,6 +135,8 @@ int main(int argc, char* argv[])
         {
             if (auto session = c.session().lock()) {
 
+				session->ResetReadByteAverage();
+
                 std::string finger_print;
                 uint16_t version;
                 uint16_t udp_port;
@@ -187,7 +189,6 @@ int main(int argc, char* argv[])
                 uint32_t user_id = account.RegisterPublicKey(c.body());
 				assert(user_id > 0);
 
-				// 公開鍵で大量データを受信するので受信量制限をリセット
 				session->ResetReadByteAverage();
 
                 // ログイン
