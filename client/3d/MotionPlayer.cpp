@@ -5,15 +5,15 @@
 
 MotionPlayer::MotionPlayer(int model_handle)
     : model_handle_(model_handle), prev_attach_index_(-1), current_attach_index_(-1),
-      connect_prev_(false), prev_blend_rate_(0), blend_time_(0),prev_anim_index_(-1),isloop_(true),isloopcheck_(false)
+      connect_prev_(false), prev_blend_rate_(0), blend_time_(0),prev_anim_index_(-1),isloop_(true),isloopcheck_(false),nextconnect_(true)
 {}
 
-void MotionPlayer::Play(int anim_index, bool connect_prev, int blend_time, int anim_src_model_handle, bool check_name, bool isloop, int nextanim_handle, bool isloopcheck)
+void MotionPlayer::Play(int anim_index, bool connect_prev, int blend_time, int anim_src_model_handle, bool check_name, bool isloop, int nextanim_handle, bool isloopcheck, bool nextconnect)
 {
  	if(nextanim_handle != -1)
 	{
 		prev_anim_index_ = nextanim_handle;
-	}else{
+	}else if(!isloop){
 		prev_anim_index_ = MV1GetAttachAnim(model_handle_,current_attach_index_);
 	}
 
@@ -25,6 +25,7 @@ void MotionPlayer::Play(int anim_index, bool connect_prev, int blend_time, int a
     blend_time_ = blend_time;
 	isloop_ = isloop;
 	isloopcheck_ = isloopcheck;
+	nextconnect_ = nextconnect;
 	if(!isloopcheck_)isplayend_ = false;
 
     prev_attach_index_ = current_attach_index_;
@@ -108,7 +109,7 @@ void MotionPlayer::AdvancePlayTime(int diff_time)
 		{
 			Stop();
 			isplayend_ = true;
-			Play(prev_anim_index_,connect_prev_,200,-1,false,true,-1,isloopcheck_);
+			Play(prev_anim_index_,nextconnect_,200,-1,false,true,-1,isloopcheck_);
 			return;
 		}
         anim_time -= anim_total_time;

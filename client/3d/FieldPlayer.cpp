@@ -254,10 +254,27 @@ void FieldPlayer::Update()
 	}else if(additional_motion_.flag_)
 	{
 		bool connect_prev = true;
-		motion_player_->Play(additional_motion_.handle_, connect_prev, 400, -1, false,additional_motion_.isloop_,additional_motion_.nextanim_handle_,additional_motion_.loopcheck_);
+		motion_player_->Play(
+			additional_motion_.handle_,
+			additional_motion_.connection_,
+			additional_motion_.connection_time_,
+			-1,
+			false,
+			additional_motion_.isloop_,
+			additional_motion_.nextanim_handle_,
+			additional_motion_.loopcheck_);
 		additional_motion_.loopcheck_ = false;
 		additional_motion_.flag_ = false;
 		additional_motion_.nextanim_handle_ = -1;
+		additional_motion_.connection_ = true;
+		additional_motion_.next_connection_ = true;
+	}else if(additional_motion_.motion_change_)
+	{
+		if(motion_player_->GetPlayEnd())
+		{
+			additional_motion_.motion_change_ = false;
+			motion_player_->Play(current_stat_.motion, true, 200, -1, false);
+		}
 	}
     // モーション再生時刻更新
     motion_player_->Next(timer_->Delta());
@@ -341,7 +358,7 @@ void FieldPlayer::Move()
         if (prev_stat_.acc.y == 0)
         {
 			jump_wait_ = false;
-            // 前回接地していた
+           // 前回接地していた
             // std::cout << "  previous on the ground" << std::endl;
 
 			// 登ったり下ったりできる段差の大きさの制限を求める
@@ -417,16 +434,19 @@ void FieldPlayer::Move()
                 // 落下している
                 // std::cout << "  previous falling" << std::endl;
 
-                // 地面に食い込むのを防止する
+                // 地面に食い込むのを防止する	
 
                 if (foot_floor_exists.first)
                 {
                     // 地面に到達した
                     // std::cout << "    current on the ground" << std::endl;
 					additional_motion_.handle_ = motion.end_jmp_;
+					additional_motion_.connection_ = false;
 					additional_motion_.isloop_ = false;
-					additional_motion_.nextanim_handle_ = motion.stand_;
+					additional_motion_.nextanim_handle_ = current_stat_.motion;
+					additional_motion_.loopcheck_ = true;
 					additional_motion_.flag_ = true;
+					additional_motion_.motion_change_ = true;
                     current_stat_.pos = foot_floor_exists.second;
                     current_stat_.acc.y = 0;
                     current_stat_.vel.y = 0;
@@ -602,11 +622,22 @@ void FieldPlayer::InputFromUser()
                     input.GetGamepadCount(InputManager::PADBIND_JUMP) > 0))
     {
 		jump_wait_ = true;
-		additional_motion_.handle_ = motion.pre_jmp_;
-		additional_motion_.isloop_ = false;
-		additional_motion_.flag_ = true;
-		additional_motion_.nextanim_handle_ = motion.jmp_;
-		additional_motion_.loopcheck_ = true;
+		if(move_dir == 0)
+		{
+			additional_motion_.handle_ = motion.pre_jmp_;
+			additional_motion_.isloop_ = false;
+			additional_motion_.flag_ = true;
+			additional_motion_.nextanim_handle_ = motion.jmp_;
+			additional_motion_.loopcheck_ = true;
+			additional_motion_.next_connection_ = false;
+		}else if(current_stat_.acc.y == 0){
+			additional_motion_.handle_ = motion.jmp_;
+			additional_motion_.isloop_ = true;
+			any_move_ = true;
+			current_stat_.acc.y = -9.8 * stage_->map_scale();
+			current_stat_.vel += VGet(0, jump_height_ * stage_->map_scale(), 0);
+			additional_motion_.flag_ = true;
+		}
     }
 
 	if (current_stat_.acc.y == 0 && jump_wait_)
@@ -617,6 +648,14 @@ void FieldPlayer::InputFromUser()
 			current_stat_.acc.y = -9.8 * stage_->map_scale();
 			current_stat_.vel += VGet(0, jump_height_ * stage_->map_scale(), 0);
 		}
+	}
+
+	if (stage_->CheckWarpPoint(current_stat_.pos))
+	{
+		//stage_->SetHostChangeFlag(true);
+
+		auto pos = ConvWorldPosToScreenPos(current_stat_.pos+VGet(0,25,25));
+		
 	}
 }
 
