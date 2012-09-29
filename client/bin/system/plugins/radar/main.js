@@ -5,7 +5,7 @@
 	"name": "レーダー",
 	"icon": "icon.png",
 	"api_version": 1,
-	"native": "rader"
+	"native": "radar"
 }
 
 ***MetaData***/

@@ -34,14 +34,10 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
 
     inputbox_->ReloadTabs();
 	inputbox_->Activate();
-	inputbox_->set_icon_image_handle(
-		ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_input.png")));
 	card_manager_->AddNativeCard("inputbox", inputbox_);
 
 	minimap_->UIPlacement(config_manager_->screen_width() - MINIMAP_MINSIZE - 12, 12);
-	minimap_->set_icon_image_handle(
-		ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_map.png")));
-	card_manager_->AddNativeCard("rader", minimap_);
+	card_manager_->AddNativeCard("radar", minimap_);
 
 	window_manager_->RestorePosition();
 

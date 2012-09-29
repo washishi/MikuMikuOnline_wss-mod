@@ -74,7 +74,7 @@ void Dashboard::Update()
 	bg_alpha_ = std::min(150, bg_alpha_);
 	
     base_rect_.width = 800;
-    base_rect_.height = 160;
+    base_rect_.height = 148;
     base_rect_.x = (screen_width - base_rect_.width) / 2;
 
 	if (end_count_ > 0) {

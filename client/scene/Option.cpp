@@ -499,7 +499,7 @@ RadioButtonItem::RadioButtonItem(const tstring& name,
 		selecting_index_(0)
 {
     selecting_bg_image_handle_ = ResourceManager::LoadCachedDivGraph<3>(
-            _T("system/images/gui/gui_option_selecting_bg.png"), 3, 1, 16, 20);
+            _T("system/images/gui/gui_option_selecting_bg.png"), 3, 1, 16, 24);
 
 	ptree item_array;
 	read_json(std::stringstream(unicode::ToString(items)), item_array);
@@ -557,13 +557,13 @@ void RadioButtonItem::Draw()
 			SetDrawBlendMode(DX_BLENDMODE_SUB, 40);
 		}
 
-		DrawGraph(left - 8, base_rect_.y - 2, *selecting_bg_image_handle_[0], TRUE);
-		DrawRectExtendGraphF(left - 8 + 16, base_rect_.y - 2,
-								right - 16 + 8, base_rect_.y - 2 + 20,
-								0, 0, 1, 20, *selecting_bg_image_handle_[2], TRUE);
-		DrawGraph(right - 16 + 8, base_rect_.y - 2, *selecting_bg_image_handle_[2], TRUE);
+		DrawGraph(left - 8, base_rect_.y - 4, *selecting_bg_image_handle_[0], TRUE);
+		DrawRectExtendGraphF(left - 8 + 16, base_rect_.y - 4,
+								right - 16 + 8, base_rect_.y + 20,
+								0, 0, 1, 24, *selecting_bg_image_handle_[2], TRUE);
+		DrawGraph(right - 16 + 8, base_rect_.y - 4, *selecting_bg_image_handle_[2], TRUE);
 
-		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 4);
 
 		DrawStringToHandle(left, base_rect_.y,
 			item.name.c_str(),

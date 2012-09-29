@@ -101,7 +101,7 @@ void WindowManager::DrawButtons()
 
 void WindowManager::DrawIcons(const Rect& rect)
 {
-	int x = 32;
+	int x = 16;
 	auto card_manager = manager_accessor_->card_manager().lock();
 	BOOST_FOREACH(const auto& card, card_manager->cards()) {
 
@@ -116,32 +116,32 @@ void WindowManager::DrawIcons(const Rect& rect)
 			if (ptr->visible()) {
 				SetDrawBlendMode(DX_BLENDMODE_SUB, 40);
 			}
-			DrawGraph(rect.x + x, rect.y + 100 + 4, *image_handle, TRUE);
+			DrawGraph(rect.x + x, rect.y + 100 + 8, *image_handle, TRUE);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 
-			x += 64;
+			x += 40;
 		}
 	}
 }
 
 void WindowManager::ProcessInputIcons(const Rect& rect, InputManager* input)
 {
-	int x = 32;
+	int x = 16;
 	auto card_manager = manager_accessor_->card_manager().lock();
 	BOOST_FOREACH(const auto& card, card_manager->cards()) {
 		if (auto ptr = card->GetWindow()) {
 
 			int icon_x = rect.x + x;
-			int icon_y = rect.y + 100 + 4;
+			int icon_y = rect.y + 100 + 8;
 
-			bool hover = (icon_x <= input->GetMouseX() && input->GetMouseX() <= icon_x + 48
-				&& icon_y <= input->GetMouseY() && input->GetMouseY() <= icon_y + 48);
+			bool hover = (icon_x <= input->GetMouseX() && input->GetMouseX() <= icon_x + 32
+				&& icon_y <= input->GetMouseY() && input->GetMouseY() <= icon_y + 32);
 
 			if (hover && input->GetMouseLeftCount() == 1) {
 				ptr->set_visible(!(ptr->visible()));
 				input->CancelMouseLeft();
 			}
-			x += 64;
+			x += 40;
 		}
 	}
 }
