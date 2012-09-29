@@ -18,6 +18,7 @@
 #include "ResourceManager.hpp"
 #include "../common/unicode.hpp"
 #include "../common/network/Command.hpp"
+#include "../common/network/Utils.hpp"
 #include "../common/database/AccountProperty.hpp"
 #include "Profiler.hpp"
 #include "GenerateJSON.hpp"
@@ -398,6 +399,42 @@ Handle<Value> Card::Function_Account_updateTrip(const Arguments& args)
             auto trip = std::string(*String::Utf8Value(args[0]->ToString()));
             command_manager->Write(network::ServerUpdateAccountProperty(TRIP, trip));
         }
+    }
+
+    return Undefined();
+}
+
+Handle<Value> Card::Function_Account_channel(const Arguments& args)
+{
+    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+
+    int id = 0;
+    if (auto command_manager = self->manager_accessor_->command_manager().lock()) {
+        id = command_manager->user_id();
+    }
+    if (auto player_manager = self->manager_accessor_->player_manager().lock()) {
+        if (auto player = player_manager->GetFromId(id)) {
+            return Integer::New(player->channel());
+        }
+    }
+
+    return Undefined();
+}
+
+Handle<Value> Card::Function_Account_updateChannel(const Arguments& args)
+{
+    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+
+	if (args.Length() >= 1 && args[0]->IsNumber()) {
+
+		int channel = args[0]->ToInteger()->Int32Value();
+
+		if (channel >= 0 && channel <= UCHAR_MAX) {
+			if (auto command_manager = self->manager_accessor_->command_manager().lock()) {
+				auto channel_str = network::Utils::Serialize((unsigned char)channel);
+				command_manager->Write(network::ServerUpdateAccountProperty(CHANNEL, channel_str));
+			}
+		}
     }
 
     return Undefined();
@@ -929,6 +966,26 @@ void Card::SetFunctions()
      * @static
      */
     script_.SetFunction("Account.updateTrip", Function_Account_updateTrip);
+
+    /**
+     * 現在のチャンネルを返します
+     *
+     * @method channel
+     * @return {Integer} チャンネル
+     *
+     * @static
+     */
+    script_.SetFunction("Account.channel", Function_Account_channel);
+
+    /**
+     * 現在のチャンネルを設定します
+     *
+     * @method updateChannel
+     * @param {Integer} channel チャンネル
+     *
+     * @static
+     */
+    script_.SetFunction("Account.updateChannel", Function_Account_updateChannel);
 
     /**
      * カード

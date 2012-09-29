@@ -60,6 +60,9 @@ namespace network {
             void set_id(UserID id);
             bool online() const;
 
+			unsigned char channel() const;
+			void set_channel(unsigned char channel);
+
             std::string global_ip() const;
             uint16_t udp_port() const;
             void set_global_ip(const std::string& global_ip);
@@ -118,6 +121,7 @@ namespace network {
 			int write_average_limit_;
 
             UserID id_;
+			unsigned char channel_;
     };
 
 }

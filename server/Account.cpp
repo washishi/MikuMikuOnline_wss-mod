@@ -78,9 +78,9 @@ std::string Account::GetUserRevisionPatch(UserID user_id, uint32_t revision)
 
             PropertyMap& property_map = usermap_it->second;
 
-            for (auto it = property_map.begin(); it != property_map.end(); ++it) {
-                if (it->second.revision > revision) {
-                    patch += network::Utils::Serialize((uint16_t)it->first) + it->second.value;
+            BOOST_FOREACH (auto& property, property_map) {
+                if (property.second.revision > revision) {
+                    patch += network::Utils::Serialize((uint16_t)property.first) + property.second.value;
                 }
             }
         }
@@ -259,6 +259,18 @@ uint32_t Account::GetUserRevision(UserID user_id) const
     uint32_t revision = 0;
     Get(user_id, REVISION, &revision);
     return revision;
+}
+
+void Account::SetUserChannel(UserID user_id, unsigned char channel)
+{
+    Set(user_id, CHANNEL, channel);
+}
+
+unsigned char Account::GetUserChannel(UserID user_id) const
+{
+    unsigned char channel = 0;
+    Get(user_id, CHANNEL, &channel);
+    return channel;
 }
 
 void Account::SetUserPosition(UserID user_id, const PlayerPosition& pos)

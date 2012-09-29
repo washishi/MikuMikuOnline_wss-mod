@@ -30,11 +30,10 @@ class Server {
         void Start(CallbackFuncPtr callback);
         void Stop();
         void Stop(int interrupt_type);
-        void SendAll(const Command&);
-		void SendAllLimited(const Command& command);
+
+        void SendAll(const Command&, int channel = -1, bool limited = false);
+        void SendOthers(const Command&, uint32_t self_id, int channel = -1, bool limited = false);
         void SendTo(const Command&, uint32_t);
-        void SendOthers(const Command&, SessionWeakPtr);
-        void SendOthersLimited(const Command&, SessionWeakPtr);
 
         bool Empty() const;
 		std::string GetStatusJSON() const;

@@ -8,6 +8,7 @@ enum AccountProperty {
     REVISION =      0x0,
     PUBLIC_KEY =    0x1,
     LOGIN =         0x2,
+    CHANNEL =       0x3,
     NAME =          0xA3,
     TRIP =          0xA4,
     MODEL_NAME =    0xA5,

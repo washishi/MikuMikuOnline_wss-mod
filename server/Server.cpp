@@ -153,21 +153,29 @@ namespace network {
 		Logger::Info("Active connection: %d", GetUserCount());
 	}
 
-    void Server::SendAll(const Command& command)
+    void Server::SendAll(const Command& command, int channel, bool limited)
     {
         BOOST_FOREACH(SessionWeakPtr& ptr, sessions_) {
             if (auto session = ptr.lock()) {
-                session->Send(command);
+				if (channel < 0 || (channel >= 0 && session->channel() == channel)) {
+					if (!limited || session->write_average_limit() > session->GetWriteByteAverage()) {
+						session->Send(command);
+					}
+				}
             }
         }
     }
 
-    void Server::SendAllLimited(const Command& command)
+    void Server::SendOthers(const Command& command, uint32_t self_id, int channel, bool limited)
     {
         BOOST_FOREACH(SessionWeakPtr& ptr, sessions_) {
             if (auto session = ptr.lock()) {
-				if (session->write_average_limit() > session->GetWriteByteAverage()) {
-					session->Send(command);
+				if (channel < 0 || (channel >= 0 && session->channel() == channel)) {
+					if (!limited || session->write_average_limit() > session->GetWriteByteAverage()) {
+						if (session->id() != self_id) {
+							session->Send(command);
+						}
+					}
 				}
             }
         }
@@ -184,34 +192,6 @@ namespace network {
 			it->lock()->Send(command);
 		}
 	}
-
-    void Server::SendOthers(const Command& command, SessionWeakPtr self_ptr)
-    {
-        BOOST_FOREACH(SessionWeakPtr& ptr, sessions_) {
-            if (auto session = ptr.lock()) {
-                if (auto self = self_ptr.lock()) {
-                    if (*session != *self) {
-                        session->Send(command);
-                    }
-                }
-            }
-        }
-    }
-
-    void Server::SendOthersLimited(const Command& command, SessionWeakPtr self_ptr)
-    {
-        BOOST_FOREACH(SessionWeakPtr& ptr, sessions_) {
-            if (auto session = ptr.lock()) {
-                if (auto self = self_ptr.lock()) {
-                    if (*session != *self) {
-						if (session->write_average_limit() > session->GetWriteByteAverage()) {
-							session->Send(command);
-						}
-                    }
-                }
-            }
-        }
-    }
 
     void Server::SendUDPTestPacket(const std::string& ip_address, uint16_t port)
     {

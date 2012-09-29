@@ -48,6 +48,9 @@ class Account {
         uint16_t GetUserUDPPort(UserID) const;
         void SetUserUDPPort(UserID, uint16_t);
         uint32_t GetUserRevision(UserID) const;
+		
+        void SetUserChannel(UserID, unsigned char);
+        unsigned char GetUserChannel(UserID) const;
 
         void SetUserPosition(UserID, const PlayerPosition&);
         PlayerPosition GetUserPosition(UserID) const;

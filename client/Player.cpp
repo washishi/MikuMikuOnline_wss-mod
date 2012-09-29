@@ -33,6 +33,7 @@ id_(id),
 name_(""),
 model_name_(""),
 login_(false),
+channel_(0),
 revision_(0)
 {
     name_tip_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
@@ -291,6 +292,14 @@ Handle<Value> Player::Function_Player_login(const Arguments& args)
     return Boolean::New(self->login_);
 }
 
+Handle<Value> Player::Function_Player_channel(const Arguments& args)
+{
+    assert(args.This()->InternalFieldCount() > 0);
+    auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+    assert(self);
+    return Integer::New(self->channel_);
+}
+
 Handle<Value> Player::Function_Player_setBalloonContent(const Arguments& args)
 {
 
@@ -386,6 +395,13 @@ void Player::RegisterFunctionTemplate(Handle<FunctionTemplate>& func)
     */
     object->Set(String::New("login"), FunctionTemplate::New(Function_Player_login));
 
+    /**
+    * プレイヤーチャンネルを返します
+    *
+    * @method channel
+    * @return {Integer}　ログインしている時trueを返します
+    */
+    object->Set(String::New("channel"), FunctionTemplate::New(Function_Player_channel));
 
     /**
     * プレイヤーの頭上の吹き出しに表示する内容を設定します
@@ -541,6 +557,16 @@ void Player::set_model_name(const std::string& trip)
     model_name_ = trip;
 }
 
+std::string Player::current_model_name() const
+{
+    return current_model_name_;
+}
+
+void Player::set_current_model_name(const std::string& model_name)
+{
+    current_model_name_ = model_name;
+}
+
 bool Player::login() const
 {
     return login_;
@@ -549,6 +575,16 @@ bool Player::login() const
 void Player::set_login(bool login)
 {
     login_ = login;
+}
+
+unsigned char Player::channel() const
+{
+	return channel_;
+}
+
+void Player::set_channel(unsigned char channel)
+{
+	channel_ = channel;
 }
 
 uint32_t Player::revision() const

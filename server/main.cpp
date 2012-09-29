@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
 						server.SendTo(send_command, user_id);
 					}
 				} else {
-					server.SendAll(send_command);
+					server.SendAll(send_command, session->channel());
 				}
 
 				Logger::Info("Receive JSON: %s", message_json.str());
@@ -124,8 +124,8 @@ int main(int argc, char* argv[])
                 PlayerPosition pos;
                 network::Utils::Deserialize(c.body(), &pos.x, &pos.y, &pos.z, &pos.theta, &pos.vy);
                 account.SetUserPosition(session->id(), pos);
-                server.SendOthersLimited(network::ClientUpdatePlayerPosition(session->id(),
-                        pos.x,pos.y,pos.z,pos.theta, pos.vy), c.session());
+                server.SendOthers(network::ClientUpdatePlayerPosition(session->id(),
+					pos.x,pos.y,pos.z,pos.theta, pos.vy), session->id(), session->channel(), true);
             }
         }
             break;
@@ -237,7 +237,7 @@ int main(int argc, char* argv[])
 
                 server.SendOthers(
                         network::ClientReceiveAccountRevisionUpdateNotify(session->id(),
-                                account.GetUserRevision(session->id())), c.session());
+                                account.GetUserRevision(session->id())), session->id());
 
                 Logger::Info(msg);
             }
@@ -265,8 +265,8 @@ int main(int argc, char* argv[])
         {
             if (auto session = c.session().lock()) {
                 AccountProperty property;
-                std::string value;
-                network::Utils::Deserialize(c.body(), &property, &value);
+				std::string buffer = c.body().substr(sizeof(AccountProperty));
+                network::Utils::Deserialize(c.body(), &property);
 
                 auto old_revision = account.GetUserRevision(session->id());
 
@@ -274,17 +274,24 @@ int main(int argc, char* argv[])
 
                 case NAME:
                     {
-                        account.SetUserName(session->id(), value);
+                        account.SetUserName(session->id(), buffer);
                     }
                     break;
                 case TRIP:
                     {
-                        account.SetUserTrip(session->id(), value);
+                        account.SetUserTrip(session->id(), buffer);
                     }
                     break;
                 case MODEL_NAME:
                     {
-                        account.SetUserModelName(session->id(), value);
+                        account.SetUserModelName(session->id(), buffer);
+                    }
+                    break;
+                case CHANNEL:
+                    {
+						unsigned char value;
+						network::Utils::Deserialize(buffer, &value);
+                        account.SetUserChannel(session->id(), value);
                     }
                     break;
                 default:

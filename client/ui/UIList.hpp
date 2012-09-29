@@ -33,7 +33,7 @@ class UIList : public UIBase {
     private:
         std::array<ImageHandlePtr,4> scrollbar_base_image_handle_;
 
-        std::vector<Persistent<Object>> items_;
+        std::vector<UIBasePtr> items_;
 
         int scroll_y_, max_scroll_y_, scroll_y_target_;
         int scrollbar_height_, scrollbar_y_;

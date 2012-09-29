@@ -25,7 +25,8 @@ namespace network {
       serialized_byte_sum_(0),
       compressed_byte_sum_(0),
 	  write_average_limit_(999999),
-      id_(0)
+      id_(0),
+	  channel_(0)
     {
 
     }
@@ -128,6 +129,16 @@ namespace network {
     {
         id_ = id;
     }
+
+	unsigned char Session::channel() const
+	{
+		return channel_;
+	}
+
+	void Session::set_channel(unsigned char channel)
+	{
+		channel_ = channel;
+	}
 
     bool Session::online() const
     {

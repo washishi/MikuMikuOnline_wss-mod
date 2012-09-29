@@ -52,6 +52,7 @@ class Player : public std::enable_shared_from_this<Player> {
         static Handle<Value> Function_Player_name(const Arguments& args);
         static Handle<Value> Function_Player_trip(const Arguments& args);
         static Handle<Value> Function_Player_login(const Arguments& args);
+        static Handle<Value> Function_Player_channel(const Arguments& args);
         static Handle<Value> Function_Player_setBalloonContent(const Arguments& args);
         static Handle<Value> Function_Player_position(const Arguments& args);
 
@@ -65,12 +66,19 @@ class Player : public std::enable_shared_from_this<Player> {
         void set_trip(const std::string& trip);
         std::string model_name() const;
         void set_model_name(const std::string& model_name);
+
         bool login() const;
         void set_login(bool login);
+		unsigned char channel() const;
+		void set_channel(unsigned char channel);
+
         uint32_t revision() const;
         void set_revision(uint32_t revision);
         const PlayerPosition& position() const;
         void set_position(const PlayerPosition& pos);
+		
+        std::string current_model_name() const;
+        void set_current_model_name(const std::string& model_name);
 
         std::string ip_address() const;
         void set_ip_address(const std::string& ip_address);
@@ -88,8 +96,9 @@ class Player : public std::enable_shared_from_this<Player> {
         unsigned int id_;
         std::string name_;
         std::string trip_;
-        std::string model_name_;
+        std::string model_name_, current_model_name_;
         bool login_;
+		unsigned char channel_;
         unsigned int revision_;
         PlayerPosition pos_;
 

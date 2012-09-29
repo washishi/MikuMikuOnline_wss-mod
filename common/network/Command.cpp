@@ -136,7 +136,7 @@ ServerReceiveAccountInitializeData::ServerReceiveAccountInitializeData(const std
 }
 
 ServerUpdateAccountProperty::ServerUpdateAccountProperty(AccountProperty property, const std::string& value) :
-Command(header::ServerUpdateAccountProperty, Utils::Serialize(property, value))
+Command(header::ServerUpdateAccountProperty, Utils::Serialize(property) + value)
 {
 
 }
