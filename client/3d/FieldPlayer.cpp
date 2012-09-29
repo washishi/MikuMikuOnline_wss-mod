@@ -340,7 +340,6 @@ void FieldPlayer::Move()
         // 前回キャラが接地していたなら、今回もキャラを地面に接地させる
         if (prev_stat_.acc.y == 0)
         {
-			jump_wait_ = false;
             // 前回接地していた
             // std::cout << "  previous on the ground" << std::endl;
 
@@ -423,14 +422,9 @@ void FieldPlayer::Move()
                 {
                     // 地面に到達した
                     // std::cout << "    current on the ground" << std::endl;
-					additional_motion_.handle_ = motion.end_jmp_;
-					additional_motion_.isloop_ = false;
-					additional_motion_.nextanim_handle_ = motion.stand_;
-					additional_motion_.flag_ = true;
                     current_stat_.pos = foot_floor_exists.second;
                     current_stat_.acc.y = 0;
                     current_stat_.vel.y = 0;
-					jump_wait_ = false;
                 }
             }
             else
@@ -597,26 +591,13 @@ void FieldPlayer::InputFromUser()
         current_stat_.roty_speed = 0;
     }
 
-    if (!jump_wait_ &&
-            (input.GetKeyCount(InputManager::KEYBIND_JUMP) > 0 ||
+    if (current_stat_.acc.y == 0 &&
+		(input.GetKeyCount(InputManager::KEYBIND_JUMP) > 0 ||
                     input.GetGamepadCount(InputManager::PADBIND_JUMP) > 0))
     {
-		jump_wait_ = true;
-		additional_motion_.handle_ = motion.pre_jmp_;
-		additional_motion_.isloop_ = false;
-		additional_motion_.flag_ = true;
-		additional_motion_.nextanim_handle_ = motion.jmp_;
-		additional_motion_.loopcheck_ = true;
-    }
-
-	if (current_stat_.acc.y == 0 && jump_wait_)
-	{
-		if(motion_player_->GetPlayEnd())
-		{
 			any_move_ = true;
 			current_stat_.acc.y = -9.8 * stage_->map_scale();
 			current_stat_.vel += VGet(0, jump_height_ * stage_->map_scale(), 0);
-		}
 	}
 }
 
