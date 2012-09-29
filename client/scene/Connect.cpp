@@ -33,14 +33,14 @@ void Connect::Begin()
     GetScreenState(&width, &height, nullptr);
 
     message_.set_width(450);
-    message_.set_text(_T("Ú‘±’†..."));
+    message_.set_text(_LT("connect.connecting"));
     message_.set_bgcolor(UIBase::Color(0,0,0,0));
     message_.set_textcolor(UIBase::Color(0,0,0,255));
     message_.set_left(40);
     message_.set_top(40);
 
     button_label_.set_width(100);
-    button_label_.set_text(_T("ƒLƒƒƒ“ƒZƒ‹"));
+    button_label_.set_text(_LT("connect.cancel"));
     button_label_.set_bgcolor(UIBase::Color(0,0,0,0));
     button_label_.set_textcolor(UIBase::Color(0,0,0,255));
     button_label_.set_left(width - button_.width() - 40 + 15);

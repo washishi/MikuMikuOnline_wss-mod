@@ -264,50 +264,50 @@ void OptionTabBase::Draw()
 // ステータスタブ
 
 StatusTab::StatusTab(const ManagerAccessorPtr& manager_accessor) :
-	OptionTabBase(_T("ステータス"), manager_accessor)
+	OptionTabBase(_LT("option.status.name"), manager_accessor)
 {
 	auto account_manager = manager_accessor_->account_manager().lock();
 	auto command_manager = manager_accessor_->command_manager().lock();
 	auto player_manager = manager_accessor_->player_manager().lock();
 
-	items_.push_back(std::make_shared<TextItem>(_T("ニックネーム"),
+	items_.push_back(std::make_shared<TextItem>(_LT("option.status.nickname"),
 		std::make_shared<std::function<tstring(void)>>(
 		[account_manager](){
 			return unicode::ToTString(account_manager->name());
 		}), manager_accessor_));
 
-	items_.push_back(std::make_shared<TextItem>(_T("モデル名"),
+	items_.push_back(std::make_shared<TextItem>(_LT("option.status.modelname"),
 		std::make_shared<std::function<tstring(void)>>(
 		[account_manager](){
 			return unicode::ToTString(account_manager->model_name());
 		}), manager_accessor_));
 
-	items_.push_back(std::make_shared<TextItem>(_T("ユーザーID"),
+	items_.push_back(std::make_shared<TextItem>(_LT("option.status.user_id"),
 		std::make_shared<std::function<tstring(void)>>(
 		[command_manager](){
 			return (tformat(_T("%d")) % command_manager->user_id()).str();
 		}), manager_accessor_));
 
-	items_.push_back(std::make_shared<TextItem>(_T("ステージ"),
+	items_.push_back(std::make_shared<TextItem>(_LT("option.status.stage"),
 		std::make_shared<std::function<tstring(void)>>(
 		[command_manager](){
 			return unicode::ToTString(command_manager->stage());
 		}), manager_accessor_));
 
-	items_.push_back(std::make_shared<TextItem>(_T("座標"),
+	items_.push_back(std::make_shared<TextItem>(_LT("option.status.position"),
 		std::make_shared<std::function<tstring(void)>>(
 		[player_manager]() -> tstring {
 			const auto& pos = player_manager->GetMyself()->position();
 			return (tformat(_T("X: %d     Y: %d     Z: %d")) % pos.x % pos.y % pos.z).str();
 		}), manager_accessor_));
 
-	items_.push_back(std::make_shared<TextItem>(_T("平均受信量"),
+	items_.push_back(std::make_shared<TextItem>(_LT("option.status.receive_average"),
 		std::make_shared<std::function<tstring(void)>>(
 		[command_manager]() -> tstring {
 			return (tformat(_T("%.1lf byte/s")) % command_manager->GetReadByteAverage()).str();
 		}), manager_accessor_));
 
-	items_.push_back(std::make_shared<TextItem>(_T("平均送信量"),
+	items_.push_back(std::make_shared<TextItem>(_LT("option.status.send_average"),
 		std::make_shared<std::function<tstring(void)>>(
 		[command_manager]() -> tstring {
 			return (tformat(_T("%.1lf byte/s")) % command_manager->GetWriteByteAverage()).str();
@@ -318,11 +318,11 @@ StatusTab::StatusTab(const ManagerAccessorPtr& manager_accessor) :
 // 表示設定タブ
 
 DisplayTab::DisplayTab(const ManagerAccessorPtr& manager_accessor) :
-	OptionTabBase(_T("表示設定"), manager_accessor)
+	OptionTabBase(_LT("option.display.name"), manager_accessor)
 {
 	items_.push_back(std::make_shared<RadioButtonItem>(
-		_T("ネームタグと吹き出し"),
-		_T("{\"表示する\":1,\"表示しない\":0}"),
+		_LT("option.display.show_nametag"),
+		_LT("option.display.show_nametag_json"),
 		std::make_shared<RadioButtonItemGetter>(
 		[manager_accessor]() -> int{
 			auto config_manager = 
@@ -340,8 +340,8 @@ DisplayTab::DisplayTab(const ManagerAccessorPtr& manager_accessor) :
 
 
 	items_.push_back(std::make_shared<RadioButtonItem>(
-		_T("相手のモデル名"),
-		_T("{\"表示する\":1,\"表示しない\":0}"),
+		_LT("option.display.show_modelname"),
+		_LT("option.display.show_modelname_json"),
 		std::make_shared<RadioButtonItemGetter>(
 		[manager_accessor]() -> int{
 			auto config_manager = 
@@ -361,11 +361,11 @@ DisplayTab::DisplayTab(const ManagerAccessorPtr& manager_accessor) :
 // 操作設定タブ
 
 InputTab::InputTab(const ManagerAccessorPtr& manager_accessor) :
-	OptionTabBase(_T("操作設定"), manager_accessor)
+	OptionTabBase(_LT("option.input.name"), manager_accessor)
 {
 	items_.push_back(std::make_shared<RadioButtonItem>(
-		_T("コントローラタイプ"),
-		_T("{\"タイプ1\":0,\"タイプ2\":1,\"タイプ3\":2}"),
+		_LT("option.input.gamepad_type"),
+		_LT("option.input.gamepad_type_json"),
 		std::make_shared<RadioButtonItemGetter>(
 		[manager_accessor]() -> int{
 			auto config_manager = 
@@ -386,7 +386,7 @@ InputTab::InputTab(const ManagerAccessorPtr& manager_accessor) :
 // その他設定タブ
 
 OtherTab::OtherTab(const ManagerAccessorPtr& manager_accessor) :
-	OptionTabBase(_T("その他"), manager_accessor)
+	OptionTabBase(_LT("option.others.name"), manager_accessor)
 {
 	//items_.push_back(std::make_shared<RadioButtonItem>(
 	//	_T("棒読みちゃんと連携"),
@@ -524,14 +524,14 @@ void RadioButtonItem::ProcessInput(InputManager* input)
 {
 	int item_left = base_rect_.x + 192;
 	int index = 0;
-	BOOST_FOREACH(const auto& item, items_) {
+	BOOST_FOREACH(auto& item, items_) {
 		int left = item_left;
 		int right = left + item.width;
 
-		bool hover = (left <= input->GetMouseX() && input->GetMouseX() <= right
+		item.hover = (left <= input->GetMouseX() && input->GetMouseX() <= right
 			&& base_rect_.y <= input->GetMouseY() && input->GetMouseY() <= base_rect_.y + height());
 
-		if (hover && input->GetMouseLeftCount() == 1) {
+		if (item.hover && input->GetMouseLeftCount() == 1) {
 			(*setter_)(item.value);
 		}
 
@@ -554,7 +554,11 @@ void RadioButtonItem::Draw()
 		int right = left + item.width;
 
 		if (value != item.value) {
-			SetDrawBlendMode(DX_BLENDMODE_SUB, 40);
+			if (item.hover) {
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+			} else {
+				SetDrawBlendMode(DX_BLENDMODE_SUB, 40);
+			}
 		}
 
 		DrawGraph(left - 8, base_rect_.y - 4, *selecting_bg_image_handle_[0], TRUE);

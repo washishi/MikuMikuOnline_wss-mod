@@ -74,3 +74,4 @@
 #include <boost/foreach.hpp>
 
 #include "../common/Logger.hpp"
+#include "Language.hpp"

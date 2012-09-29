@@ -292,6 +292,7 @@ int main(int argc, char* argv[])
 						unsigned char value;
 						network::Utils::Deserialize(buffer, &value);
                         account.SetUserChannel(session->id(), value);
+						session->set_channel(value);
                     }
                     break;
                 default:

@@ -176,6 +176,7 @@ class RadioButtonItem : public OptionItemBase {
 				name(_name), value(_value), width(_width) {}
 			tstring name;
 			int value, width;
+			bool hover;
 		};
 
 	private:

@@ -1,0 +1,42 @@
+{
+	"connect":
+		{
+			"connecting": 		"Connecting..",
+			"cancel":			"Cancel"
+		},
+	"option":
+		{
+			"status":
+				{
+					"name":					"Status",
+					"nickname":				"Nickname",
+					"modelname":			"Model",
+					"user_id":				"UserID",
+					"stage":				"Stage",
+					"position":				"Position",
+					"receive_average":		"Received average",
+					"send_average":			"Sent average"
+				},
+			
+			"display":
+				{
+					"name":					"Display",
+					"show_nametag":			"Nametags and balloons",
+					"show_nametag_json":	"{\"ON\":1,\"OFF\":0}",
+					"show_modelname":		"Model names",
+					"show_modelname_json":	"{\"ON\":1,\"OFF\":0}"
+				},
+			
+			"input":
+				{
+					"name":					"Input",
+					"gamepad_type":			"Gamepad type",
+					"gamepad_type_json":	"{\"Type1\":0,\"Type2\":1,\"Type3\":2}"
+				},
+				
+			"others":
+				{
+					"name":					"Others"
+				}
+		}
+}

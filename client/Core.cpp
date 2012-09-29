@@ -31,6 +31,8 @@ int Core::Run()
 {
 	Logger::Info(_T("%s"), unicode::ToTString(MMO_VERSION_TEXT));
 
+	Language::Initialize("“ú–{Œê");
+
     if (SetUpDxLib() == -1) {
         return -1;
     }
