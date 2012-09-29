@@ -9,6 +9,7 @@
 #include <DxLib.h>
 #include "dx_vector.hpp"
 #include "../ResourceManager.hpp"
+#include "../ui/InputBox.hpp"
 
 class Stage {
     public:
@@ -45,6 +46,8 @@ class Stage {
         float map_scale_;
 		float min_height_;
         ModelHandle skymap_handle_;
+		ModelHandle warpobj_handle_;
+		std::vector<ModelHandle> warpobj_array_;
 
         std::vector<VECTOR> start_points_;
 		std::vector<VECTOR> warp_points_;

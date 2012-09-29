@@ -12,7 +12,7 @@ Stage::Stage(const tstring& model_name) :
     map_scale_(map_handle_.property().get<float>("scale", 20.0)),
 	min_height_(map_handle_.property().get<float>("min_height", -200.0)),
 	host_change_flag_(false)
-{
+	{
     MV1SetScale(map_handle_.handle(), VGet(map_scale_, map_scale_, map_scale_));
     MV1SetupCollInfo(map_handle_.handle(), -1, 128, 64, 128);// 元の数値は256,256,256
 
@@ -36,6 +36,19 @@ Stage::Stage(const tstring& model_name) :
     if (warp_points_.empty()) {
         warp_points_.push_back(VGet(0,0,0));
     }
+	auto warpobj_name = map_handle_.property().get<std::string>("stage.warpobj_name", unicode::ToString(_T("warpobj:デフォルトワープオブジェクト")));
+	warpobj_handle_ = ResourceManager::LoadModelFromName(unicode::ToTString(warpobj_name));
+
+	float warpobj_scale = warpobj_handle_.property().get<float>("scale",12.5f);
+	if(warpobj_scale != 1.0f)MV1SetScale(warpobj_handle_.handle(), VGet(warpobj_scale, warpobj_scale, warpobj_scale));
+	auto warpobj_push_it = warp_points_.begin();
+	while(!warpobj_handle_.CheckLoaded());
+	for( warpobj_push_it; warpobj_push_it != warp_points_.end(); ++warpobj_push_it)
+	{
+		auto tmp = ResourceManager::LoadModelFromName(unicode::ToTString(warpobj_name));
+		MV1SetPosition(tmp,*warpobj_push_it);
+		warpobj_array_.push_back(tmp);
+	}
 
     auto skymap_name = map_handle_.property().get<std::string>("stage.skydome", unicode::ToString(_T("skydome:入道雲のある風景")));
     skymap_handle_ = ResourceManager::LoadModelFromName(unicode::ToTString(skymap_name));
@@ -55,6 +68,10 @@ void Stage::Draw()
 
     MV1DrawModel(skymap_handle_.handle());
     MV1DrawModel(map_handle_.handle());
+	BOOST_FOREACH(auto warp_handle,warpobj_array_)
+	{
+		MV1DrawModel(warp_handle.handle());
+	}
 }
 
 float Stage::GetFloorY(const VECTOR& v1, const VECTOR& v2) const
