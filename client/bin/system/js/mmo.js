@@ -140,7 +140,31 @@
 		Object.merge(options, defaults, false, false);
 		return Object.merge(new UI._Group, options);
 	};
-
+	
+	
+	// UICustom
+	UI.Custom = function(options) {
+		options = options || {};
+		var defaults = {
+			docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT
+		};
+		Object.merge(options, defaults, false, false);
+		
+		return (function (obj) {
+			obj._processinput = function() {
+				obj.processinput.call(obj);
+			}
+			obj._update = function() {
+				obj.update.call(obj);
+			}
+			obj._draw = function() {
+				obj.draw.call(obj);
+			}
+			return obj;
+		})(Object.merge(new UI._Custom, options));
+		
+	};
+	
 	// PlayerFunctions
 
 	Player.myself = function(){

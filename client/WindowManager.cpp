@@ -66,7 +66,10 @@ void WindowManager::Update()
 	auto card_manager = manager_accessor_->card_manager().lock();
 	BOOST_FOREACH(const auto& card, card_manager->cards()) {
 		if (auto ptr = card->GetWindow()) {
-			ptr->Update();
+				card->script().With([&](const Handle<Context>& context)
+				{
+					ptr->Update();
+				});
 		}
 	}
 }
@@ -77,7 +80,10 @@ void WindowManager::Draw()
 	BOOST_FOREACH(const auto& card, card_manager->cards()) {
 		if (auto ptr = card->GetWindow()) {
 			if (ptr->visible()) {
-				ptr->Draw();
+				card->script().With([&](const Handle<Context>& context)
+				{
+					ptr->Draw();
+				});
 			}
 		}
 	}

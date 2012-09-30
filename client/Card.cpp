@@ -1189,6 +1189,7 @@ void Card::SetFunctions()
                 UIBase::SetObjectTemplate<UILabel>("Label", &object_template);
                 UIBase::SetObjectTemplate<UIList>("List", &object_template);
                 UIBase::SetObjectTemplate<UIGroup>("Group", &object_template);
+                UIBase::SetObjectTemplate<UICustom>("Custom", &object_template);
                 auto script_object = object_template->NewInstance();
                 script_object->SetPointerInInternalField(0, this);
                 context->Global()->Set(String::New("UI"), script_object);
