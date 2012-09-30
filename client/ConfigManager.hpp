@@ -70,7 +70,7 @@ class ConfigManager
 		int show_nametag_,
 			show_modelname_,
 			gamepad_type_,
-			bouyomi_chan_;
+			camera_direction_;
 
 	public:
 		int show_nametag() const;
@@ -80,9 +80,9 @@ class ConfigManager
 
 		int gamepad_type() const;
 		void set_gamepad_type(int value);
-		
-		int bouyomi_chan() const;
-		void set_bouyomi_chan(int value);
+	
+		int camera_direction() const;
+		void set_camera_direction(int value);
 
     private:
         ManagerAccessorPtr manager_accessor_;

@@ -381,6 +381,25 @@ InputTab::InputTab(const ManagerAccessorPtr& manager_accessor) :
 			}
 		}),
 		manager_accessor_));
+
+	items_.push_back(std::make_shared<RadioButtonItem>(
+		_LT("option.input.camera_direction"),
+		_LT("option.input.camera_direction_json"),
+		std::make_shared<RadioButtonItemGetter>(
+		[manager_accessor]() -> int{
+			auto config_manager = 
+				manager_accessor->config_manager().lock();
+			return config_manager->camera_direction();
+		}),
+		std::make_shared<RadioButtonItemSetter>(
+		[manager_accessor](int value){
+			if (auto config_manager = 
+				manager_accessor->config_manager().lock()) {
+				InputManager::SetGamepadType(value);
+				config_manager->set_camera_direction(value);
+			}
+		}),
+		manager_accessor_));
 }
 
 // ÇªÇÃëºê›íËÉ^Éu

@@ -5,7 +5,7 @@
 #pragma once
 
 #include "ManagerAccessor.hpp"
-#include "3d/model.hpp"
+#include "3d/gameloop.hpp"
 
 class InputManager;
 

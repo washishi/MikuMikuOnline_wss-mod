@@ -59,7 +59,7 @@ void ConfigManager::Load(const std::string& filename)
     show_nametag_ =		pt.get("show_nametag", 1);
     show_modelname_ =	pt.get("show_modelname", 1);
     gamepad_type_ =		pt.get("gamepad_type", 0);
-    bouyomi_chan_ =		pt.get("bouyomi_chan", 0);
+    camera_direction_ =	pt.get("camera_direction", 0);
 }
 
 void ConfigManager::Save(const std::string& filename)
@@ -75,7 +75,7 @@ void ConfigManager::Save(const std::string& filename)
     pt.put("show_nametag", show_nametag_);
     pt.put("show_modelname", show_modelname_);
     pt.put("gamepad_type", gamepad_type_);
-    pt.put("bouyomi_chan", bouyomi_chan_);
+    pt.put("camera_direction", camera_direction_);
 
 	write_xml(filename, pt);
 }
@@ -188,12 +188,12 @@ void ConfigManager::set_gamepad_type(int value)
 	gamepad_type_ = value;
 }
 
-int ConfigManager::bouyomi_chan() const
+int ConfigManager::camera_direction() const
 {
-	return bouyomi_chan_;
+	return camera_direction_;
 }
 
-void ConfigManager::set_bouyomi_chan(int value)
+void ConfigManager::set_camera_direction(int value)
 {
-	bouyomi_chan_ = value;
+	camera_direction_ = value;
 }

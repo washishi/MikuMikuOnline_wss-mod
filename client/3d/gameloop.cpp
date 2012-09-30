@@ -1,4 +1,4 @@
-﻿#include "model.hpp"
+﻿#include "gameloop.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -12,6 +12,7 @@
 #include "BasicMotion.hpp"
 #include "PMDLoader.hpp"
 #include "Stage.hpp"
+#include "../ConfigManager.hpp"
 #include "../../common/Logger.hpp"
 
 int KeyChecker::Check()
@@ -42,8 +43,9 @@ int KeyChecker::GetKeyCount(size_t key_code) const
 const float GameLoop::CAMERA_MIN_RADIUS = 2.0f;
 const float GameLoop::CAMERA_MAX_RADIUS = 40.0f;
 
-GameLoop::GameLoop(const StagePtr& stage)
+GameLoop::GameLoop(const ManagerAccessorPtr& manager_accessor, const StagePtr& stage)
     : stage_(stage),
+	  manager_accessor_(manager_accessor),
       camera_default_stat(CameraStatus(7.0f, 0.8f, 0.0f, 20 * DX_PI_F / 180, false)),
       camera(camera_default_stat)
 {
@@ -99,7 +101,10 @@ FieldPlayerPtr GameLoop::myself() const
 
 void GameLoop::FixCameraPosition()
 {
-    if (!camera.manual_control/* && myself_->current_stat().motion != BasicMotion::STAND*/)
+	auto config_manager = manager_accessor_->config_manager().lock();
+
+    if (config_manager->camera_direction() == 0 &&
+		!camera.manual_control/* && myself_->current_stat().motion != BasicMotion::STAND*/)
     {
         //　camera = camera_default_stat;
         camera.theta = myself_->current_stat().roty;

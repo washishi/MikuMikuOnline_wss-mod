@@ -31,7 +31,9 @@
 				{
 					"name":					"入力設定",
 					"gamepad_type":			"ゲームパッドタイプ",
-					"gamepad_type_json":	"{\"タイプ1\":0,\"タイプ2\":1,\"タイプ3\":2}"
+					"gamepad_type_json":	"{\"タイプ1\":0,\"タイプ2\":1,\"タイプ3\":2}",
+					"camera_direction":		"カメラの向き",
+					"camera_direction_json":"{\"常に背面\":0,\"自由\":1}"
 				},
 				
 			"others":

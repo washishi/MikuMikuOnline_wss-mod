@@ -33,7 +33,7 @@ using namespace boost::posix_time;
 int main(int argc, char* argv[])
 {
     // 設定を読み込み
-    Config config("config.json");
+    Config config;
 
 	Logger::Info(_T("%s"), unicode::ToTString(MMO_VERSION_TEXT));
 
