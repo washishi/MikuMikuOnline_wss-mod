@@ -280,7 +280,7 @@ Handle<Value> Card::Function_Music_all(const Arguments& args)
 
     int i = 0;
 	BOOST_FOREACH(const boost::filesystem::path& music_path, ResourceManager::music()->GetMusicList()) {
-		array->Set(i, String::New(music_path.stem().string().c_str()));
+		array->Set(i, String::New(unicode::sjis2utf8(music_path.stem().string()).c_str()));
         i++;
     }
     return array;
