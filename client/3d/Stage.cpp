@@ -43,11 +43,11 @@ Stage::Stage(const tstring& model_name) :
 	float warpobj_scale = warpobj_handle_.property().get<float>("scale",12.5f);
 	if(warpobj_scale != 1.0f)MV1SetScale(warpobj_handle_.handle(), VGet(warpobj_scale, warpobj_scale, warpobj_scale));
 	auto warpobj_push_it = warp_points_.begin();
-	while(!warpobj_handle_.CheckLoaded());
 	for( warpobj_push_it; warpobj_push_it != warp_points_.end(); ++warpobj_push_it)
 	{
 		auto tmp = ResourceManager::LoadModelFromName(unicode::ToTString(warpobj_name));
-		MV1SetPosition(tmp,*warpobj_push_it);
+		MV1SetScale(tmp.handle(), VGet(warpobj_scale, warpobj_scale, warpobj_scale));
+		MV1SetPosition(tmp.handle(),*warpobj_push_it);
 		warpobj_array_.push_back(tmp);
 	}
 	*/
