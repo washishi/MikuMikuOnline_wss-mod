@@ -31,8 +31,6 @@ int Core::Run()
 {
 	Logger::Info(_T("%s"), unicode::ToTString(MMO_VERSION_TEXT));
 
-	Language::Initialize("“ú–{Œê");
-
     if (SetUpDxLib() == -1) {
         return -1;
     }
@@ -86,6 +84,8 @@ int Core::SetUpDxLib()
     SetWindowIconID(100);
 
     ConfigManager config;
+	
+	Language::Initialize(config.language());
 
     if (config.fullscreen() == 0) {
         ChangeWindowMode(TRUE);

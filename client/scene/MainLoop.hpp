@@ -46,6 +46,8 @@ class MainLoop : public Base {
 		MiniMapPtr minimap_;
         InputBoxPtr inputbox_;
 		int snapshot_number_;
+
+		bool snapshot_;
 };
 
 }

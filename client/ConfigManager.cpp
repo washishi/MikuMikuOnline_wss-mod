@@ -42,6 +42,7 @@ void ConfigManager::LoadConfigure()
     udp_port_ = pt.get<uint16_t>("udp_port", 39391);
 	model_edge_size_ = pt.get<float>("edge_size",1.0f);
 	stage_ = pt.get<std::string>("stage","ƒPƒƒŠƒ“’¬");
+	language_ = pt.get<std::string>("language","“ú–{Œê");
 
 	screen_width_ =  std::max(screen_width_, MIN_SCREEN_WIDTH);
 	screen_height_ = std::max(screen_height_, MIN_SCREEN_HEIGHT);
@@ -128,6 +129,11 @@ bool ConfigManager::upnp() const
 int ConfigManager::udp_port() const
 {
     return udp_port_;
+}
+
+const std::string& ConfigManager::language() const
+{
+	return language_;
 }
 
 bool  ConfigManager::shader_blur() const

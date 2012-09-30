@@ -48,7 +48,7 @@ void Option::Begin()
 	tabs_.push_back(std::make_shared<StatusTab>(manager_accessor_));
 	tabs_.push_back(std::make_shared<DisplayTab>(manager_accessor_));
 	tabs_.push_back(std::make_shared<InputTab>(manager_accessor_));
-	tabs_.push_back(std::make_shared<OtherTab>(manager_accessor_));
+	// tabs_.push_back(std::make_shared<OtherTab>(manager_accessor_));
 }
 
 void Option::Update()

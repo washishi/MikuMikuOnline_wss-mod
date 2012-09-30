@@ -34,6 +34,8 @@ class ConfigManager
         bool upnp_;
         int udp_port_;
 
+		std::string language_;
+
 		bool shader_blur_;
 		bool shader_bloom_;
 		bool shader_shadow_;
@@ -51,6 +53,8 @@ class ConfigManager
         bool antialias() const;
         std::string host() const;
         int port() const;
+
+		const std::string& language() const;
 
         int max_script_execution_time() const;
         int max_local_storage_size() const;

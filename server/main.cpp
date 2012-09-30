@@ -274,27 +274,33 @@ int main(int argc, char* argv[])
 
                 case NAME:
                     {
+						std::string value;
+						network::Utils::Deserialize(buffer, &value);
                         account.SetUserName(session->id(), buffer);
                     }
                     break;
                 case TRIP:
                     {
-                        account.SetUserTrip(session->id(), buffer);
+						std::string value;
+						network::Utils::Deserialize(buffer, &value);
+                        account.SetUserTrip(session->id(), value);
                     }
                     break;
                 case MODEL_NAME:
                     {
-                        account.SetUserModelName(session->id(), buffer);
-                    }
-                    break;
-                case CHANNEL:
-                    {
-						unsigned char value;
+						std::string value;
 						network::Utils::Deserialize(buffer, &value);
-                        account.SetUserChannel(session->id(), value);
-						session->set_channel(value);
+                        account.SetUserModelName(session->id(), value);
                     }
                     break;
+      //          case CHANNEL:
+      //              {
+						//unsigned char value;
+						//network::Utils::Deserialize(buffer, &value);
+      //                  account.SetUserChannel(session->id(), value);
+						//session->set_channel(value);
+      //              }
+      //              break;
                 default:
                     ;
                 }

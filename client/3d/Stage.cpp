@@ -26,6 +26,7 @@ Stage::Stage(const tstring& model_name) :
     if (start_points_.empty()) {
         start_points_.push_back(VGet(0, 0, 0));
     }
+	/*
     auto warp_points_array = map_handle_.property().get_child("stage.warp_points", ptree());
     for (auto it = warp_points_array.begin(); it != warp_points_array.end(); ++it) {
         float x = it->second.get<float>("x", 0);
@@ -49,7 +50,7 @@ Stage::Stage(const tstring& model_name) :
 		MV1SetPosition(tmp,*warpobj_push_it);
 		warpobj_array_.push_back(tmp);
 	}
-
+	*/
     auto skymap_name = map_handle_.property().get<std::string>("stage.skydome", unicode::ToString(_T("skydome:入道雲のある風景")));
     skymap_handle_ = ResourceManager::LoadModelFromName(unicode::ToTString(skymap_name));
 
@@ -68,10 +69,13 @@ void Stage::Draw()
 
     MV1DrawModel(skymap_handle_.handle());
     MV1DrawModel(map_handle_.handle());
+
+	/*
 	BOOST_FOREACH(auto warp_handle,warpobj_array_)
 	{
 		MV1DrawModel(warp_handle.handle());
 	}
+	*/
 }
 
 float Stage::GetFloorY(const VECTOR& v1, const VECTOR& v2) const
