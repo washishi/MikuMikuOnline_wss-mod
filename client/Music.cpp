@@ -80,16 +80,16 @@ void Music::Play(tstring name,bool crossfade)
 		SetUseASyncLoadFlag(FALSE);
 		auto NameFind = [&](boost::filesystem::path& src)->bool
 		{
-			return src.stem().string() == unicode::ToString(name);
+			return src.stem().string() == unicode::utf82sjis(unicode::ToString(name));
 		};
 		auto bgm_it_ = std::find_if(music_paths_.begin(),music_paths_.end(),NameFind);
 		void *fileaddr;
 		int filesize;
-		LoadFile(unicode::ToTString(bgm_it_->string()).c_str(),&fileaddr,&filesize);
+		LoadFile(unicode::ToTString(unicode::sjis2utf8(bgm_it_->string())).c_str(),&fileaddr,&filesize);
 		auto softhandle_ = LoadSoftSoundFromMemImage(fileaddr,filesize);
 		auto handle_ = LoadSoundMemByMemImage(fileaddr,filesize);
 		if(handle_ == -1)return;
-		bgm_handle_.insert(std::make_pair<tstring,int>(unicode::ToTString(bgm_it_->stem().string()),handle_));
+		bgm_handle_.insert(std::make_pair<tstring,int>(unicode::ToTString(unicode::sjis2utf8(bgm_it_->stem().string())),handle_));
 		SetUseASyncLoadFlag(TRUE);
 	}
 	if(crossfade)
@@ -112,16 +112,16 @@ void Music::PlayME(tstring name)
 		SetUseASyncLoadFlag(FALSE);
 		auto NameFind = [&](boost::filesystem::path& src)->bool
 		{
-			return src.stem().string() == unicode::ToString(name);
+			return src.stem().string() == unicode::utf82sjis(unicode::ToString(name));
 		};
 		auto bgm_it_ = std::find_if(music_paths_.begin(),music_paths_.end(),NameFind);
 		void *fileaddr;
 		int filesize;
-		LoadFile(unicode::ToTString(bgm_it_->string()).c_str(),&fileaddr,&filesize);
+		LoadFile(unicode::ToTString(unicode::sjis2utf8(bgm_it_->string())).c_str(),&fileaddr,&filesize);
 		auto softhandle_ = LoadSoftSoundFromMemImage(fileaddr,filesize);
 		auto handle_ = LoadSoundMemByMemImage(fileaddr,filesize);
 		if(handle_ == -1)return;
-		bgm_handle_.insert(std::make_pair<tstring,int>(unicode::ToTString(bgm_it_->stem().string()),handle_));
+		bgm_handle_.insert(std::make_pair<tstring,int>(unicode::ToTString(unicode::sjis2utf8(bgm_it_->stem().string())),handle_));
 		SetUseASyncLoadFlag(TRUE);
 	}
 	if(present_bgm_ != -1)StopSoundMem(present_bgm_);
@@ -157,12 +157,12 @@ void Music::PlaySE(tstring name)
 		SetUseASyncLoadFlag(FALSE);
 		auto NameFind = [&](boost::filesystem::path& src)->bool
 		{
-			return src.stem().string() == unicode::ToString(name);
+			return src.stem().string() == unicode::utf82sjis(unicode::ToString(name));
 		};
 		auto se_it_ = std::find_if(se_paths_.begin(),se_paths_.end(),NameFind);
-		auto handle_ = LoadSoundMemToBufNumSitei(unicode::ToTString(se_it_->string()).c_str(),64);
+		auto handle_ = LoadSoundMemToBufNumSitei(unicode::ToTString(unicode::sjis2utf8(se_it_->string())).c_str(),64);
 		if(handle_ == -1)return;
-		se_handle_.insert(std::make_pair<tstring,int>(unicode::ToTString(se_it_->stem().string()),handle_));
+		se_handle_.insert(std::make_pair<tstring,int>(unicode::ToTString(unicode::sjis2utf8(se_it_->stem().string())),handle_));
 	}
 	PlaySoundMem(se_handle_[name],DX_PLAYTYPE_BACK);
 }
