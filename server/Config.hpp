@@ -5,15 +5,19 @@
 #pragma once
 
 #include <fstream>
+#include <sstream>
+#include <istream>
 #include <string>
 #include <list>
 
 class Config
 {
     public:
-        Config(const std::string& filename);
+		Config(const std::string& json = "{}");
 
     private:
+		void Load(std::istream& stream);
+
         uint16_t port_;
         std::string server_name_;
         std::string stage_;

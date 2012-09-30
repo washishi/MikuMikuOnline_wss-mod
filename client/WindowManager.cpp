@@ -38,24 +38,12 @@ void WindowManager::ProcessInput(InputManager* input)
 	auto card_manager = manager_accessor_->card_manager().lock();
 	BOOST_FOREACH(const auto& card, card_manager->cards()) {
 		if (auto ptr = card->GetWindow()) {
-			int x = ptr->absolute_x() - 12;
-			int y = ptr->absolute_y() - 12;
-
-			bool hover = (x <= input->GetMouseX() && input->GetMouseX() <= x + 30
-				&& y <= input->GetMouseY() && input->GetMouseY() <= y + 30);
-
-			if (hover && input->GetMouseLeftCount() == 1) {
-				ptr->set_visible(false);
-				input->CancelMouseLeft();
-			}
 
 			if (ptr->visible()) {
 				card->script().With([&](const Handle<Context>& context)
 				{
 					ptr->ProcessInput(input);
 				});
-			} else {
-				closed_windows_.push_back(ptr);
 			}
 		}
 	}
@@ -136,6 +124,19 @@ void WindowManager::ProcessInputIcons(const Rect& rect, InputManager* input)
 	auto card_manager = manager_accessor_->card_manager().lock();
 	BOOST_FOREACH(const auto& card, card_manager->cards()) {
 		if (auto ptr = card->GetWindow()) {
+
+			{
+				int x = ptr->absolute_x() - 12;
+				int y = ptr->absolute_y() - 12;
+
+				bool close_hover = (x <= input->GetMouseX() && input->GetMouseX() <= x + 30
+					&& y <= input->GetMouseY() && input->GetMouseY() <= y + 30);
+
+				if (close_hover && input->GetMouseLeftCount() == 1) {
+					ptr->set_visible(false);
+					input->CancelMouseLeft();
+				}
+			}
 
 			int icon_x = rect.x + x;
 			int icon_y = rect.y + 100 + 8;

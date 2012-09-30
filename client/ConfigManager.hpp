@@ -34,6 +34,8 @@ class ConfigManager
         bool upnp_;
         int udp_port_;
 
+		std::string language_;
+
 		bool shader_blur_;
 		bool shader_bloom_;
 		bool shader_shadow_;
@@ -51,6 +53,8 @@ class ConfigManager
         bool antialias() const;
         std::string host() const;
         int port() const;
+
+		const std::string& language() const;
 
         int max_script_execution_time() const;
         int max_local_storage_size() const;
@@ -70,7 +74,7 @@ class ConfigManager
 		int show_nametag_,
 			show_modelname_,
 			gamepad_type_,
-			bouyomi_chan_;
+			camera_direction_;
 
 	public:
 		int show_nametag() const;
@@ -80,9 +84,9 @@ class ConfigManager
 
 		int gamepad_type() const;
 		void set_gamepad_type(int value);
-		
-		int bouyomi_chan() const;
-		void set_bouyomi_chan(int value);
+	
+		int camera_direction() const;
+		void set_camera_direction(int value);
 
     private:
         ManagerAccessorPtr manager_accessor_;

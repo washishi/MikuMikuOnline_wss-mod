@@ -1,0 +1,44 @@
+{
+	"connect":
+		{
+			"connecting": 		"接続中..",
+			"cancel":			"キャンセル"
+		},
+	"option":
+		{
+			"status":
+				{
+					"name":					"ステータス",
+					"nickname":				"ニックネーム",
+					"modelname":			"モデル名",
+					"user_id":				"ユーザーID",
+					"stage":				"ステージ",
+					"position":				"座標",
+					"receive_average":		"平均受信量",
+					"send_average":			"平均送信量"
+				},
+			
+			"display":
+				{
+					"name":					"表示設定",
+					"show_nametag":			"ネームタグと吹き出し",
+					"show_nametag_json":	"{\"表示する\":1,\"表示しない\":0}",
+					"show_modelname":		"相手のモデル名",
+					"show_modelname_json":	"{\"表示する\":1,\"表示しない\":0}"
+				},
+			
+			"input":
+				{
+					"name":					"入力設定",
+					"gamepad_type":			"ゲームパッドタイプ",
+					"gamepad_type_json":	"{\"タイプ1\":0,\"タイプ2\":1,\"タイプ3\":2}",
+					"camera_direction":		"カメラの向き",
+					"camera_direction_json":"{\"常に背面\":0,\"自由\":1}"
+				},
+				
+			"others":
+				{
+					"name":					"その他"
+				}
+		}
+}

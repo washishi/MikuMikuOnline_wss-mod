@@ -26,7 +26,8 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
       window_manager_(std::make_shared<WindowManager>(manager_accessor_)),
       inputbox_(std::make_shared<InputBox>(manager_accessor_)),
 	  minimap_(std::make_shared<MiniMap>(manager_accessor)),
-	  snapshot_number_(0)
+	  snapshot_number_(0),
+	  snapshot_(false)
 {
     manager_accessor_->set_player_manager(player_manager_);
     manager_accessor_->set_world_manager(world_manager_);
@@ -94,6 +95,25 @@ void MainLoop::ProcessInput(InputManager* input)
 
 	if(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) == 1)
 	{
+		snapshot_ = true;
+	}
+
+}
+
+void MainLoop::Draw()
+{
+    world_manager_->Draw();
+    player_manager_->Draw();
+    card_manager_->Draw();
+	if (auto window_manager = manager_accessor_->window_manager().lock()) {
+		window_manager->Draw();
+	}
+
+	if (snapshot_) {
+		using namespace boost::filesystem;
+		if (!exists("./screenshot")) {
+			create_directory("./screenshot");
+		}
 		TCHAR tmp_str[MAX_PATH];
 		_stprintf( tmp_str , _T(".\\screenshot\\ss%03d.png") , snapshot_number_ );
 		if(PathFileExists(tmp_str))
@@ -107,17 +127,7 @@ void MainLoop::ProcessInput(InputManager* input)
 		}
 		SaveDrawScreenToPNG( 0, 0, config_manager_->screen_width(), config_manager_->screen_height(),tmp_str);
 		snapshot_number_++;
-	}
-
-}
-
-void MainLoop::Draw()
-{
-    world_manager_->Draw();
-    player_manager_->Draw();
-    card_manager_->Draw();
-	if (auto window_manager = manager_accessor_->window_manager().lock()) {
-		window_manager->Draw();
+		snapshot_ = false;
 	}
 }
 

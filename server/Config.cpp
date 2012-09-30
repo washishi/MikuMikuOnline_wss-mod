@@ -6,16 +6,48 @@
 #include <boost/program_options.hpp>
 #include <stdint.h>
 
-Config::Config(const std::string& filename)
+namespace {
+    using boost::property_tree::ptree;
+
+	void MergePtree(ptree* dst,
+		const ptree& source,
+		const ptree::path_type& current_path = ptree::path_type(""))
+	{
+		BOOST_FOREACH(const auto& tree, source) {
+			if (!tree.first.empty()) {
+				auto new_path = current_path;
+				new_path /= tree.first;
+				if (tree.second.empty() || tree.second.front().first.empty()) {
+					if (!dst->get_child_optional(new_path)) {
+						dst->put_child(new_path, tree.second);
+					}
+				} else {
+					MergePtree(dst, tree.second, new_path);
+				}
+			}
+		}
+	}
+};
+
+Config::Config(const std::string& json)
 {
     using boost::property_tree::ptree;
     ptree pt;
 
     try {
-        read_json(filename, pt);
+        read_json(std::stringstream(json), pt);
     } catch(std::exception& e) {
-        pt = ptree();
+		Logger::Error(unicode::ToTString(e.what()));
     }
+
+	ptree pt_config;
+    try {
+        read_json(std::ifstream("./config.json"), pt_config);
+    } catch(std::exception& e) {
+		Logger::Error(unicode::ToTString(e.what()));
+    }
+
+	MergePtree(&pt, pt_config);
 	
     port_ =             pt.get<uint16_t>("port", 39390);
     server_name_ =		pt.get<std::string>("server_name", "MMO Server");
@@ -31,6 +63,10 @@ Config::Config(const std::string& filename)
 	BOOST_FOREACH(const auto& item, patterns) {
 		blocking_address_patterns_.push_back(item.second.get_value<std::string>());
 	}
+}
+
+void Config::Load(std::istream& stream)
+{
 
 }
 
