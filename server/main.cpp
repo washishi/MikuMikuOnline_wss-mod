@@ -30,14 +30,35 @@
 
 using namespace boost::posix_time;
 
+void client_sync(network::Server& server);
+void server();
+
 int main(int argc, char* argv[])
 {
-    // 設定を読み込み
-    Config config;
-
 	Logger::Info(_T("%s"), unicode::ToTString(MMO_VERSION_TEXT));
 
+#ifndef NDEBUG
  try {
+#endif
+
+	 server();
+
+#ifndef NDEBUG
+  } catch (std::exception& e) {
+      Logger::Error(e.what());
+      Logger::Info("Stop Server");
+  }
+#endif
+
+  return 0;
+
+}
+
+void server()
+{
+
+    // 設定を読み込み
+    Config config;
 
     // 署名
     network::Signature sign("server_key");
@@ -342,6 +363,12 @@ int main(int argc, char* argv[])
 
     });
 
+	client_sync(server);
+    server.Start(callback);
+}
+
+void client_sync(network::Server& server)
+{
     bool execute_with_client;
     try {
 		#ifdef _WIN32
@@ -374,14 +401,4 @@ int main(int argc, char* argv[])
     #ifdef __linux__
     network::ServerSigHandler handler(SIGINT,&server);
     #endif
-    server.Start(callback);
-
-  } catch (std::exception& e) {
-      Logger::Error(e.what());
-      
-      Logger::Info("Stop Server");
-  }
-
-  return 0;
-
 }

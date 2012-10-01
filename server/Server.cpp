@@ -35,7 +35,7 @@ namespace network {
             } else if (auto session = c.session().lock()) {
 				auto read_average = session->GetReadByteAverage();
 				if (read_average > config_.receive_limit_2()) {
-					Logger::Info(_T("Banished session: %d"), session->id());
+					Logger::Info(_T("Banished session: %d %dbyte/s"), session->id(), read_average);
 					session->Close();
 				} else if(read_average > config_.receive_limit_1()) {
 					Logger::Info(_T("Receive limit exceeded: %d: %d byte/s"), session->id(), read_average);
