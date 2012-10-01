@@ -10,8 +10,9 @@ enum AccountProperty {
     LOGIN =         0x2,
     CHANNEL =       0x3,
     NAME =          0xA3,
-    TRIP =          0xA4,
+//    TRIP =          0xA4,
     MODEL_NAME =    0xA5,
+    TRIP =          0xA6,
     IP_ADDRESS =    0xF0,
     UDP_PORT =      0xF1,
 };

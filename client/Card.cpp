@@ -392,14 +392,18 @@ Handle<Value> Card::Function_Account_updateTrip(const Arguments& args)
     auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
 
     if (args.Length() >= 1 &&
-            args[0]->IsString() &&
-            args[0]->ToString()->Length() > 0) {
+            args[0]->IsString()) {
 
+		auto trip_passwd = std::string(*String::Utf8Value(args[0]->ToString()));
         if (auto command_manager = self->manager_accessor_->command_manager().lock()) {
-            auto trip = std::string(*String::Utf8Value(args[0]->ToString()));
-            command_manager->Write(network::ServerUpdateAccountProperty(TRIP, trip));
+            command_manager->Write(network::ServerUpdateAccountProperty(TRIP, trip_passwd));
         }
+
+		if (auto account_manager = self->manager_accessor_->account_manager().lock()) {
+			account_manager->set_trip_passwd(trip_passwd);
+		}
     }
+
 
     return Undefined();
 }

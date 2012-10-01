@@ -276,6 +276,12 @@ StatusTab::StatusTab(const ManagerAccessorPtr& manager_accessor) :
 			return unicode::ToTString(account_manager->name());
 		}), manager_accessor_));
 
+	items_.push_back(std::make_shared<TextItem>(_LT("option.status.trip"),
+		std::make_shared<std::function<tstring(void)>>(
+		[player_manager](){
+			return unicode::ToTString(player_manager->GetMyself()->trip());
+		}), manager_accessor_));
+
 	items_.push_back(std::make_shared<TextItem>(_LT("option.status.modelname"),
 		std::make_shared<std::function<tstring(void)>>(
 		[account_manager](){

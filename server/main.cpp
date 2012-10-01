@@ -297,7 +297,7 @@ void server()
                     {
 						std::string value;
 						network::Utils::Deserialize(buffer, &value);
-                        account.SetUserName(session->id(), buffer);
+                        account.SetUserName(session->id(), value);
                     }
                     break;
                 case TRIP:

@@ -60,6 +60,9 @@ def make_full_package():
 	        relative_path = os.path.relpath(absolute_path, bin_path)
 	        zip.write(absolute_path, relative_path)
 	        
+	zip.writestr('music/', '')
+	zip.writestr('se/', '')
+	        
 	zip.close()
 	
 def make_server_package():

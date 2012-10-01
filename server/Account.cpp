@@ -211,10 +211,11 @@ std::string Account::GetUserTrip(UserID user_id) const
 
 void Account::SetUserTrip(UserID user_id, const std::string& trip)
 {
-    if (trip.size() > 0 && trip.size() <= 64) {
-        std::string crypted_trip = network::Encrypter::GetTrip(trip);
-        Set(user_id, TRIP, crypted_trip);
-    }
+    if (trip.size() > 0 && trip.size() <= 256) {
+        Set(user_id, TRIP, network::Encrypter::GetTrip(trip));
+    } else {
+		Set(user_id, TRIP, std::string());
+	}
 }
 
 std::string Account::GetUserModelName(UserID user_id) const

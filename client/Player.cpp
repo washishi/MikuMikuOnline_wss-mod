@@ -552,9 +552,9 @@ std::string Player::model_name() const
     return model_name_;
 }
 
-void Player::set_model_name(const std::string& trip)
+void Player::set_model_name(const std::string& name)
 {
-    model_name_ = trip;
+    model_name_ = name;
 }
 
 std::string Player::current_model_name() const

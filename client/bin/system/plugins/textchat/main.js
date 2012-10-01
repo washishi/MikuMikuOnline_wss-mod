@@ -17,11 +17,16 @@ var list;
 // チャットメッセージ受信
 var even_line = false;
 Network.onReceive = function (info, msg) {
+	var trip = ""
+	if (info.player.trip()) {
+		trip = "《" + info.player.trip() + "》"
+	}
+	
     if (msg.body && !msg.private) {
         list.addItem(
 		new UI.Label({
 		    docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT,
-		    text: "[" + info.player.name() + "] " + msg.body,
+		    text: trip + "[" + info.player.name() + "] " + msg.body,
 		    bgcolor: ((even_line = !even_line) ? "#AFEEEECC" : "#FFFFFFCC")
 		})
 	    );
@@ -31,7 +36,7 @@ Network.onReceive = function (info, msg) {
         list.addItem(
 			new UI.Label({
 		   		docking: UI.DOCKING_TOP | UI.DOCKING_LEFT | UI.DOCKING_RIGHT,
-		   		text: "[private:" + info.player.name() + "] " + msg.body,
+		   		text: trip + "[private:" + info.player.name() + "] " + msg.body,
 		    	bgcolor: ((even_line = !even_line) ? "#add8e6CC" : "#87ceebCC")
 			})
 		)
@@ -121,6 +126,11 @@ InputBox.onEnter = function (text) {
             // ニックネームを変更             
             case "nick":
                 Account.updateName(args.trim());
+                break;
+                
+            case "trip":
+            	passwd = args ? args.trim() : ""
+                Account.updateTrip(passwd);
                 break;
 
             // モデルを変更             

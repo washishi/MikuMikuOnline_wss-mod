@@ -201,6 +201,7 @@ void UIBoard::UpdateDrag(InputManager* input, bool resizeable)
     if (drag_offset_rect_.x >= 0) {
         offset_rect_.x= input->GetMouseX() - drag_offset_rect_.x;
         offset_rect_.y= input->GetMouseY() - drag_offset_rect_.y;
+
         input->CancelMouseLeft();
     } else if (drag_resize_offset_rect_.x >= 0) {
         offset_rect_.width= input->GetMouseX() -  drag_resize_offset_rect_.x;

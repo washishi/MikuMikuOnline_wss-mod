@@ -29,6 +29,9 @@ class AccountManager {
         std::string model_name() const;
         void set_model_name(const std::string& name);
 
+        std::string trip_passwd() const;
+        void set_trip_passwd(const std::string& trip_passwd);
+
         uint16_t udp_port() const;
         void set_udp_port(uint16_t port);
 
@@ -42,7 +45,7 @@ class AccountManager {
         std::string private_key_;
 
         std::string name_;
-        std::string trip_;
+        std::string trip_passwd_;
         std::string model_name_;
 
         std::string host_;

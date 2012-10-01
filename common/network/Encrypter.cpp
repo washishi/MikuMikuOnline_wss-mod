@@ -4,6 +4,7 @@
 
 #include <boost/format.hpp>
 #include <sha.h>
+#include <whrlpool.h>
 #include <osrng.h>
 #include "Encrypter.hpp"
 #include "Utils.hpp"
@@ -14,7 +15,7 @@
 
 namespace network {
 
-const int Encrypter::TRIP_LENGTH = 20;
+const int Encrypter::TRIP_LENGTH = 12;
 
 using namespace CryptoPP;
 
@@ -167,21 +168,32 @@ std::string Encrypter::GetPublicKeyFingerPrint()
 std::string Encrypter::GetHash(const std::string& in)
 {
     std::unique_ptr<byte[]> outbuf(new byte [64]);
-    CryptoPP::SHA512().CalculateDigest(outbuf.get(), (const byte*)in.data(), in.size());
+	CryptoPP::Whirlpool().CalculateDigest(outbuf.get(), (const byte*)in.data(), in.size());
+    return std::string((char*)outbuf.get(), 64);
+}
 
+std::string Encrypter::GetTripHash(const std::string& in)
+{
+    std::unique_ptr<byte[]> outbuf(new byte [64]);
+	CryptoPP::SHA512().CalculateDigest(outbuf.get(), (const byte*)in.data(), in.size());
     return std::string((char*)outbuf.get(), 64);
 }
 
 std::string Encrypter::GetTrip(const std::string& in)
 {
     static const uint8_t trip_chars[] =
-            "abcdefghijklmnopqrstuvwxyz"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            ".:;@#$%&_()=*{}~+-!?[]()^/";
+            "opt0uXE{WZABCcdvi&_gMrsmn9)<"
+			"Q(TU}q5wx:DP3yFKL1Gab>|@=*8[$%"
+            "NO6Ye#-!?R4ShHIJV72)f+](jklz/\\";
 
     int pattern_size = sizeof(trip_chars) - 1;
 
-    auto buffer = GetTripHash(in).substr(0, TRIP_LENGTH);
+	std::string digest = GetTripHash(in);
+	for (int i = 0; i < 20; i++) {
+		digest = GetTripHash(digest + in) + GetHash(in + digest);
+	}
+
+    auto buffer = digest.substr(0, TRIP_LENGTH);
     std::string out;
 
     for (auto it = buffer.begin(); it != buffer.end(); ++it) {
@@ -190,11 +202,6 @@ std::string Encrypter::GetTrip(const std::string& in)
     }
 
     return out;
-}
-
-std::string Encrypter::GetTripHash(const std::string& in)
-{
-    return GetHash(in);
 }
 
 bool Encrypter::CheckKeyPair()
