@@ -13,7 +13,7 @@
 
 namespace network {
 
-    Server::Server(const Config& config) :
+    Server::Server(Config& config) :
 			config_(config),
             endpoint_(tcp::v4(), config.port()),
             acceptor_(io_service_, endpoint_),
@@ -35,7 +35,7 @@ namespace network {
             } else if (auto session = c.session().lock()) {
 				auto read_average = session->GetReadByteAverage();
 				if (read_average > config_.receive_limit_2()) {
-					Logger::Info(_T("Banished session: %d %dbyte/s"), session->id(), read_average);
+					Logger::Info(_T("Banished a session: %d %dbyte/s"), session->id(), read_average);
 					session->Close();
 				} else if(read_average > config_.receive_limit_1()) {
 					Logger::Info(_T("Receive limit exceeded: %d: %d byte/s"), session->id(), read_average);
@@ -116,6 +116,9 @@ namespace network {
 
     void Server::ReceiveSession(const SessionPtr& session, const boost::system::error_code& error)
     {
+		
+		config_.Reload();
+
 		const auto address = session->tcp_socket().remote_endpoint().address();
 		if(IsBlockedAddress(address)) {
 			Logger::Info("Blocked IP Address: %s", address);

@@ -26,7 +26,7 @@ class Server {
         };
 
     public:
-        Server(const Config& config);
+        Server(Config& config);
         void Start(CallbackFuncPtr callback);
         void Stop();
         void Stop(int interrupt_type);
@@ -57,7 +57,7 @@ class Server {
         void FetchUDP(const std::string& buffer, const boost::asio::ip::udp::endpoint endpoint);
 
     private:
-	   Config config_;
+	   Config& config_;
 
        boost::asio::io_service io_service_;
        tcp::endpoint endpoint_;

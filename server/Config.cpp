@@ -3,8 +3,12 @@
 //
 
 #include "Config.hpp"
-#include <boost/program_options.hpp>
+#include <boost/filesystem.hpp>
 #include <stdint.h>
+
+using namespace boost::filesystem;
+
+const char* Config::CONFIG_JSON = "./config.json";
 
 namespace {
     using boost::property_tree::ptree;
@@ -29,25 +33,21 @@ namespace {
 	}
 };
 
-Config::Config(const std::string& json)
+Config::Config()
+{
+	Load();
+}
+
+void Config::Load()
 {
     using boost::property_tree::ptree;
     ptree pt;
 
     try {
-        read_json(std::stringstream(json), pt);
+        read_json(std::ifstream(CONFIG_JSON), pt);
     } catch(std::exception& e) {
 		Logger::Error(unicode::ToTString(e.what()));
     }
-
-	ptree pt_config;
-    try {
-        read_json(std::ifstream("./config.json"), pt_config);
-    } catch(std::exception& e) {
-		Logger::Error(unicode::ToTString(e.what()));
-    }
-
-	MergePtree(&pt, pt_config);
 	
     port_ =             pt.get<uint16_t>("port", 39390);
     server_name_ =		pt.get<std::string>("server_name", "MMO Server");
@@ -63,11 +63,16 @@ Config::Config(const std::string& json)
 	BOOST_FOREACH(const auto& item, patterns) {
 		blocking_address_patterns_.push_back(item.second.get_value<std::string>());
 	}
+	
+	timestamp_ = last_write_time(CONFIG_JSON);
 }
 
-void Config::Load(std::istream& stream)
+void Config::Reload()
 {
-
+	if (timestamp_ < last_write_time(CONFIG_JSON)) {
+		Config::Load();
+		Logger::Info(_T("Configuration reloaded."));
+	}
 }
 
 //

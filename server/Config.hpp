@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include <time.h>
 #include <fstream>
-#include <sstream>
 #include <istream>
 #include <string>
 #include <list>
@@ -13,10 +13,11 @@
 class Config
 {
     public:
-		Config(const std::string& json = "{}");
+		Config();
+		void Reload();
 
     private:
-		void Load(std::istream& stream);
+		void Load();
 
         uint16_t port_;
         std::string server_name_;
@@ -40,4 +41,8 @@ class Config
 		int receive_limit_2() const;
 
 		const std::list<std::string>& blocking_address_patterns() const;
+
+	private:
+		static const char* CONFIG_JSON;
+		time_t timestamp_;
 };
