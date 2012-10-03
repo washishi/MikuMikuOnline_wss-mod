@@ -158,6 +158,8 @@ void UIList::DefineInstanceTemplate(Handle<ObjectTemplate>* object)
 
 void UIList::ProcessInput(InputManager* input)
 {
+    UpdateScrollBar(input);
+
     BOOST_FOREACH (UIBasePtr& item_ptr, items_) {
 		if (input->GetMousePos().second > absolute_y() && 
 			input->GetMousePos().second < absolute_y() + absolute_height()) {
@@ -165,7 +167,6 @@ void UIList::ProcessInput(InputManager* input)
 		}
     }
 
-    UpdateScrollBar(input);
 }
 
 void UIList::UpdateScrollBar(InputManager* input)
