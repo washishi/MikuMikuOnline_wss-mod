@@ -85,11 +85,13 @@ int GameLoop::Draw()
     FixCameraPosition();
 
     stage_->Draw();
-    //myself_->Draw();
+
     for (auto it = charmgr_->GetAll().begin(); it != charmgr_->GetAll().end(); ++it) {
         auto character = *it;
         character.second->Draw();
-    }
+	}
+
+    stage_->DrawAfter();
 
     return 0;
 }

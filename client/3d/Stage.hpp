@@ -16,6 +16,7 @@ class Stage {
         Stage(const tstring& model_path);
         ~Stage();
         void Draw();
+        void DrawAfter();
 
         float GetFloorY(const VECTOR& v1, const VECTOR& v2) const;
         bool GetFloorY(const VECTOR& v1, const VECTOR& v2, float* y) const;
@@ -45,6 +46,9 @@ class Stage {
         ModelHandle map_handle_;
         float map_scale_;
 		float min_height_;
+
+		std::unordered_set<int> draw_after_meshes_;
+
         ModelHandle skymap_handle_;
 		ModelHandle warpobj_handle_;
 		std::vector<ModelHandle> warpobj_array_;

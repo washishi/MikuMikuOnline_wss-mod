@@ -26,6 +26,14 @@ Stage::Stage(const tstring& model_name) :
     if (start_points_.empty()) {
         start_points_.push_back(VGet(0, 0, 0));
     }
+
+	int handle = map_handle_.handle();
+	int frame_num = MV1GetMeshNum(handle);
+	for (int i = 0; i < frame_num; i++) {
+		if (MV1GetMeshSemiTransState(handle, i) == TRUE) {
+			draw_after_meshes_.insert(i);
+		}
+	}
 	/*
     auto warp_points_array = map_handle_.property().get_child("stage.warp_points", ptree());
     for (auto it = warp_points_array.begin(); it != warp_points_array.end(); ++it) {
@@ -67,8 +75,15 @@ void Stage::Draw()
 {
 	MMO_PROFILE_FUNCTION;
 
+	int handle = map_handle_.handle();
+	int frame_num = MV1GetMeshNum(handle);
+	for (int i = 0; i < frame_num; i++) {
+		if (draw_after_meshes_.find(i) == draw_after_meshes_.end()) {
+			MV1DrawMesh(handle, i);
+		}
+	}
+
     MV1DrawModel(skymap_handle_.handle());
-    MV1DrawModel(map_handle_.handle());
 
 	/*
 	BOOST_FOREACH(auto warp_handle,warpobj_array_)
@@ -76,6 +91,19 @@ void Stage::Draw()
 		MV1DrawModel(warp_handle.handle());
 	}
 	*/
+}
+
+void Stage::DrawAfter()
+{
+	MMO_PROFILE_FUNCTION;
+
+	int handle = map_handle_.handle();
+	int frame_num = MV1GetMeshNum(handle);
+	for (int i = 0; i < frame_num; i++) {
+		if (draw_after_meshes_.find(i) != draw_after_meshes_.end()) {
+			MV1DrawMesh(handle, i);
+		}
+	}
 }
 
 float Stage::GetFloorY(const VECTOR& v1, const VECTOR& v2) const

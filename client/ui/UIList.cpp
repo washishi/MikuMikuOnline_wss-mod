@@ -267,8 +267,12 @@ void UIList::Draw()
     SetDrawArea(absolute_x(), absolute_y(),
             absolute_x() + absolute_width(), absolute_y() + absolute_height());
     if (item_start_ >= 0) {
+		int index = 0;
         BOOST_FOREACH (UIBasePtr& item_ptr, items_) {
-            item_ptr->Draw();
+			if (index >= item_start_ && index <=  item_end_) {
+				item_ptr->Draw();
+			}
+			index++;
         }
     }
     SetDrawAreaFull();
