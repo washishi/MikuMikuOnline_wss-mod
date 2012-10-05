@@ -31,6 +31,8 @@ class Config
 		
 		std::list<std::string> blocking_address_patterns_;
 
+		boost::property_tree::ptree pt_;
+
     public:
         uint16_t port() const;
         const std::string& server_name() const;
@@ -41,6 +43,8 @@ class Config
 		int receive_limit_2() const;
 
 		const std::list<std::string>& blocking_address_patterns() const;
+
+		const boost::property_tree::ptree& pt() const;
 
 	private:
 		static const char* CONFIG_JSON;

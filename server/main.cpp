@@ -18,6 +18,7 @@
 #include "Config.hpp"
 #include "Account.hpp"
 #include "version.hpp"
+
 #ifdef __linux__
 #include "ServerSigHandler.hpp"
 #include <csignal>
@@ -81,6 +82,15 @@ void server()
         // }
 
         switch (c.header()) {
+
+		// フルステータス要求
+		case network::header::ServerRequestedFullServerInfo:
+		{
+			if (auto session = c.session().lock()) {
+				session->Send(network::ClientReceiveFullServerInfo(server.GetFullStatus()));
+			}
+		}
+		break;
 
 		// ステータス要求
 		case network::header::ServerRequstedStatus:
@@ -155,6 +165,14 @@ void server()
         case network::header::ServerReceiveClientInfo:
         {
             if (auto session = c.session().lock()) {
+
+				// 最大接続数を超えていないか判定
+				if (server.GetUserCount() >= config.capacity()) {
+					Logger::Info("Refused Session");
+					session->SyncSend(network::ClientReceiveServerCrowdedError());
+					session->Close();
+
+				}
 
 				session->ResetReadByteAverage();
 

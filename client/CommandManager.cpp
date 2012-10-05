@@ -85,6 +85,14 @@ void CommandManager::FetchCommand(const network::Command& command)
 	}
 	break;
 
+	// サーバーデータ受信
+	case ClientReceiveFullServerInfo:
+	{
+		std::string xml;
+		network::Utils::Deserialize(command.body(), &xml);
+	}
+	break;
+
 	case ClientReceiveJSON:
 	// case ClientReceiveChatLog:
 	{

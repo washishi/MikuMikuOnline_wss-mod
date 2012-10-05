@@ -99,6 +99,18 @@ namespace network {
 		return msg;
 	}
 
+	std::string Server::GetFullStatus() const
+	{
+		using namespace boost::property_tree;
+		ptree xml_ptree;
+
+		xml_ptree.put_child("config", config_.pt());
+
+		std::stringstream stream;
+		write_xml(stream, xml_ptree);
+		return stream.str();
+	}
+
     bool Server::Empty() const
     {
         return GetUserCount() == 0;
@@ -120,16 +132,13 @@ namespace network {
 		config_.Reload();
 
 		const auto address = session->tcp_socket().remote_endpoint().address();
+
+		// 拒否IPでないか判定
 		if(IsBlockedAddress(address)) {
 			Logger::Info("Blocked IP Address: %s", address);
             session->Close();
 
-		} else if (GetUserCount() >= config_.capacity()) {
-			Logger::Info("Refused Session");
-            session->SyncSend(ClientReceiveServerCrowdedError());
-            session->Close();
-
-        } else {
+		} else {
             session->set_on_receive(callback_);
             session->Start();
             sessions_.push_back(SessionWeakPtr(session));

@@ -43,23 +43,25 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
 			boost::asio::ip::udp::endpoint udp_endpoint_;
     };
 
+	template<header::CommandHeader Header>
+	class CommandTemplate : public Command {
+		public:
+			CommandTemplate() :
+			  Command(Header, "") {}
+	};
+
+	typedef CommandTemplate<header::ServerStartEncryptedSession>		ServerStartEncryptedSession;
+	typedef CommandTemplate<header::ClientStartEncryptedSession>		ClientStartEncryptedSession;
+	typedef CommandTemplate<header::ClientRequestedPublicKey>			ClientRequestedPublicKey;
+	typedef CommandTemplate<header::ClientRequestedClientInfo>			ClientRequestedClientInfo;
+	typedef CommandTemplate<header::ClientReceiveServerCrowdedError>	ClientReceiveServerCrowdedError;
+	typedef CommandTemplate<header::ServerRequestedFullServerInfo>		ServerRequestedFullServerInfo;
+
     // コネクションの切断
     class FatalConnectionError : public Command {
     public:
         FatalConnectionError();
         FatalConnectionError(uint32_t user_id);
-    };
-
-    // 暗号化通信を開始
-    class ServerStartEncryptedSession : public Command {
-    public:
-        ServerStartEncryptedSession();
-    };
-
-    // 暗号化通信を開始
-    class ClientStartEncryptedSession : public Command {
-    public:
-        ClientStartEncryptedSession();
     };
 
     // クライアントからの公開鍵を受信
@@ -94,18 +96,6 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
         ServerReceiveClientInfo(const std::string& key, uint16_t version, uint16_t udp_port);
     };
 
-    // 公開鍵を要求された
-    class ClientRequestedPublicKey : public Command {
-    public:
-        ClientRequestedPublicKey();
-    };
-
-    // クライアントの情報を要求された
-    class ClientRequestedClientInfo : public Command {
-    public:
-        ClientRequestedClientInfo();
-    };
-
     class ServerRequestedAccountRevisionPatch : public Command {
     public:
         ServerRequestedAccountRevisionPatch(uint32_t user_id, int revision);
@@ -126,11 +116,6 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
     class ClientReceiveWriteAverageLimitUpdate : public Command {
     public:
         ClientReceiveWriteAverageLimitUpdate(uint16_t byte);
-    };
-
-    class ClientReceiveServerCrowdedError : public Command {
-    public:
-        ClientReceiveServerCrowdedError();
     };
 
     class ClientReceiveUnsupportVersionError : public Command {
@@ -161,6 +146,11 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
 	class ClientReceiveServerInfo : public Command {
     public:
         ClientReceiveServerInfo(const std::string& stage);
+	};
+
+	class ClientReceiveFullServerInfo : public Command {
+    public:
+        ClientReceiveFullServerInfo(const std::string& xml);
 	};
 
 }

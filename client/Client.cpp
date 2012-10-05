@@ -108,6 +108,8 @@ Client::Client(const std::string& host,
                                             (uint16_t)MMO_PROTOCOL_VERSION,
                                             session->udp_port()
                                     ));
+							
+							session->Send(network::ServerRequestedFullServerInfo());
                         }
                     }
                     break;

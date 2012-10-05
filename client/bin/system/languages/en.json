@@ -9,6 +9,7 @@
 			"status":
 				{
 					"name":					"Status",
+					"trip":					"Tripcode",
 					"nickname":				"Nickname",
 					"modelname":			"Model",
 					"user_id":				"UserID",

@@ -9,6 +9,7 @@
 			"status":
 				{
 					"name":					"ステータス",
+					"trip":					"トリップ",
 					"nickname":				"ニックネーム",
 					"modelname":			"モデル名",
 					"user_id":				"ユーザーID",

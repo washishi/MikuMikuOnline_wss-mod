@@ -37,6 +37,7 @@ class Server {
 
         bool Empty() const;
 		std::string GetStatusJSON() const;
+		std::string GetFullStatus() const;
 
         int GetSessionReadAverageLimit();
 		int GetUserCount() const;

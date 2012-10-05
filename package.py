@@ -35,7 +35,7 @@ def make_full_package(model = True):
 	zip.write(os.path.join(base_dir, 'license.txt'), 'license.txt')
 	zip.write(os.path.join(base_dir, 'mmd.txt'), 'mmd.txt')
 
-	zip.write(os.path.join(base_dir, 'server/config.json'), 'server/config.json')
+	zip.write(os.path.join(bin_path, 'server/config.json'), 'server/config.json')
 
 	zip.write(os.path.join(bin_path, 'config.json'), 'config.json')
 	zip.write(os.path.join(bin_path, 'server/server.exe'), 'server/server.exe')
@@ -91,11 +91,11 @@ def make_server_package():
 	zip = zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED)
 
 	zip.write(os.path.join(base_dir, 'license.txt'), 'license.txt')
-	zip.write(os.path.join(base_dir, 'server/config.json'), 'config.json')
 	zip.write(os.path.join(base_dir, 'server/readme.txt'), 'readme.txt')
 
 	bin_path = os.path.join(base_dir, 'client/bin/')
 	zip.write(os.path.join(bin_path, 'server/server.exe'), 'server.exe')
+	zip.write(os.path.join(bin_path, 'server/config.json'), 'config.json')
 	        
 	zip.close()
 	

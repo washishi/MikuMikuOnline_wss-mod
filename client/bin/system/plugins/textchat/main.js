@@ -17,6 +17,11 @@ var list;
 // チャットメッセージ受信
 var even_line = false;
 Network.onReceive = function (info, msg) {
+
+	if (msg.type && msg.type != "chat") {
+		return;
+	}
+
 	var trip = ""
 	if (info.player.trip()) {
 		trip = "《" + info.player.trip() + "》"
@@ -151,13 +156,14 @@ InputBox.onEnter = function (text) {
 
             // システム      
             case "system":
-                var msgObject = { system: args.trim() };
+                var msgObject = { type: "system", system: args.trim() };
                 Network.sendAll(msgObject);
                 break;
 
             // プライベート      
             case "private":
                 var msgObject = {
+                	type: "chat", 
                     private: [
                     			Player.myself().id(),
                     			Player.getFromName([args.trim()]).id()
@@ -177,7 +183,7 @@ InputBox.onEnter = function (text) {
 
     } else {
         // コマンドでない場合はそのままチャットメッセージとして送信
-        var msgObject = { body: text };
+        var msgObject = { type: "chat", body: text };
         Network.sendAll(msgObject);
     }
 

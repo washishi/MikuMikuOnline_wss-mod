@@ -28,6 +28,8 @@ namespace header {
         ServerUpdateAccountProperty =               0x13,
         ServerReceiveJSON =                         0x14,
         ClientReceiveJSON =                         0x15,
+        ServerRequestedFullServerInfo =             0x16,
+        ClientReceiveFullServerInfo =               0x17,
 		
 		ServerReceiveWriteLimit =					0x20,
 		ServerRequstedStatus =						0xE0,

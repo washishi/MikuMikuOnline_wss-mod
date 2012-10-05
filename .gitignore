@@ -17,7 +17,6 @@ log_*.txt
 /Client/bin/account.xml
 /Client/bin/config.json
 /Client/bin/Log.txt
-/Client/bin/server
 /Server/server_key.pub
 /Server/server_key
 /Server/Debug
@@ -30,7 +29,6 @@ log_*.txt
 /server/buildversion.hpp
 /server/Release
 /ServerLauncher
-/client/bin/server
 /client/bin/tool
 /client/bin/widgets
 /client/bin/models

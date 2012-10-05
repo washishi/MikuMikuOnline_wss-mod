@@ -40,22 +40,9 @@ FatalConnectionError::FatalConnectionError(uint32_t user_id) :
     body_ = Utils::Serialize(user_id);
 }
 
-ServerStartEncryptedSession::ServerStartEncryptedSession() :
-        Command(header::ServerStartEncryptedSession, "")
-{
-
-}
-
-ClientStartEncryptedSession::ClientStartEncryptedSession() :
-        Command(header::ClientStartEncryptedSession, "")
-{
-
-}
-
 ServerReceivePublicKey::ServerReceivePublicKey(const std::string& key) :
         Command(header::ServerReceivePublicKey, key)
 {
-
 }
 
 ClientReceiveCommonKey::ClientReceiveCommonKey(const std::string& key,
@@ -83,18 +70,6 @@ ServerReceiveClientInfo::ServerReceiveClientInfo(const std::string& key, uint16_
 
 }
 
-ClientRequestedPublicKey::ClientRequestedPublicKey() :
-        Command(header::ClientRequestedPublicKey, "")
-{
-
-}
-
-ClientRequestedClientInfo::ClientRequestedClientInfo() :
-        Command(header::ClientRequestedClientInfo, "")
-{
-
-}
-
 ServerRequestedAccountRevisionPatch::ServerRequestedAccountRevisionPatch(uint32_t user_id, int revision) :
                                            Command(header::ServerRequestedAccountRevisionPatch,
                                                    Utils::Serialize(user_id, revision))
@@ -116,12 +91,6 @@ ClientReceiveAccountRevisionUpdateNotify(uint32_t user_id, int revision) :
 ClientReceiveWriteAverageLimitUpdate::ClientReceiveWriteAverageLimitUpdate(uint16_t byte) :
         Command(header::ClientReceiveWriteAverageLimitUpdate, Utils::Serialize(byte))
 {
-}
-
-ClientReceiveServerCrowdedError::ClientReceiveServerCrowdedError() :
-        Command(header::ClientReceiveServerCrowdedError, "")
-{
-
 }
 
 ClientReceiveUnsupportVersionError::ClientReceiveUnsupportVersionError(uint32_t require_version) :
@@ -153,6 +122,12 @@ ClientReceiveJSON::ClientReceiveJSON(const std::string& info_json, const std::st
 
 ClientReceiveServerInfo::ClientReceiveServerInfo(const std::string& stage) :
 	Command(header::ClientReceiveServerInfo, Utils::Serialize(stage))
+{
+
+}
+
+ClientReceiveFullServerInfo::ClientReceiveFullServerInfo(const std::string& xml) :
+	Command(header::ClientReceiveFullServerInfo, Utils::Serialize(xml))
 {
 
 }

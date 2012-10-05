@@ -40,36 +40,36 @@ Config::Config()
 
 void Config::Load()
 {
-    using boost::property_tree::ptree;
-    ptree pt;
-
-    try {
-        read_json(std::ifstream(CONFIG_JSON), pt);
-    } catch(std::exception& e) {
+	try {
+		read_json(std::ifstream(CONFIG_JSON), pt_);
+	} catch(std::exception& e) {
 		Logger::Error(unicode::ToTString(e.what()));
-    }
+	}
 	
-    port_ =             pt.get<uint16_t>("port", 39390);
-    server_name_ =		pt.get<std::string>("server_name", "MMO Server");
-    stage_ =			pt.get<std::string>("stage", "stage:ケロリン町");
-    capacity_ =			pt.get<int>("capacity", 20);
+    port_ =             pt_.get<uint16_t>("port", 39390);
+    server_name_ =		pt_.get<std::string>("server_name", "MMO Server");
+	stage_ =			pt_.get<std::string>("stage", unicode::sjis2utf8("stage:ケロリン町"));
+    capacity_ =			pt_.get<int>("capacity", 20);
 
-	public_ =			pt.get<bool>("public", false);
+	public_ =			pt_.get<bool>("public", false);
 
-	receive_limit_1_ =	pt.get<int>("receive_limit_1", 60);
-	receive_limit_2_ =	pt.get<int>("receive_limit_2", 100);
+	receive_limit_1_ =	pt_.get<int>("receive_limit_1", 60);
+	receive_limit_2_ =	pt_.get<int>("receive_limit_2", 100);
 
-	auto patterns =		pt.get_child("blocking_address_patterns", ptree());
+	auto patterns =		pt_.get_child("blocking_address_patterns", ptree());
 	BOOST_FOREACH(const auto& item, patterns) {
 		blocking_address_patterns_.push_back(item.second.get_value<std::string>());
 	}
 	
-	timestamp_ = last_write_time(CONFIG_JSON);
+	if (exists(CONFIG_JSON)) {
+		timestamp_ = last_write_time(CONFIG_JSON);
+	}
 }
 
 void Config::Reload()
 {
-	if (timestamp_ < last_write_time(CONFIG_JSON)) {
+	if (exists(CONFIG_JSON) &&
+		timestamp_ < last_write_time(CONFIG_JSON)) {
 		Config::Load();
 		Logger::Info(_T("Configuration reloaded."));
 	}
@@ -112,4 +112,9 @@ int Config::receive_limit_2() const
 const std::list<std::string>& Config::blocking_address_patterns() const
 {
 	return blocking_address_patterns_;
+}
+
+const boost::property_tree::ptree& Config::pt() const
+{
+	return pt_;
 }
