@@ -40,15 +40,19 @@ Config::Config()
 
 void Config::Load()
 {
+
 	try {
-		read_json(std::ifstream(CONFIG_JSON), pt_);
+		std::ifstream ifs;
+		ifs.open(CONFIG_JSON);
+		read_json(ifs, pt_);
 	} catch(std::exception& e) {
 		Logger::Error(unicode::ToTString(e.what()));
 	}
 	
     port_ =             pt_.get<uint16_t>("port", 39390);
     server_name_ =		pt_.get<std::string>("server_name", "MMO Server");
-	stage_ =			pt_.get<std::string>("stage", unicode::sjis2utf8("stage:ケロリン町"));
+    server_note_ =		pt_.get<std::string>("server_note", "");
+	stage_ =			pt_.get<std::string>("stage", unicode::ToString(_T("stage:ケロリン町")));
     capacity_ =			pt_.get<int>("capacity", 20);
 
 	public_ =			pt_.get<bool>("public", false);
@@ -59,6 +63,11 @@ void Config::Load()
 	auto patterns =		pt_.get_child("blocking_address_patterns", ptree());
 	BOOST_FOREACH(const auto& item, patterns) {
 		blocking_address_patterns_.push_back(item.second.get_value<std::string>());
+	}
+
+	auto lobby_servers = pt_.get_child("lobby_servers", ptree());
+	BOOST_FOREACH(const auto& item, lobby_servers) {
+		lobby_servers_.push_back(item.second.get_value<std::string>());
 	}
 	
 	if (exists(CONFIG_JSON)) {
@@ -89,6 +98,16 @@ const std::string& Config::server_name() const
     return server_name_;
 }
 
+const std::string& Config::server_note() const
+{
+    return server_note_;
+}
+
+bool Config::is_public() const
+{
+	return public_;
+}
+
 const std::string& Config::stage() const
 {
     return stage_;
@@ -112,6 +131,11 @@ int Config::receive_limit_2() const
 const std::list<std::string>& Config::blocking_address_patterns() const
 {
 	return blocking_address_patterns_;
+}
+
+const std::list<std::string>& Config::lobby_servers() const
+{
+	return lobby_servers_;
 }
 
 const boost::property_tree::ptree& Config::pt() const

@@ -54,5 +54,7 @@
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
 #include <boost/foreach.hpp>
+#include <boost/circular_buffer.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include "../common/Logger.hpp"

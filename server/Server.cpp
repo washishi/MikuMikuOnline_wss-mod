@@ -13,12 +13,12 @@
 
 namespace network {
 
-    Server::Server(Config& config) :
-			config_(config),
-            endpoint_(tcp::v4(), config.port()),
+    Server::Server() :
+            endpoint_(tcp::v4(), config_.port()),
             acceptor_(io_service_, endpoint_),
-            socket_udp_(io_service_, udp::endpoint(udp::v4(), config.port())),
-            udp_packet_count_(0)
+            socket_udp_(io_service_, udp::endpoint(udp::v4(), config_.port())),
+            udp_packet_count_(0),
+			recent_chat_log_(10)
     {
     }
 
@@ -47,6 +47,12 @@ namespace network {
             }
 
         });
+
+		BOOST_FOREACH(const auto& host, config().lobby_servers()) {
+			udp::resolver resolver(io_service_);
+			udp::resolver::query query(udp::v4(), host.c_str(), "39380");
+			lobby_hosts_.push_back(resolver.resolve(query));
+		}
 
         {
         auto new_session = boost::make_shared<ServerSession>(io_service_);
@@ -105,10 +111,50 @@ namespace network {
 		ptree xml_ptree;
 
 		xml_ptree.put_child("config", config_.pt());
+		xml_ptree.put("version", (boost::format("%d.%d.%d") 
+			% MMO_VERSION_MAJOR % MMO_VERSION_MINOR % MMO_VERSION_REVISION).str());
+		xml_ptree.put("protocol_version", MMO_PROTOCOL_VERSION);
 
+		{
+			ptree player_array;
+			auto id_list = account_.GetIDList();
+			BOOST_FOREACH(unsigned int id, id_list) {
+				ptree player;
+				player.put("name", account_.GetUserName(id));
+				player.put("model_name", account_.GetUserModelName(id));
+				player_array.push_back(std::make_pair("", player));
+			}
+			xml_ptree.put_child("players", player_array);
+		}
+
+		{
+			ptree log_array;
+			BOOST_FOREACH(const std::string& msg, recent_chat_log_) {
+				log_array.push_back(std::make_pair("", msg));
+			}
+			xml_ptree.put_child("recent_chat_log", log_array);
+		}
+
+		xml_ptree.put_child("channels", channel_.pt());
+		
 		std::stringstream stream;
 		write_xml(stream, xml_ptree);
 		return stream.str();
+	}
+
+	const Config& Server::config() const
+	{
+		return config_;
+	}
+
+	Account& Server::account()
+	{
+		return account_;
+	}
+	
+	void Server::AddChatLog(const std::string& msg)
+	{
+		recent_chat_log_.push_back(msg);
 	}
 
     bool Server::Empty() const
@@ -171,7 +217,9 @@ namespace network {
             if (auto session = ptr.lock()) {
 				if (channel < 0 || (channel >= 0 && session->channel() == channel)) {
 					if (!limited || session->write_average_limit() > session->GetWriteByteAverage()) {
-						session->Send(command);
+						if (session->id() > 0) {
+							session->Send(command);
+						}
 					}
 				}
             }
@@ -184,7 +232,7 @@ namespace network {
             if (auto session = ptr.lock()) {
 				if (channel < 0 || (channel >= 0 && session->channel() == channel)) {
 					if (!limited || session->write_average_limit() > session->GetWriteByteAverage()) {
-						if (session->id() != self_id) {
+						if (session->id() > 0 && session->id() != self_id) {
 							session->Send(command);
 						}
 					}
@@ -222,6 +270,14 @@ namespace network {
             io_service_.post(boost::bind(&Server::DoWriteUDP, this, request, *iterator));
         }
     }
+
+	void Server::SendPublicPing()
+	{
+		static char request[] = "P";
+		BOOST_FOREACH(const auto& iterator, lobby_hosts_) {
+			io_service_.post(boost::bind(&Server::DoWriteUDP, this, request, *iterator));
+		}
+	}
 
     void Server::SendUDP(const std::string& message, const boost::asio::ip::udp::endpoint endpoint)
     {

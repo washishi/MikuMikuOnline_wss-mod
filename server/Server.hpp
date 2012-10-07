@@ -7,8 +7,11 @@
 #include <string>
 #include <list>
 #include <functional>
+#include <boost/circular_buffer.hpp>
 #include "../common/network/Session.hpp"
 #include "Config.hpp"
+#include "Account.hpp"
+#include "Channel.hpp"
 
 #define UDP_MAX_RECEIVE_LENGTH (2048)
 #define UDP_TEST_PACKET_TIME (5)
@@ -26,7 +29,7 @@ class Server {
         };
 
     public:
-        Server(Config& config);
+        Server();
         void Start(CallbackFuncPtr callback);
         void Stop();
         void Stop(int interrupt_type);
@@ -39,12 +42,18 @@ class Server {
 		std::string GetStatusJSON() const;
 		std::string GetFullStatus() const;
 
+		const Config& config() const;
+		Account& account();
+
+		void AddChatLog(const std::string& msg);
+
         int GetSessionReadAverageLimit();
 		int GetUserCount() const;
 		void RefreshSession();
 
         void SendUDPTestPacket(const std::string& ip_address, uint16_t port);
 		void SendUDP(const std::string& message, const boost::asio::ip::udp::endpoint endpoint);
+		void SendPublicPing();
 
 		bool IsBlockedAddress(const boost::asio::ip::address& address);
 
@@ -58,7 +67,9 @@ class Server {
         void FetchUDP(const std::string& buffer, const boost::asio::ip::udp::endpoint endpoint);
 
     private:
-	   Config& config_;
+	   Config config_;
+	   Account account_;
+	   Channel channel_;
 
        boost::asio::io_service io_service_;
        tcp::endpoint endpoint_;
@@ -74,6 +85,9 @@ class Server {
 
        boost::mutex mutex_;
        std::list<SessionWeakPtr> sessions_;
+
+	   boost::circular_buffer<std::string> recent_chat_log_;
+	   std::list<udp::resolver::iterator> lobby_hosts_;
 
 };
 

@@ -16,7 +16,6 @@
 #include "../common/database/AccountProperty.hpp"
 #include "../common/Logger.hpp"
 #include "Config.hpp"
-#include "Account.hpp"
 #include "version.hpp"
 
 #ifdef __linux__
@@ -32,6 +31,7 @@
 using namespace boost::posix_time;
 
 void client_sync(network::Server& server);
+void public_ping(network::Server& server);
 void server();
 
 int main(int argc, char* argv[])
@@ -58,18 +58,14 @@ int main(int argc, char* argv[])
 void server()
 {
 
-    // 設定を読み込み
-    Config config;
-
     // 署名
     network::Signature sign("server_key");
 
     // アカウント
-    Account account("account.db");
-    network::Server server(config);
+    network::Server server;
 
     auto callback = std::make_shared<std::function<void(network::Command)>>(
-            [&server, &account, &sign, &config](network::Command c){
+            [&server, &sign](network::Command c){
 
         // ログを出力
         auto msg = (boost::format("Receive: 0x%08x %dbyte") % c.header() % c.body().size()).str();
@@ -80,14 +76,21 @@ void server()
         // if (auto session = c.session().lock()) {
         //     std::cout << "Write Average: " << session->GetReadByteAverage() << "bytes" << std::endl;
         // }
-
+		auto header = c.header();
         switch (c.header()) {
 
-		// フルステータス要求
 		case network::header::ServerRequestedFullServerInfo:
 		{
 			if (auto session = c.session().lock()) {
 				session->Send(network::ClientReceiveFullServerInfo(server.GetFullStatus()));
+			}
+		}
+		break;
+
+		case network::header::ServerRequestedPlainFullServerInfo:
+		{
+			if (auto session = c.session().lock()) {
+				session->Send(network::ClientReceivePlainFullServerInfo(server.GetFullStatus()));
 			}
 		}
 		break;
@@ -139,6 +142,10 @@ void server()
 						server.SendTo(send_command, user_id);
 					}
 				} else {
+					auto name = server.account().GetUserName(id);
+					auto body = message_tree.get<std::string>("body", std::string());
+					server.AddChatLog((boost::format("[%s] %s") % name % body).str());
+
 					server.SendAll(send_command, session->channel());
 				}
 
@@ -154,7 +161,7 @@ void server()
             if (auto session = c.session().lock()) {
                 PlayerPosition pos;
                 network::Utils::Deserialize(c.body(), &pos.x, &pos.y, &pos.z, &pos.theta, &pos.vy);
-                account.SetUserPosition(session->id(), pos);
+                server.account().SetUserPosition(session->id(), pos);
                 server.SendOthers(network::ClientUpdatePlayerPosition(session->id(),
 					pos.x,pos.y,pos.z,pos.theta, pos.vy), session->id(), session->channel(), true);
             }
@@ -167,7 +174,7 @@ void server()
             if (auto session = c.session().lock()) {
 
 				// 最大接続数を超えていないか判定
-				if (server.GetUserCount() >= config.capacity()) {
+				if (server.GetUserCount() >= server.config().capacity()) {
 					Logger::Info("Refused Session");
 					session->SyncSend(network::ClientReceiveServerCrowdedError());
 					session->Close();
@@ -197,7 +204,7 @@ void server()
                 // テスト送信
                 server.SendUDPTestPacket(session->global_ip(), session->udp_port());
 
-                uint32_t id = account.GetUserIdFromFingerPrint(finger_print);
+                uint32_t id = server.account().GetUserIdFromFingerPrint(finger_print);
                 if (id == 0) {
                     // 未登録の場合、公開鍵を要求
                     session->Send(network::ClientRequestedPublicKey());
@@ -205,11 +212,11 @@ void server()
                     uint32_t user_id = static_cast<uint32_t>(id);
                     // ログイン
                     session->set_id(user_id);
-                    account.LogIn(user_id);
-                    session->encrypter().SetPublicKey(account.GetPublicKey(user_id));
+                    server.account().LogIn(user_id);
+                    session->encrypter().SetPublicKey(server.account().GetPublicKey(user_id));
 
-                    account.SetUserIPAddress(session->id(), session->global_ip());
-                    account.SetUserUDPPort(session->id(), session->udp_port());
+                    server.account().SetUserIPAddress(session->id(), session->global_ip());
+                    server.account().SetUserUDPPort(session->id(), session->udp_port());
 
                     // 共通鍵を送り返す
                     auto key = session->encrypter().GetCryptedCommonKey();
@@ -225,18 +232,18 @@ void server()
         case network::header::ServerReceivePublicKey:
         {
             if (auto session = c.session().lock()) {
-                uint32_t user_id = account.RegisterPublicKey(c.body());
+                uint32_t user_id = server.account().RegisterPublicKey(c.body());
 				assert(user_id > 0);
 
 				session->ResetReadByteAverage();
 
                 // ログイン
                 session->set_id(user_id);
-                account.LogIn(user_id);
-                session->encrypter().SetPublicKey(account.GetPublicKey(user_id));
+                server.account().LogIn(user_id);
+                session->encrypter().SetPublicKey(server.account().GetPublicKey(user_id));
 
-                account.SetUserIPAddress(session->id(), session->global_ip());
-                account.SetUserUDPPort(session->id(), session->udp_port());
+                server.account().SetUserIPAddress(session->id(), session->global_ip());
+                server.account().SetUserUDPPort(session->id(), session->udp_port());
 
                 // 共通鍵を送り返す
                 auto key = session->encrypter().GetCryptedCommonKey();
@@ -252,7 +259,7 @@ void server()
         {
             if (auto session = c.session().lock()) {
 				
-				session->Send(network::ClientReceiveServerInfo(config.stage()));
+				session->Send(network::ClientReceiveServerInfo(server.config().stage()));
 
                 session->Send(network::ClientStartEncryptedSession());
                 session->EnableEncryption();
@@ -266,17 +273,17 @@ void server()
         case network::header::ServerReceiveAccountInitializeData:
         {
             if (auto session = c.session().lock()) {
-                account.LoadInitializeData(session->id(), c.body());
+                server.account().LoadInitializeData(session->id(), c.body());
 
-                const auto& list = account.GetIDList();
+                const auto& list = server.account().GetIDList();
                 BOOST_FOREACH(UserID user_id, list) {
                     session->Send(network::ClientReceiveAccountRevisionUpdateNotify(user_id,
-                            account.GetUserRevision(user_id)));
+                            server.account().GetUserRevision(user_id)));
                 }
 
                 server.SendOthers(
                         network::ClientReceiveAccountRevisionUpdateNotify(session->id(),
-                                account.GetUserRevision(session->id())), session->id());
+                                server.account().GetUserRevision(session->id())), session->id());
 
                 Logger::Info(msg);
             }
@@ -291,9 +298,9 @@ void server()
                 uint32_t client_revision;
                 network::Utils::Deserialize(c.body(), &user_id, &client_revision);
 
-                if (client_revision < account.GetUserRevision(user_id)) {
+                if (client_revision < server.account().GetUserRevision(user_id)) {
                     session->Send(network::ClientReceiveAccountRevisionPatch(
-                            account.GetUserRevisionPatch(user_id, client_revision)));
+                            server.account().GetUserRevisionPatch(user_id, client_revision)));
                 }
                 Logger::Info(msg);
             }
@@ -307,7 +314,7 @@ void server()
 				std::string buffer = c.body().substr(sizeof(AccountProperty));
                 network::Utils::Deserialize(c.body(), &property);
 
-                auto old_revision = account.GetUserRevision(session->id());
+                auto old_revision = server.account().GetUserRevision(session->id());
 
                 switch (property) {
 
@@ -315,36 +322,37 @@ void server()
                     {
 						std::string value;
 						network::Utils::Deserialize(buffer, &value);
-                        account.SetUserName(session->id(), value);
+                        server.account().SetUserName(session->id(), value);
                     }
                     break;
                 case TRIP:
                     {
 						std::string value;
 						network::Utils::Deserialize(buffer, &value);
-                        account.SetUserTrip(session->id(), value);
+                        server.account().SetUserTrip(session->id(), value);
                     }
                     break;
                 case MODEL_NAME:
                     {
 						std::string value;
 						network::Utils::Deserialize(buffer, &value);
-                        account.SetUserModelName(session->id(), value);
+                        server.account().SetUserModelName(session->id(), value);
                     }
                     break;
-      //          case CHANNEL:
-      //              {
-						//unsigned char value;
-						//network::Utils::Deserialize(buffer, &value);
-      //                  account.SetUserChannel(session->id(), value);
-						//session->set_channel(value);
-      //              }
-      //              break;
+                case CHANNEL:
+                    {
+						std::string value;
+						network::Utils::Deserialize(buffer, &value);
+						auto channel = *reinterpret_cast<const unsigned int*>(value.data());
+                        server.account().SetUserChannel(session->id(), channel);
+						session->set_channel(channel);
+                    }
+                    break;
                 default:
                     ;
                 }
 
-                auto new_revison = account.GetUserRevision(session->id());
+                auto new_revison = server.account().GetUserRevision(session->id());
                 if (new_revison > old_revision) {
                     server.SendAll(
                             network::ClientReceiveAccountRevisionUpdateNotify(
@@ -362,14 +370,14 @@ void server()
             if (c.body().size() > 0) {
                 int user_id;
                 network::Utils::Deserialize(c.body(), &user_id);
-                account.LogOut(user_id);
+                server.account().LogOut(user_id);
 
                 server.SendAll(
                         network::ClientReceiveAccountRevisionUpdateNotify(user_id,
-                                account.GetUserRevision(user_id)));
+                                server.account().GetUserRevision(user_id)));
 
                 Logger::Info("Logout User: %d", user_id);
-				account.Remove(user_id);
+				server.account().Remove(user_id);
             }
         }
         Logger::Info(msg);
@@ -382,7 +390,22 @@ void server()
     });
 
 	client_sync(server);
+
+	if (server.config().is_public()) {
+		public_ping(server);
+	}
+
     server.Start(callback);
+}
+
+void public_ping(network::Server& server)
+{
+    boost::thread([&server](){
+        while (1) {
+            boost::this_thread::sleep(boost::posix_time::seconds(10));
+			server.SendPublicPing();
+        }
+    });
 }
 
 void client_sync(network::Server& server)
@@ -404,7 +427,7 @@ void client_sync(network::Server& server)
     if (execute_with_client) {
         boost::thread([&server](){
             while (1) {
-                boost::this_thread::sleep(boost::posix_time::milliseconds(4000));
+                boost::this_thread::sleep(boost::posix_time::seconds(4));
                 try {
 					using namespace boost::interprocess;
 					windows_shared_memory shm(open_only, "MMO_SERVER_WITH_CLIENT", read_only);

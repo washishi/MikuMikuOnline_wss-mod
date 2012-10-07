@@ -1,6 +1,15 @@
 {
 	"port": 39390,
+	
 	"server_name": "MMO Server",
+	"server_note": "MikuMikuOnlineのサーバーです",
+	
+	"public": true,
+	"lobby_servers":
+		[
+			"m2op.net"
+		],
+	
 	"stage": "stage:ケロリン町",
 	"capacity": 20,
 	

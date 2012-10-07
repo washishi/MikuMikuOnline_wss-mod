@@ -81,7 +81,7 @@ namespace network {
             void UpdateReadByteAverage();
             void UpdateWriteByteAverage();
 
-            std::string Serialize(const Command& command);
+            std::string Serialize(const Command& command, bool plain);
             Command Deserialize(const std::string& msg);
 
             void ReceiveTCP(const boost::system::error_code& error);

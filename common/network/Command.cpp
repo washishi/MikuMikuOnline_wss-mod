@@ -28,6 +28,11 @@ boost::asio::ip::udp::endpoint Command::udp_endpoint() const
 	return udp_endpoint_;
 }
 
+bool Command::plain() const
+{
+	return plain_;
+}
+
 FatalConnectionError::FatalConnectionError() :
         Command(header::FatalConnectionError, "")
 {
@@ -130,6 +135,12 @@ ClientReceiveFullServerInfo::ClientReceiveFullServerInfo(const std::string& xml)
 	Command(header::ClientReceiveFullServerInfo, Utils::Serialize(xml))
 {
 
+}
+
+ClientReceivePlainFullServerInfo::ClientReceivePlainFullServerInfo(const std::string& xml) :
+	Command(header::ClientReceivePlainFullServerInfo, Utils::Serialize(xml))
+{
+	plain_ = true;
 }
 
 }

@@ -43,7 +43,7 @@ namespace network {
 
     void Session::Send(const Command& command)
     {
-        auto msg = Serialize(command);
+        auto msg = Serialize(command, command.plain());
         write_byte_sum_ += msg.size();
         UpdateWriteByteAverage();
 
@@ -54,7 +54,7 @@ namespace network {
 
     void Session::SyncSend(const Command& command)
     {
-        auto msg = Serialize(command);
+        auto msg = Serialize(command, command.plain());
         write_byte_sum_ += msg.size();
         UpdateWriteByteAverage();
 
@@ -194,7 +194,7 @@ namespace network {
 		write_average_limit_ = limit;
 	}
 
-    std::string Session::Serialize(const Command& command)
+    std::string Session::Serialize(const Command& command, bool plain)
     {
         assert(command.header() < 0xFF);
         auto header = static_cast<uint8_t>(command.header());
@@ -202,24 +202,29 @@ namespace network {
 
         std::string msg = Utils::Serialize(header) + body;
 
-        // 圧縮
-        if (body.size() >= COMPRESS_MIN_LENGTH) {
-            auto compressed = Utils::LZ4Compress(msg);
-            if (msg.size() > compressed.size() + sizeof(uint8_t)) {
-                assert(msg.size() < 65535);
-                msg = Utils::Serialize(static_cast<uint8_t>(header::LZ4_COMPRESS_HEADER),
-                    static_cast<uint16_t>(msg.size()))
-                    + compressed;
-            }
-        }
+		if (plain) {
+			auto length = Utils::Serialize(static_cast<unsigned int>(msg.size()));
+			return length + msg;
+		} else {
+			// 圧縮
+			if (body.size() >= COMPRESS_MIN_LENGTH) {
+				auto compressed = Utils::LZ4Compress(msg);
+				if (msg.size() > compressed.size() + sizeof(uint8_t)) {
+					assert(msg.size() < 65535);
+					msg = Utils::Serialize(static_cast<uint8_t>(header::LZ4_COMPRESS_HEADER),
+						static_cast<uint16_t>(msg.size()))
+						+ compressed;
+				}
+			}
 
-        // 暗号化
-        if (encryption_) {
-            msg = Utils::Serialize(static_cast<uint8_t>(header::ENCRYPT_HEADER))
-                + encrypter_.Encrypt(msg);
-        }
+			// 暗号化
+			if (encryption_) {
+				msg = Utils::Serialize(static_cast<uint8_t>(header::ENCRYPT_HEADER))
+					+ encrypter_.Encrypt(msg);
+			}
+			return Utils::Encode(msg);
+		}
 
-        return Utils::Encode(msg);
     }
 
     Command Session::Deserialize(const std::string& msg)
@@ -247,7 +252,7 @@ namespace network {
 
         std::string body = decoded_msg.substr(sizeof(header));
 
-        return Command(static_cast<header::CommandHeader>(header), body, shared_from_this());
+		return Command(static_cast<header::CommandHeader>(header), body, shared_from_this());
     }
 
     void Session::ReceiveTCP(const boost::system::error_code& error)

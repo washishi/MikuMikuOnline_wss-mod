@@ -19,20 +19,25 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
 
     class Command {
         public:
-            Command(header::CommandHeader header, const std::string body) :
-                header_(header), body_(body) {}
+            Command(header::CommandHeader header,
+				const std::string body) :
+                header_(header), body_(body), plain_(false) {}
 
-            Command(header::CommandHeader header, const std::string body, const SessionWeakPtr& session) :
-                header_(header), body_(body), session_(session) {}
+            Command(header::CommandHeader header,
+				const std::string body,
+				const SessionWeakPtr& session) :
+                header_(header), body_(body), session_(session), plain_(false) {}
 
-            Command(header::CommandHeader header, const std::string body,
+            Command(header::CommandHeader header,
+				const std::string body,
 				const boost::asio::ip::udp::endpoint& udp_endpoint) :
-                header_(header), body_(body), udp_endpoint_(udp_endpoint) {}
+                header_(header), body_(body), udp_endpoint_(udp_endpoint), plain_(false) {}
 
             header::CommandHeader header() const;
             const std::string& body() const;
             SessionWeakPtr session();
 			boost::asio::ip::udp::endpoint udp_endpoint() const;
+			bool plain() const;
 
         private:
             header::CommandHeader header_;
@@ -41,6 +46,7 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
             std::string body_;
             SessionWeakPtr session_;
 			boost::asio::ip::udp::endpoint udp_endpoint_;
+			bool plain_;
     };
 
 	template<header::CommandHeader Header>
@@ -56,6 +62,7 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
 	typedef CommandTemplate<header::ClientRequestedClientInfo>			ClientRequestedClientInfo;
 	typedef CommandTemplate<header::ClientReceiveServerCrowdedError>	ClientReceiveServerCrowdedError;
 	typedef CommandTemplate<header::ServerRequestedFullServerInfo>		ServerRequestedFullServerInfo;
+	typedef CommandTemplate<header::ServerRequestedPlainFullServerInfo>	ServerRequestedPlainFullServerInfo;
 
     // コネクションの切断
     class FatalConnectionError : public Command {
@@ -153,4 +160,8 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
         ClientReceiveFullServerInfo(const std::string& xml);
 	};
 
+	class ClientReceivePlainFullServerInfo : public Command {
+    public:
+        ClientReceivePlainFullServerInfo(const std::string& xml);
+	};
 }

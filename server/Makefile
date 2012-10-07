@@ -15,6 +15,7 @@ OBJS += $(patsubst %.c,%.o,$(wildcard ../common/network/lz4/*.c))
 
 all: stdafx.h.gch $(OBJS)
 	$(LD) $(CXXFLAGS) -o $(TARGET) $(OBJS) $(LIBS) $(LIBDIRS)
+	cp ../client/bin/server/config.json .
 
 clean:
 	@rm -f $(OBJS) $(TARGET) stdafx.h.gch

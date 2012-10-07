@@ -32,6 +32,10 @@ namespace header {
         ClientReceiveFullServerInfo =               0x17,
 		
 		ServerReceiveWriteLimit =					0x20,
+		
+        ServerRequestedPlainFullServerInfo =        0x40,
+        ClientReceivePlainFullServerInfo =			0x41,
+
 		ServerRequstedStatus =						0xE0,
 
         LZ4_COMPRESS_HEADER =                       0xF0,

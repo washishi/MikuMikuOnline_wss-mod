@@ -9,7 +9,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <assert.h>
 
-Account::Account(const std::string& logfile) :
+Account::Account() :
 revision_(0),
 max_user_id_(0)
 {

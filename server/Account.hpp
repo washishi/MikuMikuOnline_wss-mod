@@ -15,10 +15,11 @@
 #include <boost/thread.hpp>
 
 typedef uint32_t UserID;
+#undef GetUserName
 
 class Account {
     public:
-        Account(const std::string&);
+        Account();
         ~Account();
 
         void LoadInitializeData(UserID user_id, std::string data);
