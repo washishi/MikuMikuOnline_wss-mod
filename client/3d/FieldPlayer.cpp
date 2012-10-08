@@ -45,7 +45,7 @@ FieldPlayer::FieldPlayer(CharacterDataProvider& data_provider, const StagePtr& s
 		jump_wait_(false),
         camera_roty_(nullptr)
 {
-	shadow_handle_ = LoadGraph( _T(".\\resources\\textures\\shadow.tga") );
+	shadow_handle_ = LoadGraph( _T("./system/textures/shadow.tga") );
 }
 
 void FieldPlayer::Chara_ShadowRender() const

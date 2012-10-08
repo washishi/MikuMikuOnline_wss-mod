@@ -1,4 +1,4 @@
-﻿//
+//
 // Server.cpp
 //
 
@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <boost/make_shared.hpp>
 #include <boost/foreach.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/property_tree/ptree_serialization.hpp>
 #include "../common/Logger.hpp"
 #include "../common/network/Command.hpp"
 #include "../common/network/Utils.hpp"
@@ -86,7 +88,9 @@ namespace network {
 	int Server::GetUserCount() const
 	{
 		auto count = std::count_if(sessions_.begin(), sessions_.end(),
-			[](const SessionWeakPtr& s){ return !s.expired() && s.lock()->online(); });
+			[](const SessionWeakPtr& s){ 
+				return !s.expired() && s.lock()->online() && s.lock()->id() > 0; 
+			});
 
 		return count;
 	}
@@ -118,27 +122,31 @@ namespace network {
 		{
 			ptree player_array;
 			auto id_list = account_.GetIDList();
-			BOOST_FOREACH(unsigned int id, id_list) {
-				ptree player;
-				player.put("name", account_.GetUserName(id));
-				player.put("model_name", account_.GetUserModelName(id));
-				player_array.push_back(std::make_pair("", player));
+			BOOST_FOREACH(const auto& s, sessions_) {
+				if (!s.expired() && s.lock()->online() && s.lock()->id() > 0) {
+					auto id = s.lock()->id();
+					ptree player;
+					player.put("name", account_.GetUserName(id));
+					player.put("model_name", account_.GetUserModelName(id));
+					player_array.push_back(std::make_pair("", player));
+				}
 			}
 			xml_ptree.put_child("players", player_array);
 		}
 
-		{
-			ptree log_array;
-			BOOST_FOREACH(const std::string& msg, recent_chat_log_) {
-				log_array.push_back(std::make_pair("", msg));
-			}
-			xml_ptree.put_child("recent_chat_log", log_array);
-		}
+		//{
+		//	ptree log_array;
+		//	BOOST_FOREACH(const std::string& msg, recent_chat_log_) {
+		//		log_array.push_back(std::make_pair("", msg));
+		//	}
+		//	xml_ptree.put_child("recent_chat_log", log_array);
+		//}
 
 		xml_ptree.put_child("channels", channel_.pt());
-		
 		std::stringstream stream;
-		write_xml(stream, xml_ptree);
+		boost::archive::text_oarchive oa(stream);
+		oa << xml_ptree;
+
 		return stream.str();
 	}
 

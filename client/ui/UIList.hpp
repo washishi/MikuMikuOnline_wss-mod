@@ -18,7 +18,7 @@ class UIList : public UIBase {
         void Draw();
 
     public:
-        static void DefineInstanceTemplate(Handle<ObjectTemplate>* object);
+        static void                           DefineInstanceTemplate(Handle<ObjectTemplate>* object);
 
     private:
         /* function */

@@ -288,6 +288,12 @@ StatusTab::StatusTab(const ManagerAccessorPtr& manager_accessor) :
 			return unicode::ToTString(account_manager->model_name());
 		}), manager_accessor_));
 
+	items_.push_back(std::make_shared<TextItem>(_LT("option.status.channel"),
+		std::make_shared<std::function<tstring(void)>>(
+		[player_manager](){
+			return (tformat(_T("%d")) % static_cast<int>(player_manager->GetMyself()->channel())).str();
+		}), manager_accessor_));
+
 	items_.push_back(std::make_shared<TextItem>(_LT("option.status.user_id"),
 		std::make_shared<std::function<tstring(void)>>(
 		[command_manager](){

@@ -435,8 +435,8 @@ Handle<Value> Card::Function_Account_updateChannel(const Arguments& args)
 
 		if (channel >= 0 && channel <= UCHAR_MAX) {
 			if (auto command_manager = self->manager_accessor_->command_manager().lock()) {
-				auto channel_str = network::Utils::Serialize((unsigned char)channel);
-				command_manager->Write(network::ServerUpdateAccountProperty(CHANNEL, channel_str));
+				auto channel_str = (unsigned char)channel;
+				command_manager->Write(network::ServerUpdateAccountProperty(CHANNEL, network::Utils::Serialize(channel_str)));
 			}
 		}
     }

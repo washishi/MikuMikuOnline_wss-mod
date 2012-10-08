@@ -88,8 +88,19 @@ void CommandManager::FetchCommand(const network::Command& command)
 	// サーバーデータ受信
 	case ClientReceiveFullServerInfo:
 	{
-		std::string xml;
-		network::Utils::Deserialize(command.body(), &xml);
+		using namespace boost::property_tree;
+		std::string buffer;
+		network::Utils::Deserialize(command.body(), &buffer);
+		std::stringstream stream(buffer);
+		ptree pt;
+		try {
+			boost::archive::text_iarchive ia(stream);
+			ia >> pt;
+		} catch (std::exception& e) {
+			Logger::Error(_T("%s"), unicode::ToTString(e.what()));
+		}
+
+		auto channels = pt.get_child("channels", ptree());
 	}
 	break;
 

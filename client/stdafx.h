@@ -73,6 +73,11 @@
 #include <boost/format.hpp>
 #include <boost/thread.hpp>
 #include <boost/foreach.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/property_tree/ptree_serialization.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/serialization/string.hpp>
 
 #include "../common/Logger.hpp"
 #include "Language.hpp"

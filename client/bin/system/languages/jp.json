@@ -13,6 +13,7 @@
 					"nickname":				"ニックネーム",
 					"modelname":			"モデル名",
 					"user_id":				"ユーザーID",
+					"channel":				"チャンネル",
 					"stage":				"ステージ",
 					"position":				"座標",
 					"receive_average":		"平均受信量",

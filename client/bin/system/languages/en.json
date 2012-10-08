@@ -13,6 +13,7 @@
 					"nickname":				"Nickname",
 					"modelname":			"Model",
 					"user_id":				"UserID",
+					"channel":				"Channel",
 					"stage":				"Stage",
 					"position":				"Position",
 					"receive_average":		"Received average",
