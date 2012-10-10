@@ -4,6 +4,7 @@ LD = g++
 
 CXXFLAGS = -g -ggdb -Wall -std=gnu++0x -I/usr/include/cryptopp
 LIBS = -lcryptopp -lboost_system -lboost_thread -lboost_date_time -lboost_filesystem -lboost_regex \
+ -lboost_serialization \
  -lpthread -lssl -ldl -lrt
 LIBDIRS = -L/usr/lib -L/usr/local/lib
 
