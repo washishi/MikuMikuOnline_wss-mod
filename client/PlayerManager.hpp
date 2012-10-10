@@ -15,6 +15,9 @@ class CharacterDataProvider;
 class Timer;
 typedef std::shared_ptr<Timer> TimerPtr;
 
+class Stage;
+typedef std::shared_ptr<Stage> StagePtr;
+
 class InputManager;
 
 class PlayerManager : public std::enable_shared_from_this<PlayerManager> {
@@ -50,6 +53,8 @@ class PlayerManager : public std::enable_shared_from_this<PlayerManager> {
 
         std::shared_ptr<CharacterManager> charmgr_;
         std::map<unsigned int, std::unique_ptr<CharacterDataProvider>> char_data_providers_;
+
+		const std::shared_ptr<StagePtr> stage_ptr_holder_;
 
         int font_handle_;
         std::array<int, 4> name_tip_image_handle_;

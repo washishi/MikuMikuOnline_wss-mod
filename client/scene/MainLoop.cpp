@@ -5,6 +5,7 @@
 #include "MainLoop.hpp"
 #include "Option.hpp"
 #include "Dashboard.hpp"
+#include "ChannelChange.hpp"
 #include <vector>
 #include <algorithm>
 #include "../ResourceManager.hpp"
@@ -17,10 +18,10 @@
 namespace scene {
 MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
       manager_accessor_(manager_accessor),
-      player_manager_(std::make_shared<PlayerManager>(manager_accessor_)),
+      player_manager_(manager_accessor->player_manager().lock()),
       card_manager_(manager_accessor->card_manager().lock()),
       command_manager_(manager_accessor->command_manager().lock()),
-      world_manager_(std::make_shared<WorldManager>(manager_accessor_)),
+      world_manager_(manager_accessor->world_manager().lock()),
       account_manager_(manager_accessor->account_manager().lock()),
       config_manager_(manager_accessor->config_manager().lock()),
       window_manager_(std::make_shared<WindowManager>(manager_accessor_)),
@@ -29,8 +30,6 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
 	  snapshot_number_(0),
 	  snapshot_(false)
 {
-    manager_accessor_->set_player_manager(player_manager_);
-    manager_accessor_->set_world_manager(world_manager_);
     manager_accessor_->set_window_manager(window_manager_);
 
     inputbox_->ReloadTabs();
@@ -98,6 +97,18 @@ void MainLoop::ProcessInput(InputManager* input)
 		snapshot_ = true;
 	}
 
+	if (const auto& channel = command_manager_->current_channel()) {
+		BOOST_FOREACH(const auto& warp_point, channel->warp_points) {
+			auto point = VGet(warp_point.x, warp_point.y + 30, warp_point.z);
+			const auto& pos = player_manager_->GetMyself()->position();
+
+			auto distance = VSize(VGet(warp_point.x - pos.x, warp_point.y - pos.y, warp_point.z - pos.z));
+			if (distance < 50 && input->GetKeyCount(KEY_INPUT_M) == 1) {
+				next_scene_ = std::make_shared<scene::ChannelChange>(warp_point.channel, manager_accessor_);
+			}
+		}
+	}
+
 }
 
 void MainLoop::Draw()
@@ -128,6 +139,38 @@ void MainLoop::Draw()
 		SaveDrawScreenToPNG( 0, 0, config_manager_->screen_width(), config_manager_->screen_height(),tmp_str);
 		snapshot_number_++;
 		snapshot_ = false;
+	}
+	
+	if (const auto& channel = command_manager_->current_channel()) {
+		BOOST_FOREACH(const auto& warp_point, channel->warp_points) {
+			auto point = VGet(warp_point.x, warp_point.y + 30, warp_point.z);
+			const auto& pos = player_manager_->GetMyself()->position();
+
+			auto distance = VSize(VGet(warp_point.x - pos.x, warp_point.y - pos.y, warp_point.z - pos.z));
+
+			if (world_manager_->stage()->IsVisiblePoint(point)) {
+				auto screen_pos = ConvWorldPosToScreenPos(point);
+				int x = (screen_pos.x / 2) * 2;
+				int y = (screen_pos.y / 2) * 2 - 16;
+
+				UILabel label_;
+				label_.set_width(160);
+				if (distance < 50) {
+					label_.set_text(unicode::ToTString(warp_point.name) + _T("\n‚lƒL[‚Å“]‘—‚µ‚Ü‚·"));
+					label_.set_bgcolor(UIBase::Color(255,0,0,150));
+				} else {
+					label_.set_text(unicode::ToTString(warp_point.name));
+					label_.set_bgcolor(UIBase::Color(0,0,0,150));
+				}
+				label_.set_textcolor(UIBase::Color(255,255,255,255));
+
+				label_.set_left(x - 60);
+				label_.set_top(y + 10);
+
+				label_.Update();
+				label_.Draw();
+			}
+		}
 	}
 }
 

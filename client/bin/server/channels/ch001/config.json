@@ -1,0 +1,12 @@
+{
+	"name": "ゲキド街チャンネル",
+	"stage": "stage:ゲキド街",
+	"capacity": 25,
+	"warp_points":
+		[
+			{
+				"position": {"x": 0, "y": 0, "z": 0},
+				"channel": 0
+			}
+		]
+}

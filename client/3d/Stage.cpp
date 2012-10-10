@@ -5,13 +5,15 @@
 #include "Stage.hpp"
 #include "../../common/Logger.hpp"
 #include "../Profiler.hpp"
+#include "../CommandManager.hpp"
 #include <string>
 
-Stage::Stage(const tstring& model_name) :
-    map_handle_(ResourceManager::LoadModelFromName(model_name)),
+Stage::Stage(const ChannelPtr& channel) :
+    map_handle_(ResourceManager::LoadModelFromName(unicode::ToTString(channel->stage))),
     map_scale_(map_handle_.property().get<float>("scale", 20.0)),
 	min_height_(map_handle_.property().get<float>("min_height", -200.0)),
-	host_change_flag_(false)
+	host_change_flag_(false),
+	channel_(channel)
 	{
     MV1SetScale(map_handle_.handle(), VGet(map_scale_, map_scale_, map_scale_));
     MV1SetupCollInfo(map_handle_.handle(), -1, 128, 64, 128);// 元の数値は256,256,256
@@ -34,6 +36,15 @@ Stage::Stage(const tstring& model_name) :
 			draw_after_meshes_.insert(i);
 		}
 	}
+
+	BOOST_FOREACH(const auto& warp_point, channel_->warp_points) {
+		auto handle = ResourceManager::LoadModelFromName(_T("warpobj:ワープオブジェクト"));
+		float scale = handle.property().get<float>("scale", 80.0);
+		MV1SetPosition(handle.handle(), VGet(warp_point.x, warp_point.y, warp_point.z));
+		MV1SetScale(handle.handle(), VGet(scale, scale, scale));
+		warpobj_handles_.push_back(handle);
+	}
+
 	/*
     auto warp_points_array = map_handle_.property().get_child("stage.warp_points", ptree());
     for (auto it = warp_points_array.begin(); it != warp_points_array.end(); ++it) {
@@ -84,6 +95,10 @@ void Stage::Draw()
 	}
 
     MV1DrawModel(skymap_handle_.handle());
+
+	BOOST_FOREACH(const auto& warp_point_handle, warpobj_handles_) {
+		MV1DrawModel(warp_point_handle.handle());
+	}
 
 	/*
 	BOOST_FOREACH(auto warp_handle,warpobj_array_)

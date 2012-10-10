@@ -10,7 +10,7 @@
 class PlayerCharacter : public Character
 {
 public:
-    PlayerCharacter(CharacterDataProvider& data_provider, const StagePtr& stage, const TimerPtr& timer);
+    PlayerCharacter(CharacterDataProvider& data_provider, const std::shared_ptr<const StagePtr>& stage, const TimerPtr& timer);
     virtual ~PlayerCharacter();
 
     void Draw() const;

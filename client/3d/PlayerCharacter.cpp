@@ -24,7 +24,7 @@ inline bool NearlyEqualRelative(const T& lhs, const T& rhs, const U& ratio)
 class PlayerCharacter::Impl
 {
 public:
-    Impl(CharacterDataProvider& data_provider, const StagePtr& stage, const TimerPtr& timer)
+    Impl(CharacterDataProvider& data_provider, const std::shared_ptr<const StagePtr>& stage, const TimerPtr& timer)
         : data_provider_(data_provider),
           model_handle_(-1),
           current_target_pos_(VGet(0, 1000, 0)),
@@ -67,8 +67,8 @@ public:
 		MV1_COLL_RESULT_POLY *HitRes ;
 		VERTEX3D Vertex[ 3 ] ;
 		VECTOR SlideVec ;
-		auto shadow_height = model_height_*stage_->map_scale();
-		auto shadow_size = shadow_size_ * stage_->map_scale();
+		auto shadow_height = model_height_ * (*stage_)->map_scale();
+		auto shadow_size = shadow_size_ * (*stage_)->map_scale();
 
 		// ライティングを無効にする
 		SetUseLighting( FALSE ) ;
@@ -80,7 +80,7 @@ public:
 		SetTextureAddressMode( DX_TEXADDRESS_CLAMP ) ;
 
 		// キャラクターの直下に存在する地面のポリゴンを取得
-		HitResDim = MV1CollCheck_Capsule( stage_->map_handle().handle(), -1, VAdd( current_pos_, VGet( 0.0f, 0.5f * shadow_height, 0.0f ) ), VAdd( current_pos_, VGet( 0.0f, -shadow_height, 0.0f ) ), shadow_size ) ;
+		HitResDim = MV1CollCheck_Capsule((*stage_)->map_handle().handle(), -1, VAdd( current_pos_, VGet( 0.0f, 0.5f * shadow_height, 0.0f ) ), VAdd( current_pos_, VGet( 0.0f, -shadow_height, 0.0f ) ), shadow_size ) ;
 
 		// 頂点データで変化が無い部分をセット
 		Vertex[ 0 ].dif = GetColorU8( 255,255,255,255 ) ;
@@ -206,7 +206,7 @@ public:
 
 				/*
 				const auto jump_result_y =
-					jump_height_ * stage_->map_scale() * (time_entire - time_now) * (jump_height_ / 5.0f) * 1.019952f + 
+					jump_height_ * (*stage_)->map_scale() * (time_entire - time_now) * (jump_height_ / 5.0f) * 1.019952f + 
 					0.5f * -9.8f * (time_entire - time_now) * (time_entire - time_now) * (1.0f / flight_duration_ideal_) * (jump_height_ / 5.0f) * (jump_height_ / 5.0f);	// 今からジャンプした際の最終的な位置
 				*/
 				static auto st_acc = -9.8f;
@@ -215,12 +215,12 @@ public:
 				
 				if(jump_flag_ == false && current_target_vec_y_ != 0){
 					for(acc;acc < -6.5f;acc+=0.1f){
-						prediction_vector = jump_height_ * stage_->map_scale() + (acc) * (time_entire - time_now) * (jump_height_ / 5.0f) * (1.0f / flight_duration_ideal_ );
+						prediction_vector = jump_height_ * (*stage_)->map_scale() + (acc) * (time_entire - time_now) * (jump_height_ / 5.0f) * (1.0f / flight_duration_ideal_ );
 						// ターゲット座標ではジャンプを始めている
 						if( prediction_vector > current_target_vec_y_ - 1 && prediction_vector < current_target_vec_y_ + 1)
 						{
 							// 目標座標でベクトルが上向きなら一致、ジャンプを始める
-							move_vec_y_ = jump_height_ * stage_->map_scale();
+							move_vec_y_ = jump_height_ * (*stage_)->map_scale();
 							jump_flag_ = true;
 						}//	それ以外はそのまま
 					}
@@ -231,7 +231,7 @@ public:
 				moved_pos = current_pos_ + diff_pos;
 				if( jump_flag_ == true )
 				{
-					move_vec_y_ += (st_acc * stage_->map_scale() * timer_->DeltaSec() * (1.0f/flight_duration_ideal_) * (jump_height_ / 5.0f));
+					move_vec_y_ += (st_acc * (*stage_)->map_scale() * timer_->DeltaSec() * (1.0f/flight_duration_ideal_) * (jump_height_ / 5.0f));
 					moved_pos.y = current_pos_.y + move_vec_y_ * timer_->DeltaSec() * (jump_height_ / 5.0f);
 				}
 
@@ -239,7 +239,7 @@ public:
                 float floor_y;
 				std::pair<bool, VECTOR> floor_coll;
 					// 足で接地検査
-					floor_coll = stage_->FloorExists(moved_pos,model_height_,0);
+					floor_coll = (*stage_)->FloorExists(moved_pos,model_height_,0);
                 //moved_pos.y = std::max(moved_pos.y, floor_y); // 床にあたっているときは床の方がyが高くなる
 				if(!jump_flag_){
 					// 登ったり下ったりできる段差の大きさの制限を求める
@@ -251,7 +251,7 @@ public:
 					// 接地点計算
 					//std::cout << "  ground collision check: current pos = " << current_stat_.pos << std::endl;
 
-					auto coll_info = MV1CollCheck_Line(stage_->map_handle().handle(), -1,
+					auto coll_info = MV1CollCheck_Line((*stage_)->map_handle().handle(), -1,
 						moved_pos + VGet(0, y_max_limit, 0),
 						moved_pos + VGet(0, y_min_limit, 0));
 					if(coll_info.HitFlag && NearlyEqualRelative(coll_info.HitPosition.y, floor_coll.second.y, 0.001)){
@@ -264,7 +264,7 @@ public:
 							moved_pos = current_pos_ + VSize(diff_pos) * VNorm(diff);
 						}
 					}
-					auto floor_exists = stage_->FloorExists(moved_pos, model_height_, 50);
+					auto floor_exists = (*stage_)->FloorExists(moved_pos, model_height_, 50);
 					if( floor_exists.first )
 					{
 						if( floor_exists.second.y < moved_pos.y && current_target_pos.y < moved_pos.y)
@@ -290,8 +290,8 @@ public:
 					}else{
 						// 上昇している
 
-						const auto player_top = VGet(0, model_height_ * stage_->map_scale(), 0);
-						auto coll_info = MV1CollCheck_Line(stage_->map_handle().handle(), -1,
+						const auto player_top = VGet(0, model_height_ * (*stage_)->map_scale(), 0);
+						auto coll_info = MV1CollCheck_Line((*stage_)->map_handle().handle(), -1,
 							current_pos_ + player_top,
 							moved_pos + player_top);
 						if (coll_info.HitFlag)
@@ -300,7 +300,7 @@ public:
 							// std::cout << "    current collided to ceiling" << std::endl;
 
 							moved_pos = coll_info.HitPosition - player_top;
-							move_vec_y_ = -(move_vec_y_ - (st_acc * stage_->map_scale() * timer_->DeltaSec() * (1.0f/flight_duration_ideal_) * (jump_height_ / 5.0f))) * 1.0; // 反射
+							move_vec_y_ = -(move_vec_y_ - (st_acc * (*stage_)->map_scale() * timer_->DeltaSec() * (1.0f/flight_duration_ideal_) * (jump_height_ / 5.0f))) * 1.0; // 反射
 						}
 					}
 				}
@@ -373,7 +373,7 @@ private:
     std::unique_ptr<MotionPlayer> motion_player_;
 	std::pair<bool, int> additional_motion_;
     TimerPtr timer_;
-    StagePtr stage_;
+    std::shared_ptr<const StagePtr> stage_;
 	int shadow_handle_;
 	float shadow_size_;
 	bool jump_end_;
@@ -383,7 +383,8 @@ private:
     } motion;
 };
 
-PlayerCharacter::PlayerCharacter(CharacterDataProvider& data_provider, const StagePtr& stage, const TimerPtr& timer)
+PlayerCharacter::PlayerCharacter(CharacterDataProvider& data_provider,
+	const std::shared_ptr<const StagePtr>& stage, const TimerPtr& timer)
     : impl_(new Impl(data_provider, stage, timer))
 {}
 

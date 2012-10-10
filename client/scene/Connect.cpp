@@ -5,9 +5,11 @@
 #include "MainLoop.hpp"
 #include "Title.hpp"
 #include "Connect.hpp"
+#include "ChannelChange.hpp"
 #include <vector>
 #include <algorithm>
 #include "../ResourceManager.hpp"
+#include "../PlayerManager.hpp"
 #include "../../common/Logger.hpp"
 
 namespace scene {
@@ -17,9 +19,11 @@ Connect::Connect(const ManagerAccessorPtr& manager_accessor) :
               account_manager_(manager_accessor->account_manager().lock()),
               config_manager_(manager_accessor->config_manager().lock()),
 			  command_manager_(std::make_shared<CommandManager>(manager_accessor_)),
+			  player_manager_(std::make_shared<PlayerManager>(manager_accessor_)),
 			  return_flag_(false)
 {
     manager_accessor_->set_command_manager(command_manager_);
+    manager_accessor_->set_player_manager(player_manager_);
 }
 
 Connect::~Connect()
@@ -87,11 +91,11 @@ void Connect::Update()
 		message_.set_text(_T("エラー：サーバーとクライアントのバージョンが対応していません"));
 		command_manager_->set_client(ClientUniqPtr());
 		break;
-	case CommandManager::STATUS_ERROR_NOSTAGE:
-		message_.set_text((tformat(_T("エラー：接続するにはステージデータ「%s」が必要です")) % 
-			unicode::ToTString(command_manager_->stage())).str());
-		command_manager_->set_client(ClientUniqPtr());
-		break;
+	//case CommandManager::STATUS_ERROR_NOSTAGE:
+	//	message_.set_text((tformat(_T("エラー：接続するにはステージデータ「%s」が必要です")) % 
+	//		unicode::ToTString(command_manager_->stage())).str());
+	//	command_manager_->set_client(ClientUniqPtr());
+	//	break;
 	}
 
     button_.Update();
@@ -99,7 +103,7 @@ void Connect::Update()
     message_.Update();
 
     if (command_manager_->status() == CommandManager::STATUS_READY) {
-        next_scene_= std::make_shared<scene::MainLoop>(manager_accessor_);
+        next_scene_= std::make_shared<scene::ChannelChange>(0, manager_accessor_);
 	} else if (return_flag_) {
 		next_scene_= std::make_shared<scene::Title>(manager_accessor_);
     }

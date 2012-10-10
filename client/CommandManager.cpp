@@ -76,12 +76,12 @@ void CommandManager::FetchCommand(const network::Command& command)
 	// サーバーデータ受信
 	case ClientReceiveServerInfo:
 	{
-		network::Utils::Deserialize(command.body(), & stage_);
-		if (ResourceManager::NameToFullPath(unicode::ToTString(stage_)).empty()) {
-			status_ = STATUS_ERROR_NOSTAGE;
-		} else {
-			status_ = STATUS_READY;
-		}
+		//network::Utils::Deserialize(command.body(), & stage_);
+		//if (ResourceManager::NameToFullPath(unicode::ToTString(stage_)).empty()) {
+		//	status_ = STATUS_ERROR_NOSTAGE;
+		//} else {
+		//	status_ = STATUS_READY;
+		//}
 	}
 	break;
 
@@ -101,6 +101,47 @@ void CommandManager::FetchCommand(const network::Command& command)
 		}
 
 		auto channels = pt.get_child("channels", ptree());
+		BOOST_FOREACH(const auto& channel, channels) {
+			auto ptr = std::make_shared<Channel>();
+			auto id = boost::lexical_cast<int>(channel.first.substr(2));
+			ptr->name = channel.second.get<std::string>("name");
+			ptr->stage = channel.second.get<std::string>("stage");
+
+			auto warp_points = channel.second.get_child("warp_points", ptree());
+			BOOST_FOREACH(const auto& warp_point, warp_points) {
+				auto channel = warp_point.second.get<unsigned char>("channel", 0);
+				auto x = warp_point.second.get<float>("position.x", 0);
+				auto y = warp_point.second.get<float>("position.y", 0);
+				auto z = warp_point.second.get<float>("position.z", 0);
+				Channel::WarpPoint point = {x, y, z, channel, ""};
+				ptr->warp_points.push_back(point);
+			}
+			channels_[id] = ptr;
+		}
+
+		// 存在しないチャンネルへのワープポイントを削除
+		BOOST_FOREACH(const auto& channel, channels_) {
+			auto& warp_points = channel.second->warp_points;
+			auto end_it = std::remove_if(warp_points.begin(),
+				warp_points.end(),
+				[this](Channel::WarpPoint& point) -> bool {
+				auto it = channels_.find(point.channel);
+				if (it != channels_.end()) {
+					point.name = it->second->name;
+					return false;
+				} else {
+					return true;
+				}
+			});
+			warp_points.erase(end_it, warp_points.end());
+		}
+
+		if (ResourceManager::NameToFullPath(
+			unicode::ToTString(channels_[0]->stage)).empty()) {
+			status_ = STATUS_ERROR_NOSTAGE;
+		} else {
+			status_ = STATUS_READY;
+		}
 	}
 	break;
 
@@ -210,10 +251,21 @@ CommandManager::Status CommandManager::status() const
 	return status_;
 }
 
-std::string CommandManager::stage() const
+const std::map<unsigned char, ChannelPtr>& CommandManager::channels() const
 {
-	return stage_;
+	return channels_;
 }
+
+ChannelPtr CommandManager::current_channel() const
+{
+	PlayerManagerPtr player_manager = manager_accessor_->player_manager().lock();
+	if (auto myself = player_manager->GetMyself()) {
+		return channels_.at(myself->channel());
+	} else {
+		return ChannelPtr();
+	}
+}
+
 
 double CommandManager::GetReadByteAverage() const
 {

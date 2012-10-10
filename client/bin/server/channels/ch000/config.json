@@ -1,0 +1,12 @@
+{
+	"name": "ケロリン町チャンネル",
+	"stage": "stage:ケロリン町",
+	"capacity": 20,
+	"warp_points":
+		[
+			{
+				"position": {"x": 0, "y": 0, "z": 0},
+				"channel": 1
+			}
+		]
+}

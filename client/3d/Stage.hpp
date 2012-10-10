@@ -11,9 +11,12 @@
 #include "../ResourceManager.hpp"
 #include "../ui/InputBox.hpp"
 
+struct Channel;
+typedef std::shared_ptr<Channel> ChannelPtr;
+
 class Stage {
     public:
-        Stage(const tstring& model_path);
+        Stage(const ChannelPtr& channel);
         ~Stage();
         void Draw();
         void DrawAfter();
@@ -50,13 +53,13 @@ class Stage {
 		std::unordered_set<int> draw_after_meshes_;
 
         ModelHandle skymap_handle_;
-		ModelHandle warpobj_handle_;
-		std::vector<ModelHandle> warpobj_array_;
+		std::vector<ModelHandle> warpobj_handles_;
 
         std::vector<VECTOR> start_points_;
 		std::vector<VECTOR> warp_points_;
 
 		bool host_change_flag_;
+		ChannelPtr channel_;
 };
 
 typedef std::shared_ptr<Stage> StagePtr;

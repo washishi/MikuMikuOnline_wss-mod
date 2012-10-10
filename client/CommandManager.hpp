@@ -12,6 +12,21 @@ namespace network {
     class Command;
 }
 
+struct Channel {
+	public:
+		struct WarpPoint {
+			float x, y, z;
+			unsigned int channel;
+			std::string name;
+		};
+
+	public:
+		std::string name, stage;
+		std::vector<WarpPoint> warp_points;
+};
+
+typedef std::shared_ptr<Channel> ChannelPtr;
+
 typedef std::unique_ptr<network::Client> ClientUniqPtr;
 
 class CommandManager {
@@ -38,7 +53,8 @@ class CommandManager {
 
         void set_client(ClientUniqPtr client);
         unsigned int user_id();
-		std::string stage() const;
+		const std::map<unsigned char, ChannelPtr>& channels() const;
+		ChannelPtr current_channel() const;
 
 		void FetchCommand(const network::Command& command);
 
@@ -48,7 +64,8 @@ class CommandManager {
         ManagerAccessorPtr manager_accessor_;
         ClientUniqPtr client_;
 		Status status_;
-		std::string stage_;
+
+		std::map<unsigned char, ChannelPtr> channels_;
 };
 
 typedef std::shared_ptr<CommandManager> CommandManagerPtr;

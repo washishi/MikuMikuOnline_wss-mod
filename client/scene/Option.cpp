@@ -290,8 +290,10 @@ StatusTab::StatusTab(const ManagerAccessorPtr& manager_accessor) :
 
 	items_.push_back(std::make_shared<TextItem>(_LT("option.status.channel"),
 		std::make_shared<std::function<tstring(void)>>(
-		[player_manager](){
-			return (tformat(_T("%d")) % static_cast<int>(player_manager->GetMyself()->channel())).str();
+		[player_manager, command_manager]() -> tstring {
+			auto channel = player_manager->GetMyself()->channel();
+			auto name = command_manager->channels().at(channel)->name;
+			return (tformat(_T("%s (%d)")) % unicode::ToTString(name) % static_cast<int>(channel)).str();
 		}), manager_accessor_));
 
 	items_.push_back(std::make_shared<TextItem>(_LT("option.status.user_id"),
@@ -302,8 +304,10 @@ StatusTab::StatusTab(const ManagerAccessorPtr& manager_accessor) :
 
 	items_.push_back(std::make_shared<TextItem>(_LT("option.status.stage"),
 		std::make_shared<std::function<tstring(void)>>(
-		[command_manager](){
-			return unicode::ToTString(command_manager->stage());
+		[player_manager, command_manager]() -> tstring {
+			auto channel = player_manager->GetMyself()->channel();
+			auto stage = command_manager->channels().at(channel)->stage;
+			return unicode::ToTString(stage);
 		}), manager_accessor_));
 
 	items_.push_back(std::make_shared<TextItem>(_LT("option.status.position"),

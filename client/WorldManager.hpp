@@ -9,12 +9,9 @@
 
 class InputManager;
 
-class Stage;
-typedef std::shared_ptr<Stage> StagePtr;
-
 class WorldManager {
     public:
-        WorldManager(const ManagerAccessorPtr& manager_accessor = ManagerAccessorPtr());
+        WorldManager(const StagePtr& stage, const ManagerAccessorPtr& manager_accessor = ManagerAccessorPtr());
         void Init();
         void ProcessInput(InputManager* input);
         void Update();

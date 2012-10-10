@@ -26,7 +26,7 @@ inline bool NearlyEqualRelative(const T& lhs, const T& rhs, const U& ratio)
 
 } // namespace
 
-FieldPlayer::FieldPlayer(CharacterDataProvider& data_provider, const StagePtr& stage, const TimerPtr& timer)
+FieldPlayer::FieldPlayer(CharacterDataProvider& data_provider, const std::shared_ptr<const StagePtr>& stage, const TimerPtr& timer)
 :       prev_stat_(),
         current_stat_(PlayerStatus( VGet(0, 0, 0), VGet(0, 0, 0), VGet(0, 0, 0),
                 0.0f, 0.0f, 0, 0, 1.0f, false)),
@@ -55,8 +55,8 @@ void FieldPlayer::Chara_ShadowRender() const
 	MV1_COLL_RESULT_POLY *HitRes ;
 	VERTEX3D Vertex[ 3 ] ;
 	VECTOR SlideVec ;
-	auto shadow_height = model_height_*stage_->map_scale();
-	auto shadow_size = shadow_size_ * stage_->map_scale();
+	auto shadow_height = model_height_ * (*stage_)->map_scale();
+	auto shadow_size = shadow_size_ * (*stage_)->map_scale();
 
 	// ライティングを無効にする
 	SetUseLighting( FALSE ) ;
@@ -68,7 +68,7 @@ void FieldPlayer::Chara_ShadowRender() const
 	SetTextureAddressMode( DX_TEXADDRESS_CLAMP ) ;
 
 	// キャラクターの直下に存在する地面のポリゴンを取得
-	HitResDim = MV1CollCheck_Capsule( stage_->map_handle().handle() , -1, VAdd( current_stat_.pos, VGet( 0, 0.5f * shadow_height, 0 ) ), VAdd( current_stat_.pos, VGet( 0.0f,-shadow_height, 0.0f ) ), shadow_size ) ;
+	HitResDim = MV1CollCheck_Capsule( (*stage_)->map_handle().handle() , -1, VAdd( current_stat_.pos, VGet( 0, 0.5f * shadow_height, 0 ) ), VAdd( current_stat_.pos, VGet( 0.0f,-shadow_height, 0.0f ) ), shadow_size ) ;
 
 	// 頂点データで変化が無い部分をセット
 	Vertex[ 0 ].dif = GetColorU8( 255,255,255,255 ) ;
@@ -137,9 +137,9 @@ void FieldPlayer::Draw() const
     MV1DrawModel(model_handle_.handle());
 	Chara_ShadowRender();
 
-    // DrawLine3D(current_stat_.pos, current_stat_.pos + VGet(2 * stage_->map_scale(), 0, 0), GetColor(255, 0, 0));
-    // DrawLine3D(current_stat_.pos, current_stat_.pos + VGet(0, 2 * stage_->map_scale(), 0), GetColor(0, 255, 0));
-    // DrawLine3D(current_stat_.pos, current_stat_.pos + VGet(0, 0, 2 * stage_->map_scale()), GetColor(0, 0, 255));
+    // DrawLine3D(current_stat_.pos, current_stat_.pos + VGet(2 * (*stage_)->map_scale(), 0, 0), GetColor(255, 0, 0));
+    // DrawLine3D(current_stat_.pos, current_stat_.pos + VGet(0, 2 * (*stage_)->map_scale(), 0), GetColor(0, 255, 0));
+    // DrawLine3D(current_stat_.pos, current_stat_.pos + VGet(0, 0, 2 * (*stage_)->map_scale()), GetColor(0, 0, 255));
 }
 
 void FieldPlayer::Init(tstring model_name)
@@ -150,17 +150,17 @@ void FieldPlayer::Init(tstring model_name)
 
 void FieldPlayer::ResetPosition()
 {
-    const auto& points = stage_->start_points();
+    const auto& points = (*stage_)->start_points();
     std::mt19937 engine(time(nullptr));
     std::uniform_int_distribution<int> distribution(0, points.size() - 1);
 
     current_stat_.pos = points[distribution(engine)];
-    current_stat_.pos.y = stage_->GetFloorY(current_stat_.pos + VGet(0, 20, 0), current_stat_.pos - VGet(0, 20, 0));
+    current_stat_.pos.y = (*stage_)->GetFloorY(current_stat_.pos + VGet(0, 20, 0), current_stat_.pos - VGet(0, 20, 0));
 }
 
 void FieldPlayer::RescuePosition()
 {
-    const auto& points = stage_->start_points();
+    const auto& points = (*stage_)->start_points();
     const auto& new_pos =
             std::min_element(points.begin(), points.end(),
             [this](const VECTOR& a, const VECTOR& b){
@@ -173,7 +173,7 @@ void FieldPlayer::RescuePosition()
             });
 
     current_stat_.pos = *new_pos;
-    current_stat_.pos.y = stage_->GetFloorY(current_stat_.pos - VGet(0, 100, 0), current_stat_.pos + VGet(0, 100, 0));
+    current_stat_.pos.y = (*stage_)->GetFloorY(current_stat_.pos - VGet(0, 100, 0), current_stat_.pos + VGet(0, 100, 0));
 	current_stat_.acc.y = 0;
 	current_stat_.vel.y = 0;
 }
@@ -226,7 +226,7 @@ void FieldPlayer::Update()
 	}
 
 	// 落ちた時に強制復帰
-	if (prev_stat_.pos.y < stage_->min_height()) {
+	if (prev_stat_.pos.y < (*stage_)->min_height()) {
 		RescuePosition();
 	}
     /*
@@ -267,7 +267,7 @@ void FieldPlayer::Update()
     data_provider_.set_motion(current_stat_.motion);
     data_provider_.set_vy(current_stat_.vel.y);
 
-    stage_->UpdateSkymapPosition(GetCameraTarget());
+    (*stage_)->UpdateSkymapPosition(GetCameraTarget());
 }
 
 void FieldPlayer::Move()
@@ -306,8 +306,8 @@ void FieldPlayer::Move()
 
 
     // 移動方向に障害物があるか、または床がない場合は移動不可能
-	auto front_collides = stage_->FrontCollides(
-            0.4, current_stat_.pos, prev_stat_.pos,1.0 * stage_->map_scale(), (model_height_ - 0.1) * stage_->map_scale() ,128);
+	auto front_collides = (*stage_)->FrontCollides(
+            0.4, current_stat_.pos, prev_stat_.pos,1.0 * (*stage_)->map_scale(), (model_height_ - 0.1) * (*stage_)->map_scale() ,128);
 
 	if(front_collides.first && current_stat_.acc.y == 0)
 	{
@@ -320,7 +320,7 @@ void FieldPlayer::Move()
         current_stat_.vel.x = current_stat_.vel.z = 0;
 	}
     // 50mの深さまで床検出
-    auto floor_exists = stage_->FloorExists(current_stat_.pos, model_height_, 50);
+    auto floor_exists = (*stage_)->FloorExists(current_stat_.pos, model_height_, 50);
 	if(!floor_exists.first)
 	{
 		current_stat_.pos.x = front_collides.second.x;
@@ -329,7 +329,7 @@ void FieldPlayer::Move()
 	}
 
     // 足が地面にめり込んでいるか
-    auto foot_floor_exists = stage_->FloorExists(current_stat_.pos, model_height_, 0);
+    auto foot_floor_exists = (*stage_)->FloorExists(current_stat_.pos, model_height_, 0);
 
     const auto pos_diff = current_stat_.pos - prev_stat_.pos;
     const auto pos_diff_length = VSize(pos_diff);
@@ -352,7 +352,7 @@ void FieldPlayer::Move()
 			// 接地点計算
 			//std::cout << "  ground collision check: current pos = " << current_stat_.pos << std::endl;
 
-			auto coll_info = MV1CollCheck_Line(stage_->map_handle().handle(), -1,
+			auto coll_info = MV1CollCheck_Line((*stage_)->map_handle().handle(), -1,
 				current_stat_.pos + VGet(0, y_max_limit, 0),
 				current_stat_.pos + VGet(0, y_min_limit, 0));
 			if (coll_info.HitFlag && NearlyEqualRelative(coll_info.HitPosition.y, floor_exists.second.y, 0.001))
@@ -372,9 +372,9 @@ void FieldPlayer::Move()
 				if (floor_exists.second.y < current_stat_.pos.y)
 				{
 					// 床はあるし、自分より低い位置なので落ちる
-					current_stat_.acc.y = -9.8 * stage_->map_scale();
+					current_stat_.acc.y = -9.8 * (*stage_)->map_scale();
 				}
-				else if (floor_exists.second.y < current_stat_.pos.y + 0.6 * stage_->map_scale())
+				else if (floor_exists.second.y < current_stat_.pos.y + 0.6 * (*stage_)->map_scale())
 				{
 					// 床があり、平らなので登る
 					auto delta = prev_stat_.pos - current_stat_.pos;
@@ -432,8 +432,8 @@ void FieldPlayer::Move()
                 // 上昇している
                 // std::cout << "  previous rising" << std::endl;
 
-                const auto player_top = VGet(0, model_height_ * stage_->map_scale(), 0);
-                auto coll_info = MV1CollCheck_Line(stage_->map_handle().handle(), -1,
+                const auto player_top = VGet(0, model_height_ * (*stage_)->map_scale(), 0);
+                auto coll_info = MV1CollCheck_Line((*stage_)->map_handle().handle(), -1,
                         prev_stat_.pos + player_top,
                         current_stat_.pos + player_top);
                 if (coll_info.HitFlag)
@@ -477,10 +477,10 @@ void FieldPlayer::InputFromUser()
         : 90.0f) * DX_PI_F / 180;
 
 	/*
-	auto warp_chk = stage_->CheckWarpPoint(current_stat_.pos);
+	auto warp_chk = (*stage_)->CheckWarpPoint(current_stat_.pos);
 	if (warp_chk && input.GetKeyCount(InputManager::KEYBIND_ENTER) > 0 )
 	{
-		stage_->SetHostChangeFlag(warp_chk);
+		(*stage_)->SetHostChangeFlag(warp_chk);
 	}
 	*/
 
@@ -534,7 +534,7 @@ void FieldPlayer::InputFromUser()
     {
         // 接地しており、かつ移動する
         any_move_ = true;
-        current_stat_.vel = VGet(sin(roty), 0, cos(roty)) * (-move_dir * move_speed * stage_->map_scale());
+        current_stat_.vel = VGet(sin(roty), 0, cos(roty)) * (-move_dir * move_speed * (*stage_)->map_scale());
         current_stat_.motion =
             current_stat_.is_walking ? motion.walk_ : motion.run_;
     }
@@ -543,19 +543,19 @@ void FieldPlayer::InputFromUser()
         // 空中にいる
         any_move_ = true;
         auto acc = 5.0f;
-		auto vel = current_stat_.vel + VGet(sin(roty), 0, cos(roty)) * (-move_dir * acc * stage_->map_scale());// * timer_->DeltaSec());// * ((6.0f-current_stat_.vel.y)/(stage_->map_scale()*12.0f))
+		auto vel = current_stat_.vel + VGet(sin(roty), 0, cos(roty)) * (-move_dir * acc * (*stage_)->map_scale());// * timer_->DeltaSec());// * ((6.0f-current_stat_.vel.y)/((*stage_)->map_scale()*12.0f))
         vel.y = 0;
 
-        if (VSize(vel) > std::max(move_speed, 1.0f) * stage_->map_scale())
+        if (VSize(vel) > std::max(move_speed, 1.0f) * (*stage_)->map_scale())
         {
-            vel = vel * (std::max(move_speed, 1.0f) * stage_->map_scale() / VSize(vel));
+            vel = vel * (std::max(move_speed, 1.0f) * (*stage_)->map_scale() / VSize(vel));
         }
         vel.y = current_stat_.vel.y;
         current_stat_.vel = vel;
 		current_stat_.acc.y = 
-			(current_stat_.acc.y + (0.2f * chg_acc * stage_->map_scale())) > -6.5f * stage_->map_scale() ? -6.5f * stage_->map_scale() :
-			current_stat_.acc.y + (0.2f * chg_acc * stage_->map_scale()) < -11.0f * stage_->map_scale() ? -11.0f * stage_->map_scale() :
-			current_stat_.acc.y + (0.2f * chg_acc * stage_->map_scale());
+			(current_stat_.acc.y + (0.2f * chg_acc * (*stage_)->map_scale())) > -6.5f * (*stage_)->map_scale() ? -6.5f * (*stage_)->map_scale() :
+			current_stat_.acc.y + (0.2f * chg_acc * (*stage_)->map_scale()) < -11.0f * (*stage_)->map_scale() ? -11.0f * (*stage_)->map_scale() :
+			current_stat_.acc.y + (0.2f * chg_acc * (*stage_)->map_scale());
     }
     else
     {
@@ -596,8 +596,8 @@ void FieldPlayer::InputFromUser()
                     input.GetGamepadCount(InputManager::PADBIND_JUMP) > 0))
     {
 			any_move_ = true;
-			current_stat_.acc.y = -9.8 * stage_->map_scale();
-			current_stat_.vel += VGet(0, jump_height_ * stage_->map_scale(), 0);
+			current_stat_.acc.y = -9.8 * (*stage_)->map_scale();
+			current_stat_.vel += VGet(0, jump_height_ * (*stage_)->map_scale(), 0);
 	}
 }
 
