@@ -28,7 +28,26 @@ class UICustom : public UIBase {
 		static void Property_set_draw(Local<String> property, Local<Value> value, const AccessorInfo& info);
 
 	private:
-		static Handle<Value> Function_drawLine(const Arguments& args);
+		/* function */
+		static Handle<Value> Function_DrawLine(const Arguments& args);
+		static Handle<Value> Function_DrawBox(const Arguments& args);
+		static Handle<Value> Function_DrawEdgeBox(const Arguments& args);
+		static Handle<Value> Function_DrawCircle(const Arguments& args);
+		static Handle<Value> Function_DrawOval(const Arguments& args);
+		static Handle<Value> Function_DrawTriangle(const Arguments& args);
+		static Handle<Value> Function_DrawQuadrangle(const Arguments& args);
+		static Handle<Value> Function_DrawPixel(const Arguments& args);
+		static Handle<Value> Function_Paint(const Arguments& args);
+		static Handle<Value> Function_DrawPixelSet(const Arguments& args);
+		static Handle<Value> Function_DrawLineSet(const Arguments& args);
+		static Handle<Value> Function_DrawPixel3D(const Arguments& args);
+		static Handle<Value> Function_DrawLine3D(const Arguments& args);
+		static Handle<Value> Function_DrawCube3D(const Arguments& args);
+		static Handle<Value> Function_DrawSphere3D(const Arguments& args);
+		static Handle<Value> Function_DrawCapsule3D(const Arguments& args);
+		static Handle<Value> Function_DrawCone3D(const Arguments& args);
+	
+		static Handle<Value> Function_LoadGraph(const Arguments& args);
 
 };
 

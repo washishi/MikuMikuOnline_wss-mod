@@ -45,6 +45,86 @@ Input::Input() :
     y_ = 100;
     width_ = 160;
     height_ = font_height_ + 4;
+
+	right_click_list_.addItem(UIBasePtr(new UIBase([&]()->UIBase{
+		UILabel label;
+		label.set_input_adaptor(std::shared_ptr<Input>(this));
+		label.set_text(unicode::ToTString("切り取り"));
+		label.set_on_click_function_([&]()->void{
+			HGLOBAL hGlobal;
+			LPTSTR pMem;
+			auto input_ = label.input_adpator();
+			hGlobal = GlobalAlloc(GHND, lstrlen( input_->message().c_str() ) + 128 );
+			if ( hGlobal == NULL ) {
+				return;
+			}
+			pMem = (LPTSTR)GlobalLock( hGlobal );
+			if ( pMem == NULL ) {
+				GlobalFree( hGlobal );
+				return;
+			}
+			lstrcpy( pMem, input_->message().c_str() );
+			GlobalUnlock( hGlobal );
+			OpenClipboard( NULL );
+			EmptyClipboard();
+			SetClipboardData(CF_TEXT, hGlobal);
+			CloseClipboard();
+		});
+		return static_cast<UIBase>(label);
+	}())));
+	right_click_list_.addItem(UIBasePtr(new UIBase([&]()->UIBase{
+		UILabel label;
+		label.set_input_adaptor(std::shared_ptr<Input>(this));
+		label.set_text(unicode::ToTString("コピー"));
+		label.set_on_click_function_([&]()->void{
+			HGLOBAL hGlobal;
+			LPTSTR pMem;
+			auto input_ = label.input_adpator();
+			hGlobal = GlobalAlloc(GHND, lstrlen( input_->message().c_str() ) + 128 );
+			if ( hGlobal == NULL ) {
+				return;
+			}
+			pMem = (LPTSTR)GlobalLock( hGlobal );
+			if ( pMem == NULL ) {
+				GlobalFree( hGlobal );
+				return;
+			}
+			lstrcpy( pMem, input_->message().c_str() );
+			GlobalUnlock( hGlobal );
+			OpenClipboard( NULL );
+			EmptyClipboard();
+			SetClipboardData(CF_TEXT, hGlobal);
+			CloseClipboard();
+		});
+		return static_cast<UIBase>(label);
+	}())));
+	right_click_list_.addItem(UIBasePtr(new UIBase([&]()->UIBase{
+		UILabel label;
+		label.set_input_adaptor(std::shared_ptr<Input>(this));
+		label.set_text(unicode::ToTString("貼り付け"));
+		label.set_on_click_function_([&]()->void{
+			HGLOBAL hGlobal;
+			LPTSTR pMem;
+			auto input_ = label.input_adpator();
+			hGlobal = GlobalAlloc(GHND, lstrlen( input_->message().c_str() ) + 128 );
+			if ( hGlobal == NULL ) {
+				return;
+			}
+			pMem = (LPTSTR)GlobalLock( hGlobal );
+			if ( pMem == NULL ) {
+				GlobalFree( hGlobal );
+				return;
+			}
+			lstrcpy( pMem, input_->message().c_str() );
+			GlobalUnlock( hGlobal );
+			OpenClipboard( NULL );
+			EmptyClipboard();
+			SetClipboardData(CF_TEXT, hGlobal);
+			CloseClipboard();
+		});
+		return static_cast<UIBase>(label);
+	}())));
+	
 }
 
 void Input::Draw()
@@ -270,6 +350,8 @@ void Input::ProcessInput(InputManager* input)
     if (!input) {
         return;
     }
+
+	bool push_mouse_right = (input->GetMouseRight() > 0);
 
     // bool push_mouse_left = (input->GetMouseLeftCount() > 0);
 
@@ -504,7 +586,7 @@ void Input::ProcessInput(InputManager* input)
         #endif
 
             // 選択範囲を記録
-            if (select_start < char_count && char_count <= select_end) {
+            if (select_start > 0 && char_count >= select_end) {
                 selecting_lines_.resize(static_cast<int>(lines_.size() + message_lines_.size()) + 1,
                         std::pair<int, int>(99999, 0));
                 selecting_lines_[static_cast<int>(lines_.size() + message_lines_.size())].first = std::min(
@@ -716,6 +798,11 @@ void Input::ProcessInput(InputManager* input)
     if (active()) {
         input->CancelKeyCountAll();
     }
+
+	// 右クリック描画
+	if (push_mouse_right) {
+
+	}
 }
 
 bool Input::active()

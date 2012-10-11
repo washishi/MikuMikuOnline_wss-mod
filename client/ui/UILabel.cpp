@@ -189,6 +189,8 @@ void UILabel::ProcessInput(InputManager* input)
 	if (input->GetMouseLeftCount() == 1 && hover) {  
 		if (!on_click_.IsEmpty() && on_click_->IsFunction()) {
 			on_click_.As<Function>()->CallAsFunction(Context::GetCurrent()->Global(), 0, nullptr);
+		}else if(!on_click_function_._Empty()) {
+			on_click_function_();
 		}
 	}
 }

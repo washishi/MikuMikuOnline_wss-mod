@@ -35,7 +35,7 @@ class InputBox : public UISuper {
         int multiline() const;
         void set_multiline(int multiline);
 
-    private:
+private:
         void CancelSelect();
 
         void DrawBase();
@@ -112,4 +112,5 @@ class InputBox : public UISuper {
         const static int IME_MARGIN_Y;
         const static int IME_MAX_PAGE_SIZE;
         const static int IME_MIN_WIDTH;
+
 };

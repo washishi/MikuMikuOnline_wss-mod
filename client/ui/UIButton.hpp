@@ -11,7 +11,6 @@
 #include <functional>
 
 class UIButton : public UIBase {
-        typedef std::function<void()> CallbackFunc;
 
     public:
         UIButton();

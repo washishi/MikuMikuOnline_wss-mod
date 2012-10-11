@@ -16,7 +16,9 @@ class UIBoard : public UIBase {
         void Draw();
 
         bool resizable() const;
+		bool boardvisible() const;
         void set_resizable(bool resizable);
+		void set_boardvisible(bool visible);
 
     public:
         static void DefineInstanceTemplate(Handle<ObjectTemplate>* object);
@@ -38,6 +40,7 @@ class UIBoard : public UIBase {
         std::array<ImageHandlePtr,4> base_image_handle_;
 
         bool resizable_;
+		bool boardvisible_;
 
         int max_width_, min_width_;
         int max_height_, min_height_;
@@ -47,3 +50,5 @@ class UIBoard : public UIBase {
     private:
         const static int BASE_BLOCK_SIZE;
 };
+
+typedef std::shared_ptr<UIBoard> UIBoardPtr;

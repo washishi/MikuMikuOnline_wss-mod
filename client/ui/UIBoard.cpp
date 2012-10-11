@@ -25,7 +25,8 @@ UIBoard::UIBoard() :
                 max_height_(800),
                 min_height_(100),
                 drag_offset_rect_(-1, -1, -1, -1),
-                drag_resize_offset_rect_(-1, -1, -1, -1)
+                drag_resize_offset_rect_(-1, -1, -1, -1),
+				boardvisible_(true)
 {
     base_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
             _T("system/images/gui/gui_board_bg.png"), 2, 2, 24, 24);
@@ -247,40 +248,42 @@ void UIBoard::Draw()
     if (!visible_) {
         return;
     }
+	
+	if (boardvisible_) {
+		SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
 
-    SetDrawBlendMode(DX_BLENDMODE_ADD, 255);
+		int x = absolute_x();
+		int y = absolute_y();
+		int width = absolute_width();
+		int height = absolute_height();
 
-    int x = absolute_x();
-    int y = absolute_y();
-    int width = absolute_width();
-    int height = absolute_height();
+		DrawGraph(x, y, *base_image_handle_[0], TRUE);
+		DrawGraph(x + width - BASE_BLOCK_SIZE, y, *base_image_handle_[1], TRUE);
+		DrawGraph(x, y + height - BASE_BLOCK_SIZE, *base_image_handle_[2], TRUE);
+		DrawGraph(x + width - BASE_BLOCK_SIZE, y + height - BASE_BLOCK_SIZE, *base_image_handle_[3], TRUE);
 
-    DrawGraph(x, y, *base_image_handle_[0], TRUE);
-    DrawGraph(x + width - BASE_BLOCK_SIZE, y, *base_image_handle_[1], TRUE);
-    DrawGraph(x, y + height - BASE_BLOCK_SIZE, *base_image_handle_[2], TRUE);
-    DrawGraph(x + width - BASE_BLOCK_SIZE, y + height - BASE_BLOCK_SIZE, *base_image_handle_[3], TRUE);
+		DrawRectExtendGraphF(x + BASE_BLOCK_SIZE, y,
+			x + width - BASE_BLOCK_SIZE, y + BASE_BLOCK_SIZE,
+			0, 0, 1, BASE_BLOCK_SIZE, *base_image_handle_[1], TRUE);
 
-    DrawRectExtendGraphF(x + BASE_BLOCK_SIZE, y,
-                         x + width - BASE_BLOCK_SIZE, y + BASE_BLOCK_SIZE,
-                         0, 0, 1, BASE_BLOCK_SIZE, *base_image_handle_[1], TRUE);
+		DrawRectExtendGraphF(x + BASE_BLOCK_SIZE, y + height - BASE_BLOCK_SIZE,
+			x + width - BASE_BLOCK_SIZE, y + height,
+			0, 0, 1, BASE_BLOCK_SIZE, *base_image_handle_[3], TRUE);
 
-    DrawRectExtendGraphF(x + BASE_BLOCK_SIZE, y + height - BASE_BLOCK_SIZE,
-                         x + width - BASE_BLOCK_SIZE, y + height,
-                         0, 0, 1, BASE_BLOCK_SIZE, *base_image_handle_[3], TRUE);
+		DrawRectExtendGraphF(x, y + BASE_BLOCK_SIZE,
+			x + BASE_BLOCK_SIZE, y + height - BASE_BLOCK_SIZE,
+			0, 0, BASE_BLOCK_SIZE, 1, *base_image_handle_[2], TRUE);
 
-    DrawRectExtendGraphF(x, y + BASE_BLOCK_SIZE,
-                         x + BASE_BLOCK_SIZE, y + height - BASE_BLOCK_SIZE,
-                         0, 0, BASE_BLOCK_SIZE, 1, *base_image_handle_[2], TRUE);
+		DrawRectExtendGraphF(x + width - BASE_BLOCK_SIZE, y + BASE_BLOCK_SIZE,
+			x + width, y + height - BASE_BLOCK_SIZE,
+			0, 0, BASE_BLOCK_SIZE, 1, *base_image_handle_[3], TRUE);
 
-    DrawRectExtendGraphF(x + width - BASE_BLOCK_SIZE, y + BASE_BLOCK_SIZE,
-                         x + width, y + height - BASE_BLOCK_SIZE,
-                         0, 0, BASE_BLOCK_SIZE, 1, *base_image_handle_[3], TRUE);
+		DrawRectExtendGraphF(x + BASE_BLOCK_SIZE, y + BASE_BLOCK_SIZE,
+			x + width - BASE_BLOCK_SIZE, y + height - BASE_BLOCK_SIZE,
+			0, 0, 1, 1, *base_image_handle_[3], TRUE);
 
-    DrawRectExtendGraphF(x + BASE_BLOCK_SIZE, y + BASE_BLOCK_SIZE,
-                         x + width - BASE_BLOCK_SIZE, y + height - BASE_BLOCK_SIZE,
-                         0, 0, 1, 1, *base_image_handle_[3], TRUE);
-
-    SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
 
     DrawChildren();
 }
@@ -288,6 +291,16 @@ void UIBoard::Draw()
 bool UIBoard::resizable() const
 {
     return resizable_;
+}
+
+bool UIBoard::boardvisible() const
+{
+	return boardvisible_;
+}
+
+void UIBoard::set_boardvisible(bool visible)
+{
+	boardvisible_ = visible;
 }
 
 void UIBoard::set_resizable(bool resizable)

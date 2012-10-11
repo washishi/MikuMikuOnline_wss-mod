@@ -169,6 +169,36 @@ void UIList::ProcessInput(InputManager* input)
 
 }
 
+void UIList::addItem(UIBasePtr item)
+{
+	item->set_parent_c(UIBasePtr(new UIList(*this)));
+	items_.push_back(item);
+}
+
+void UIList::removeItem(UIBasePtr item)
+{
+	auto it = std::find(items_.begin(), items_.end(), item);
+	if (it != items_.end()) {
+		UIBasePtr chid_ptr = *it;
+		chid_ptr->set_parent_c(nullptr);
+		items_.erase(it);
+	}
+}
+
+void UIList::clearItems()
+{
+    BOOST_FOREACH(auto it, items_) {
+        UIBasePtr chid_ptr = it;
+        chid_ptr->set_parent_c(nullptr);
+    }
+	items_.clear();
+}
+
+void UIList::set_scroll_y(int scroll_y)
+{
+	scroll_y_ = scroll_y;
+}
+
 void UIList::UpdateScrollBar(InputManager* input)
 {
     int screen_width, screen_height;

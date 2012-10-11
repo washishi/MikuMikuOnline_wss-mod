@@ -102,7 +102,12 @@ InputBox::InputBox(const ManagerAccessorPtr& manager_accessor) :
 
         return true;
     });
+
+
 }
+
+
+
 
 InputBox::~InputBox()
 {

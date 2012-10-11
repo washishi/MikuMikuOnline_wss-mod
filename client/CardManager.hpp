@@ -66,6 +66,7 @@ class CardManager : public std::enable_shared_from_this<CardManager> {
         static char CARDS_DIR[];
         static char START_METADATA[];
         static char END_METADATA[];
+
 };
 
 typedef std::shared_ptr<CardManager> CardManagerPtr;

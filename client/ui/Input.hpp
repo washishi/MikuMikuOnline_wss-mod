@@ -8,6 +8,7 @@
 #include <functional>
 #include "../ResourceManager.hpp"
 #include "../InputManager.hpp"
+#include "include.hpp"
 
 class Input {
         typedef std::function<bool(const std::string&)> CallbackFunc;
@@ -79,6 +80,8 @@ class Input {
 
         bool reverse_color_;
         int blink_count_;
+
+		UIList right_click_list_;
 
     private:
         const static size_t TEXT_BUFFER_SIZE;

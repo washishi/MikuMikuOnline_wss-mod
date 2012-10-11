@@ -7,6 +7,7 @@
 #include "UISuper.hpp"
 #include <v8.h>
 #include "../InputManager.hpp"
+#include <functional>
 
 using namespace v8;
 
@@ -14,8 +15,10 @@ class ScriptEnvironment;
 typedef std::weak_ptr<ScriptEnvironment> ScriptEnvironmentWeakPtr;
 
 class UIBase;
+class Input;
 typedef std::shared_ptr<UIBase> UIBasePtr;
 typedef std::weak_ptr<UIBase> UIBaseWeakPtr;
+typedef std::function<void()> CallbackFunc;
 
 class UIBase : public UISuper {
 
@@ -24,8 +27,8 @@ class UIBase : public UISuper {
         virtual ~UIBase();
 
         virtual void ProcessInput(InputManager* input);
-        virtual void Update() = 0;
-        virtual void Draw() = 0;
+        virtual void Update();
+        virtual void Draw();
         virtual void AsyncUpdate(); // 毎ループ実行する必要のない処理
 
         /* function */
@@ -57,7 +60,10 @@ class UIBase : public UISuper {
 
         Handle<Object> parent() const;
         void set_parent(const Handle<Object>& parent);
-
+		UIBasePtr parent_c() const;
+		void set_parent_c(const UIBasePtr &parent_c);
+		std::shared_ptr<Input> input_adpator() const;
+		void set_input_adaptor(const std::shared_ptr<Input> &adaptor);
         size_t children_size() const;
 
         template<class T>
@@ -92,13 +98,22 @@ class UIBase : public UISuper {
 
         void Focus();
 
+	public:
+		/* Property */
+		template<class F>
+		void set_on_click_function_(F function);
+
     protected:
 
         Persistent<Object> parent_;
         std::vector<Persistent<Object>> children_;
 
         Persistent<Function> on_click_;
+		CallbackFunc on_click_function_;
 
+		/*C++からクラスを伝達するためのメンバ*/
+		UIBasePtr parent_c_;
+		std::shared_ptr<Input> input_adaptor_;
 };
 
 inline void Destruct(Persistent<Value> handle, void* parameter) {
@@ -154,4 +169,10 @@ void UIBase::SetConstant(Handle<ObjectTemplate>* object, const std::string& name
 {
     Handle<ObjectTemplate>& instance_template = *object;
     instance_template->Set(String::New(name.c_str()), value);
+}
+
+template<class F>
+void UIBase::set_on_click_function_(F function)
+{
+	on_click_function_ = function;
 }
