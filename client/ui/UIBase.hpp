@@ -7,6 +7,7 @@
 #include "UISuper.hpp"
 #include <v8.h>
 #include "../InputManager.hpp"
+#include <functional>
 
 using namespace v8;
 
@@ -14,8 +15,10 @@ class ScriptEnvironment;
 typedef std::weak_ptr<ScriptEnvironment> ScriptEnvironmentWeakPtr;
 
 class UIBase;
+class Input;
 typedef std::shared_ptr<UIBase> UIBasePtr;
 typedef std::weak_ptr<UIBase> UIBaseWeakPtr;
+typedef std::function<void(UIBase*)> CallbackFuncWithThisPointer;
 
 class UIBase : public UISuper {
 
@@ -24,8 +27,8 @@ class UIBase : public UISuper {
         virtual ~UIBase();
 
         virtual void ProcessInput(InputManager* input);
-        virtual void Update() = 0;
-        virtual void Draw() = 0;
+        virtual void Update();
+        virtual void Draw();
         virtual void AsyncUpdate(); // 毎ループ実行する必要のない処理
 
         /* function */
@@ -57,6 +60,10 @@ class UIBase : public UISuper {
 
         Handle<Object> parent() const;
         void set_parent(const Handle<Object>& parent);
+		UIBasePtr parent_c() const;
+		void set_parent_c(const UIBasePtr &parent_c);
+		Input* input_adpator() const;
+		void set_input_adaptor(Input * adaptor);
 
         size_t children_size() const;
 
@@ -92,12 +99,30 @@ class UIBase : public UISuper {
 
         void Focus();
 
+	public:
+		/* Property */
+		template<class F>
+		void set_on_click_function_(F function);
+		template<class F>
+		void set_on_hover_function_(F function);
+		template<class F>
+		void set_on_out_function_(F function);
+
     protected:
 
         Persistent<Object> parent_;
         std::vector<Persistent<Object>> children_;
 
         Persistent<Function> on_click_;
+		CallbackFuncWithThisPointer on_click_function_;
+		CallbackFuncWithThisPointer on_hover_function_;
+		CallbackFuncWithThisPointer on_out_function_;
+
+		bool hover_flag_;
+
+		/*C++からクラスを伝達するためのメンバ*/
+		UIBasePtr parent_c_;
+		Input* input_adaptor_;
 
 };
 
@@ -154,4 +179,22 @@ void UIBase::SetConstant(Handle<ObjectTemplate>* object, const std::string& name
 {
     Handle<ObjectTemplate>& instance_template = *object;
     instance_template->Set(String::New(name.c_str()), value);
+}
+
+template<class F>
+void UIBase::set_on_click_function_(F function)
+{
+	on_click_function_ = function;
+}
+
+template<class F>
+void UIBase::set_on_hover_function_(F function)
+{
+	on_hover_function_ = function;
+}
+
+template<class F>
+void UIBase::set_on_out_function_(F function)
+{
+	on_out_function_ = function;
 }

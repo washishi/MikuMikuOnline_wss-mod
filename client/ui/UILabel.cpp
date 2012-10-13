@@ -189,6 +189,19 @@ void UILabel::ProcessInput(InputManager* input)
 	if (input->GetMouseLeftCount() == 1 && hover) {  
 		if (!on_click_.IsEmpty() && on_click_->IsFunction()) {
 			on_click_.As<Function>()->CallAsFunction(Context::GetCurrent()->Global(), 0, nullptr);
+		}else if(!on_click_function_._Empty()) {
+			on_click_function_(this);
+			input->CancelMouseLeft();
+		}
+	}else if(hover && !hover_flag_){
+		if(!on_hover_function_._Empty()) {
+			on_hover_function_(this);
+			hover_flag_ = true;
+		}
+	}else if(!hover && hover_flag_){
+		if(!on_out_function_._Empty()) {
+			on_out_function_(this);
+			hover_flag_ = false;
 		}
 	}
 }

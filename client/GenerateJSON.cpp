@@ -160,6 +160,31 @@ _error:
 		return RemoveDirectory( lpPathName );
 	}
 
+	int Trim(char *s) {
+    int i;
+    int count = 0;
+
+    /* 空ポインタか? */
+    if ( s == NULL ) { /* yes */
+        return -1;
+    }
+
+    /* 文字列長を取得する */
+    i = strlen(s);
+
+    /* 末尾から順に空白でない位置を探す */
+    while ( --i >= 0 && s[i] == ' ' ) count++;
+
+    /* 終端ナル文字を付加する */
+    s[i+1] = '\0';
+
+    /* 先頭から順に空白でない位置を探す */
+    i = 0;
+    while ( s[i] != '\0' && s[i] == ' ' ) i++;
+    strcpy(s, &s[i]);
+
+    return i + count;
+	}
 };
 
 JsonGen::JsonGen()
@@ -209,7 +234,7 @@ JsonGen::JsonGen()
 			{
 				ZeroMemory(tcsTmpPath_Pmd,MAX_PATH);
 				_tcscpy_s(tcsTmpPath_Pmd,tcsTmpDir);
-				_tcscat_s(tcsTmpPath_Pmd,_T("*.pmd"));
+				_tcscat_s(tcsTmpPath_Pmd,_T("*.pm?"));
 				hPmdFind = FindFirstFile(tcsTmpPath_Pmd, &win32fd_pmd);
 				if(hPmdFind == (HANDLE)0xffffffff)
 				{
@@ -247,6 +272,7 @@ JsonGen::JsonGen()
 
 					// モデル名取得
 					strcpy_s(pmd_model_name_,pmd_info+7);
+					Trim(pmd_model_name_);
 					int cnt = 0x1b;
 					size_t info_size = ADFUNC_DXconvAnsiToWide(0,0,pmd_info+cnt);
 					TCHAR *pmd_info_t = new TCHAR[info_size + 1];

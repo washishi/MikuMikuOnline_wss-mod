@@ -8,7 +8,7 @@
 
 const size_t Input::TEXT_BUFFER_SIZE = 1024;
 const size_t Input::HISTORY_MAX_SIZE = 50;
-const int Input::KEY_REPEAT_FRAME = 6;
+const int Input::KEY_REPEAT_FRAME = 8;
 
 const int Input::INPUT_MARGIN_X = 8;
 const int Input::INPUT_MARGIN_Y = 6;
@@ -19,9 +19,12 @@ const int Input::IME_MARGIN_Y = 16;
 const int Input::IME_MAX_PAGE_SIZE = 6;
 const int Input::IME_MIN_WIDTH = 120;
 
-Input::Input() :
+Input::Input(ConfigManagerPtr config_manager) :
 	multiline_(true),
-    reverse_color_(false)
+    reverse_color_(false),
+	drag_flag_(false),
+	rightmenu_show_(false),
+	config_manager_(config_manager)
 {
     input_bg_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
             _T("system/images/gui/gui_inputbox_input_bg.png"), 2, 2, 12, 12);
@@ -45,6 +48,104 @@ Input::Input() :
     y_ = 100;
     width_ = 160;
     height_ = font_height_ + 4;
+
+}
+
+void Input::Init()
+{
+	right_click_list_.addItem(UIBasePtr(new UILabel([&]()->UILabel{
+		UILabel label;
+		label.set_input_adaptor(this);
+		label.set_text(unicode::ToTString(unicode::sjis2utf8("切り取り")));
+		label.set_width(120);
+		label.set_top(12);
+		label.set_left(0);
+		label.set_textcolor(UISuper::Color(0,0,0,255));
+		label.set_bgcolor(UISuper::Color(255,255,255,180));
+		label.set_on_click_function_([](UIBase* ptr)->void{
+			auto input_ = ptr->input_adpator();
+			auto sel_txt = input_->selecting_text();
+			SetClipboardText(sel_txt.c_str());
+			auto text = input_->text();
+			auto pos = text.find(sel_txt);
+			tstring res;
+			if( pos != std::string::npos )
+			{
+				res = text.substr(0,pos);
+				res += text.substr(pos + sel_txt.size(),text.size() - pos + sel_txt.size());
+			}
+			input_->set_text(res);
+		});
+		label.set_on_hover_function_([](UIBase* ptr)->void{
+			auto label_ptr = (UILabel *)ptr;
+			label_ptr->set_bgcolor(UISuper::Color(0,0,0,180));
+			label_ptr->set_textcolor(UISuper::Color(255,255,255));
+		});
+		label.set_on_out_function_([](UIBase* ptr)->void{
+			auto label_ptr = (UILabel *)ptr;
+			label_ptr->set_bgcolor(UISuper::Color(255,255,255,180));
+			label_ptr->set_textcolor(UISuper::Color(0,0,0));
+		});
+		return label;
+	}())));
+	right_click_list_.addItem(UIBasePtr(new UILabel([&]()->UILabel{
+		UILabel label;
+		label.set_input_adaptor(this);
+		label.set_text(unicode::ToTString(unicode::sjis2utf8("コピー")));
+		label.set_width(120);
+		label.set_top(12);
+		label.set_left(0);
+		label.set_textcolor(UISuper::Color(0,0,0,255));
+		label.set_bgcolor(UISuper::Color(255,255,255,180));
+		label.set_on_click_function_([&](UIBase* ptr)->void{
+			auto input_ = ptr->input_adpator();
+			SetClipboardText(input_->selecting_text().c_str());
+		});
+		label.set_on_hover_function_([](UIBase* ptr)->void{
+			auto label_ptr = (UILabel *)ptr;
+			label_ptr->set_bgcolor(UISuper::Color(0,0,0,180));
+			label_ptr->set_textcolor(UISuper::Color(255,255,255));
+		});
+		label.set_on_out_function_([](UIBase* ptr)->void{
+			auto label_ptr = (UILabel *)ptr;
+			label_ptr->set_bgcolor(UISuper::Color(255,255,255,180));
+			label_ptr->set_textcolor(UISuper::Color(0,0,0));
+		});
+		return label;
+	}())));
+	right_click_list_.addItem(UIBasePtr(new UILabel([&]()->UILabel{
+		UILabel label;
+		label.set_input_adaptor(this);
+		label.set_text(unicode::ToTString(unicode::sjis2utf8("貼り付け")));
+		label.set_width(120);
+		label.set_top(12);
+		label.set_left(0);
+		label.set_textcolor(UISuper::Color(0,0,0,255));
+		label.set_bgcolor(UISuper::Color(255,255,255,180));
+		label.set_on_click_function_([&](UIBase* ptr)->void{
+			auto input_ = ptr->input_adpator();
+			auto size = GetClipboardText(NULL);
+			if(size > 0){
+				TCHAR *buf = new TCHAR[size];
+				GetClipboardText(buf);
+				input_->paste_text(buf);
+				delete []buf;
+			}
+		});
+		label.set_on_hover_function_([](UIBase* ptr)->void{
+			auto label_ptr = (UILabel *)ptr;
+			label_ptr->set_bgcolor(UISuper::Color(0,0,0,180));
+			label_ptr->set_textcolor(UISuper::Color(255,255,255));
+		});
+		label.set_on_out_function_([](UIBase* ptr)->void{
+			auto label_ptr = (UILabel *)ptr;
+			label_ptr->set_bgcolor(UISuper::Color(255,255,255,180));
+			label_ptr->set_textcolor(UISuper::Color(0,0,0));
+		});
+		return label;
+	}())));
+	right_click_list_.set_height((font_height_ + 2)* 3);
+	right_click_list_.set_width(120);
 }
 
 void Input::Draw()
@@ -159,12 +260,98 @@ void Input::Draw()
             }
         }
 
-        for (auto it = lines_.begin(); it != lines_.end(); ++it) {
-            auto line = *it;
-            DrawStringToHandle(internal_x, internal_y + current_line * font_height_,
-                    line.c_str(), text_color, font_handle_);
-            current_line++;
-        }
+		int select_start = 0,select_end = 0;
+		GetKeyInputSelectArea(&select_start,&select_end,input_handle_);
+		if( select_start > select_end )std::swap(select_start,select_end);
+
+		if( select_start > -1 && select_end != select_start ) {
+			if ( multiline_ ) {
+				BOOST_FOREACH(auto it,lines_){
+					int width = 0;
+					TCHAR c[2] = {0};
+					if( select_start >= it.size() && select_start != -1 ) {
+						DrawStringToHandle(internal_x, internal_y + current_line * font_height_,
+							it.c_str(), text_color, font_handle_);
+						if(select_start == it.size()){
+							select_start -= it.size();
+						}else{
+							select_start -= it.size() + 1;
+						}
+						select_end -= it.size() + 1;
+						++current_line;
+					}else if(select_start != -1){
+						for(int i = 0;i < select_start;++i){
+							c[0] = it[i];
+							DrawStringToHandle(internal_x + width, internal_y + current_line * font_height_,
+								c, text_color, font_handle_);
+							width += GetDrawStringWidthToHandle(c,1,font_handle_);
+						}
+						for(int i = select_start;i < ((select_end > it.size()) ? it.size() : select_end); ++i){
+							c[0] = it[i];
+							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 180);
+							DrawBox(internal_x + width,internal_y + current_line * font_height_,
+								internal_x + width + GetDrawStringWidthToHandle(c,1,font_handle_),internal_y + ( current_line + 1 ) * font_height_,text_color,1);
+							DrawStringToHandle(internal_x + width, internal_y + current_line * font_height_,
+								c, !reverse_color_ ? GetColor(255, 255, 255) : GetColor(0, 0, 0), font_handle_);
+							width += GetDrawStringWidthToHandle(c,1,font_handle_);
+							SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+						}
+						for(int i = ((select_end > it.size()) ? it.size() : select_end);i < it.size(); ++i){
+							c[0] = it[i];
+							DrawStringToHandle(internal_x + width, internal_y + current_line * font_height_,
+								c, text_color, font_handle_);
+							width += GetDrawStringWidthToHandle(c,1,font_handle_);
+						}
+						if(select_end > it.size()){
+							select_end -= it.size() + 1;
+							select_start = 0;
+						}else{
+							select_start = -1;
+						}
+						++current_line;
+					}else if(select_start == -1){
+						DrawStringToHandle(internal_x + width, internal_y + current_line * font_height_,
+							it.c_str(), text_color, font_handle_);
+						++current_line;
+					}
+				}
+			}else{
+				BOOST_FOREACH(auto it,lines_){
+					int width = 0;
+					TCHAR c[2] = {0};
+					for(int i = 0;i < select_start;++i){
+						c[0] = it[i];
+						DrawStringToHandle(internal_x + width, internal_y + current_line * font_height_,
+							c, text_color, font_handle_);
+						width += GetDrawStringWidthToHandle(c,1,font_handle_);
+					}
+					for(int i = select_start;i < select_end; ++i){
+						c[0] = it[i];
+				        SetDrawBlendMode(DX_BLENDMODE_ALPHA, 180);
+						DrawBox(internal_x + width,internal_y + current_line * font_height_,
+							internal_x + width + GetDrawStringWidthToHandle(c,1,font_handle_),internal_y + ( current_line + 1 ) * font_height_,text_color,1);
+						DrawStringToHandle(internal_x + width, internal_y + current_line * font_height_,
+							c, !reverse_color_ ? GetColor(255, 255, 255) : GetColor(0, 0, 0), font_handle_);
+						width += GetDrawStringWidthToHandle(c,1,font_handle_);
+						SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+					}
+					for(int i = select_end;i < it.size(); ++i){
+						c[0] = it[i];
+						DrawStringToHandle(internal_x + width, internal_y + current_line * font_height_,
+							c, text_color, font_handle_);
+						width += GetDrawStringWidthToHandle(c,1,font_handle_);
+					}
+				}
+			}
+		}else{
+			for (auto it = lines_.begin(); it != lines_.end(); ++it) {
+				auto line = *it;
+				DrawStringToHandle(internal_x, internal_y + current_line * font_height_,
+					line.c_str(), text_color, font_handle_);
+				current_line++;
+			}
+		}
+
 
         // カーソルを描画
         if (clause_lines_.size() <= 0 && active() && blink_count_ < 30) {
@@ -258,11 +445,21 @@ void Input::Draw()
             }
         }
     }
+	{
+		if ( rightmenu_show_ ) {
+			right_click_list_.Draw();
+		}
+	}
 }
 
 void Input::Update()
 {
     blink_count_ = (blink_count_ + 1) % 60;
+	{
+		if ( rightmenu_show_ ) {
+			right_click_list_.Update();
+		}
+	}
 }
 
 void Input::ProcessInput(InputManager* input)
@@ -271,7 +468,15 @@ void Input::ProcessInput(InputManager* input)
         return;
     }
 
-    // bool push_mouse_left = (input->GetMouseLeftCount() > 0);
+	if ( rightmenu_show_ ) {
+		right_click_list_.ProcessInput(input);
+	}
+
+    bool push_mouse_left = (input->GetMouseLeftCount() > 0);
+	bool prev_mouse_left = input->GetPrevMouseLeft();
+
+	bool push_mouse_right = (input->GetMouseRightCount() > 0);
+	bool prev_mouse_right = input->GetPrevMouseRight();
 
     // bool first_key_shift = (input->GetKeyCount(KEY_INPUT_RSHIFT) == 1
     //        || input->GetKeyCount(KEY_INPUT_LSHIFT) == 1);
@@ -292,6 +497,7 @@ void Input::ProcessInput(InputManager* input)
             + KEY_REPEAT_FRAME) % (KEY_REPEAT_FRAME + 1) == 0;
     bool push_repeat_key_down = (input->GetKeyCount(KEY_INPUT_DOWN)
             + KEY_REPEAT_FRAME) % (KEY_REPEAT_FRAME + 1) == 0;
+
     // bool push_long_backspace = (input->GetKeyCount(KEY_INPUT_BACK) > 60 * 1.5);
 
     auto input_text = text();
@@ -407,13 +613,192 @@ void Input::ProcessInput(InputManager* input)
     }
 
     if (active()) {
-        // カーソル位置（byte）を取得
+		if ( !rightmenu_show_ &&
+			!( rightmenu_show_ && right_click_list_.absolute_x()<= input->GetMouseX() && input->GetMouseX() <= right_click_list_.absolute_x()+ right_click_list_.absolute_width()
+			&& right_click_list_.absolute_y() <= input->GetMouseY() && input->GetMouseY() <= right_click_list_.absolute_y() + right_click_list_.absolute_height())) {
+				// マウス左ボタンが押された時
+				if (push_mouse_left && !prev_mouse_left) {
+					auto mpos = input->GetMousePos();
+					auto offset_x = mpos.first - (x_ + INPUT_MARGIN_X);
+					auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y);
+					// カレット変更
+					if( multiline_ ) {
+						auto line_num = offset_y / font_height_;
+						//if( ( offset_y % font_height_ ) != 0 )++line_num;
+						int tmp = 0,cnt = 0;
+						if( line_num < (int)lines_.size() && line_num >= 0 ){
+							for(int i = 0;i < line_num; ++i){
+								cnt += lines_[i].size();
+							}
+							for(int i = 0;i < lines_[line_num].size(); ++i){
+								auto tmp_x = GetDrawStringWidthToHandle(&lines_[line_num][i],1,font_handle_);
+								if( tmp + tmp_x < offset_x ){
+									tmp += tmp_x;
+									++cnt;
+								}
+							}
+							SetKeyInputCursorPosition(line_num + cnt,input_handle_);
+						}
+					}else{
+						int tmp = 0,cnt = 0;
+						for(int i = 0;i < lines_[0].size(); ++i){
+							auto tmp_x = GetDrawStringWidthToHandle(&lines_[0][i],1,font_handle_);
+							if( tmp + tmp_x < offset_x ){
+								tmp += tmp_x;
+								++cnt;
+							}
+						}
+						if( selecting_coursorpoint_.first = selecting_coursorpoint_.second ) {
+							SetKeyInputSelectArea( -1, -1, input_handle_ );
+						}else{
+							SetKeyInputSelectArea(selecting_coursorpoint_.first,selecting_coursorpoint_.second,input_handle_);
+						}
+						SetKeyInputCursorPosition(cnt,input_handle_);
+					}
+				}
+				// マウス左ボタンがドラッグされた時
+				if (push_mouse_left && prev_mouse_left ) {
+					int prev_cursor_pos = 0;
+					if( !drag_flag_ ){
+						prev_cursor_pos = GetKeyInputCursorPosition(input_handle_);
+					}else{
+						prev_cursor_pos = selecting_coursorpoint_.first;
+					}
+					auto mpos = input->GetMousePos();
+					auto offset_x = mpos.first - (x_ + INPUT_MARGIN_X);
+					auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y);
+					// カレット変更
+					if( multiline_ ) {
+						auto line_num = offset_y / font_height_;
+						int tmp = 0,cnt = 0;
+						if( line_num < (int)lines_.size() && line_num >= 0){
+							for(int i = 0;i < line_num; ++i,++cnt){
+								cnt += lines_[i].size();
+							}
+							for(int i = 0;i < lines_[line_num].size(); ++i){
+								auto tmp_x = GetDrawStringWidthToHandle(&lines_[line_num][i],1,font_handle_);
+								if( tmp + tmp_x < offset_x ){
+									tmp += tmp_x;
+									++cnt;
+								}
+							}
+						}
+						selecting_coursorpoint_ = std::make_pair<int,int>(prev_cursor_pos,cnt);
+					}else{
+						int tmp = 0,cnt = 0;
+						for(int i = 0;i < lines_[0].size(); ++i){
+							auto tmp_x = GetDrawStringWidthToHandle(&lines_[0][i],1,font_handle_);
+							if( tmp + tmp_x < offset_x ){
+								tmp += tmp_x;
+								++cnt;
+							}
+						}
+						selecting_coursorpoint_ = std::make_pair<int,int>(prev_cursor_pos,cnt);
+					}
+					SetKeyInputSelectArea(selecting_coursorpoint_.first,selecting_coursorpoint_.second,input_handle_);
+					SetKeyInputCursorPosition(selecting_coursorpoint_.second,input_handle_);
+					drag_flag_ = true;
+				}
+				// マウス左ボタンが離され、且つ前回ドラッグされていた時
+				if (!push_mouse_left && prev_mouse_left && drag_flag_ ) {
+					drag_flag_ = false;
+					if( selecting_coursorpoint_.first == selecting_coursorpoint_.second ) {
+						SetKeyInputSelectArea( -1, -1, input_handle_ );
+					}else{
+						SetKeyInputSelectArea(selecting_coursorpoint_.first,selecting_coursorpoint_.second,input_handle_);
+					}
+					SetKeyInputCursorPosition(selecting_coursorpoint_.second,input_handle_);
+				}
+		}else{
+			if( push_mouse_left ){
+				rightmenu_show_ = false;
+				auto mpos = input->GetMousePos();
+				auto offset_x = mpos.first - (x_ + INPUT_MARGIN_X);
+				auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y);
+				// カレット変更
+				if( multiline_ ) {
+					auto line_num = offset_y / font_height_;
+					//if( ( offset_y % font_height_ ) != 0 )++line_num;
+					int tmp = 0,cnt = 0;
+					if( line_num < (int)lines_.size() && line_num >= 0 ){
+						for(int i = 0;i < line_num; ++i){
+							cnt += lines_[i].size();
+						}
+						for(int i = 0;i < lines_[line_num].size(); ++i){
+							auto tmp_x = GetDrawStringWidthToHandle(&lines_[line_num][i],1,font_handle_);
+							if( tmp + tmp_x < offset_x ){
+								tmp += tmp_x;
+								++cnt;
+							}
+						}
+						SetKeyInputCursorPosition(line_num + cnt,input_handle_);
+					}
+				}else{
+					int tmp = 0,cnt = 0;
+					for(int i = 0;i < lines_[0].size(); ++i){
+						auto tmp_x = GetDrawStringWidthToHandle(&lines_[0][i],1,font_handle_);
+						if( tmp + tmp_x < offset_x ){
+							tmp += tmp_x;
+							++cnt;
+						}
+					}
+					if( selecting_coursorpoint_.first = selecting_coursorpoint_.second ) {
+						SetKeyInputSelectArea( -1, -1, input_handle_ );
+					}else{
+						SetKeyInputSelectArea(selecting_coursorpoint_.first,selecting_coursorpoint_.second,input_handle_);
+					}
+					SetKeyInputCursorPosition(cnt,input_handle_);
+				}
+			}
+		}
+		// マウス右ボタンが押されたとき
+		if ( push_mouse_right && !prev_mouse_right ) {
+			if( x() <= input->GetMouseX() && input->GetMouseX() <= x() + width() && 
+				y() <= input->GetMouseY() && input->GetMouseY() <= y() + height()){
+					mouse_pos_ = input->GetMousePos();
+					if( mouse_pos_.second + right_click_list_.absolute_height() > config_manager_->screen_height()){
+						right_click_list_.set_top(mouse_pos_.second - right_click_list_.absolute_height());
+						if ( mouse_pos_.first + right_click_list_.absolute_width() > config_manager_->screen_width()){
+							right_click_list_.set_left(mouse_pos_.first - right_click_list_.absolute_width());
+							BOOST_FOREACH(auto it,right_click_list_.getItems()){
+								it->set_left(mouse_pos_.first - right_click_list_.absolute_width());
+								it->set_top(mouse_pos_.second - right_click_list_.absolute_height() + 12);
+							}
+						}else{
+							right_click_list_.set_left(mouse_pos_.first);
+							BOOST_FOREACH(auto it,right_click_list_.getItems()){
+								it->set_left(mouse_pos_.first);
+								it->set_top(mouse_pos_.second - right_click_list_.absolute_height() + 12);
+							}
+						}
+					}else{
+						right_click_list_.set_top(mouse_pos_.second);
+						if ( mouse_pos_.first + right_click_list_.absolute_width() > config_manager_->screen_width()){
+							right_click_list_.set_left(mouse_pos_.first - right_click_list_.absolute_width());
+							BOOST_FOREACH(auto it,right_click_list_.getItems()){
+								it->set_left(mouse_pos_.first - right_click_list_.absolute_width());
+								it->set_top(mouse_pos_.second + 12);
+							}
+						}else{
+							right_click_list_.set_left(mouse_pos_.first);
+							BOOST_FOREACH(auto it,right_click_list_.getItems()){
+								it->set_left(mouse_pos_.first);
+								it->set_top(mouse_pos_.second + 12);
+							}
+						}
+					}
+					rightmenu_show_ = true;
+			}
+		}
+
+        // カーソル位置（文字単位）を取得
         cursor_byte_pos = GetKeyInputCursorPosition(input_handle_);
 		if (prev_cursor_pos_ != cursor_byte_pos) {
 			ResetCursorCount();
 		}
 
 		prev_cursor_pos_ = cursor_byte_pos;
+
 
         // カーソルのドット単位の位置を取得する
         cursor_dot_pos = GetDrawStringWidthToHandle(String, cursor_byte_pos,
@@ -621,6 +1006,7 @@ void Input::ProcessInput(InputManager* input)
             TCHAR c = *it;
             int width = GetDrawStringWidthToHandle(&c, 1, font_handle_);
             line_buffer += tstring(&c, 1);
+			char_count++;
         #else
             unsigned char c = *it;
             TCHAR string[2] = { 0, 0 };
@@ -659,7 +1045,7 @@ void Input::ProcessInput(InputManager* input)
                     && cursor_moveto_x_ <= line_width + width
                     && static_cast<int>(lines_.size() + message_lines_.size()) * font_height_ <= cursor_moveto_y_
                     && cursor_moveto_y_ <= (static_cast<int>(lines_.size() + message_lines_.size()) + 1) * font_height_) {
-                SetKeyInputCursorPosition(prev_char_count, input_handle_);
+                SetKeyInputCursorPosition(char_count - 1, input_handle_);
                 cursor_moveto_x_ = -1;
                 cursor_moveto_y_ = -1;
             }
@@ -813,6 +1199,51 @@ void Input::set_message(const tstring& message)
 void Input::set_on_enter(const CallbackFunc& func)
 {
     on_enter_ = func;
+}
+
+tstring Input::selecting_text() const
+{
+		int select_start = 0,select_end = 0;
+		GetKeyInputSelectArea(&select_start,&select_end,input_handle_);
+		if( select_start > select_end )std::swap(select_start,select_end);
+		tstring selecting_text;
+
+		if( select_start > -1 && select_end != select_start ) {
+			if ( multiline_ ) {
+				BOOST_FOREACH(auto it,lines_){
+					TCHAR c[2] = {0};
+					if( select_start > it.size() && select_start != -1 ) {
+						select_start -= it.size();
+						select_end -= it.size();
+					}else{
+						for(int i = select_start;i < select_end; ++i){
+							c[0] = it[i];
+						    selecting_text += c;
+						}
+						select_start = -1;
+					}
+				}
+			}else{
+				BOOST_FOREACH(auto it,lines_){
+					TCHAR c[2] = {0};
+					for(int i = select_start;i < select_end; ++i){
+						c[0] = it[i];
+				        selecting_text += c;
+					}
+				}
+			}
+		}
+		return selecting_text;
+}
+
+void Input::paste_text(tstring text)
+{
+	auto pos = GetKeyInputCursorPosition(input_handle_);
+	TCHAR String[TEXT_BUFFER_SIZE];
+    GetKeyInputString(String, input_handle_);
+    tstring dat(String, _tcslen(String));
+	dat.insert(pos,text);
+	SetKeyInputString(dat.c_str(), input_handle_);
 }
 
 bool Input::reverse_color() const

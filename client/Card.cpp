@@ -24,6 +24,12 @@
 #include "GenerateJSON.hpp"
 #include "Music.hpp"
 
+#pragma comment(lib,"libctemplate.lib")
+
+#define CTEMPLATE_DLL_DECL
+#include <config.h>
+#include <ctemplate/template.h>
+
 
 char Card::STORAGE_DIR[] = "storage";
 char Card::SCRIPT_PATH[] = "system/js";
@@ -75,6 +81,7 @@ Card::Card(
         context->Global()->Set(String::New("Model"),  script_object->Clone());
         context->Global()->Set(String::New("Account"), script_object->Clone());
         context->Global()->Set(String::New("Music"),  script_object->Clone());
+        context->Global()->Set(String::New("Plugin"),  script_object->Clone());
         context->Global()->Set(String::New("InputBox"),   script_object->Clone());
         context->Global()->Set(String::New("Card"),    script_object->Clone());
         context->Global()->Set(String::New("Screen"),  script_object->Clone());
@@ -101,11 +108,39 @@ Card::Card(
 					assert(!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject());
 				});
 
-		ui_board_ = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+		ui_board_ = *static_cast<UISuperPtr*>(ui_board_obj_->GetPointerFromInternalField(0));
 	}
 	
 	ui_board_->set_icon_image_handle(
 		ResourceManager::LoadCachedGraph(unicode::ToTString(source_folder_ + "/" + icon_)));
+
+
+	auto sprit = [](const std::string &str, const std::string &delim)->std::vector<std::string>
+	{
+		std::vector<std::string> res;
+		size_t current = 0, found, delimlen = delim.size();
+		while((found = str.find(delim, current)) != std::string::npos){
+			res.push_back(std::string(str, current, found - current));
+			current = found + delimlen;
+		}
+		res.push_back(std::string(str, current, str.size() - current));
+		return res;
+	};
+
+
+	auto ui_board_tmp = *static_cast<UIBoardPtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+	auto pos = name_.find_first_of("@");
+	if ( pos != std::string::npos )
+	{
+		std::string plug_dat = name_.substr(pos,name_.length() - pos);
+		auto str_array = sprit(plug_dat,",");
+		BOOST_FOREACH(auto str,str_array)
+		{
+			if(str == "plugin")ui_board_tmp->set_boardvisible(false);
+			if(str == "uiplugin")ui_board_tmp->set_boardvisible(true);
+		}
+	}
+
 }
 
 Card::~Card()
@@ -296,6 +331,26 @@ Handle<Value> Card::Function_Music_IsLoadingDone(const Arguments& args)
 	}
 	return Boolean::New(false);
 }
+
+Handle<Value> Card::Function_Plugin_Run(const Arguments& args)
+{
+    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    if (auto card_manager = self->manager_accessor_->card_manager().lock()) {
+		if ( args[0]->IsString() ) {
+			auto name = std::string(*String::Utf8Value(args[0]->ToString()));
+			BOOST_FOREACH(auto card,card_manager->cards()) {
+				auto pos = card->name().find_first_of("@");
+				if( pos != std::string::npos ) {
+					if ( name == card->name().substr(0,pos) ) {
+						card->Run();
+					}
+				}
+			}
+		}
+	}
+	return Undefined();
+}
+
 
 Handle<Value> Card::Function_Account_id(const Arguments& args)
 {
@@ -890,6 +945,15 @@ void Card::SetFunctions()
 	script_.SetFunction("Music.rebuild", Function_Music_Rebuild);
 
     script_.SetProperty("Music.onReload", Property_Music_onReload, Property_set_Music_onReload);
+
+    /**
+     * 非自動実行プラグインを走らせます
+     *
+     * @method run
+     * @static
+     */
+	script_.SetFunction("Plugin.run", Function_Plugin_Run);
+
 	/**
      * アカウント
      *
@@ -1347,8 +1411,9 @@ UISuperPtr Card::GetWindow() const
 		return ui_board_;
 	} else {
 	    if (ui_board_obj_->IsObject()) {
-		    auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
-		    if (ptr->children_size() > 0) {
+		    auto ptr = *static_cast<UIBoardPtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+			assert(ptr);
+		    if (ptr->children_size() > 0 && ptr->boardvisible()) {
 				return ptr;
 		    }
 	    }

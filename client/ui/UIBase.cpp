@@ -19,7 +19,8 @@
 #include <DxLib.h>
 #include <algorithm>
 
-UIBase::UIBase()
+UIBase::UIBase() :
+hover_flag_(false)
 {
 
 }
@@ -36,6 +37,17 @@ UIBase::~UIBase()
 void UIBase::ProcessInput(InputManager* input)
 {
 
+}
+
+void UIBase::Update()
+{
+};
+
+void UIBase::Draw()
+{
+	if(!children_.empty()){
+		DrawChildren();
+	}
 }
 
 void UIBase::AsyncUpdate()
@@ -467,6 +479,26 @@ Handle<Object> UIBase::parent() const
 void UIBase::set_parent(const Handle<Object>& parent)
 {
     parent_ = Persistent<Object>::New(parent);
+}
+
+UIBasePtr UIBase::parent_c() const
+{
+    return parent_c_;
+}
+
+void UIBase::set_parent_c(const UIBasePtr& parent)
+{
+    parent_c_ = parent;
+}
+
+Input* UIBase::input_adpator() const
+{
+	return input_adaptor_;
+}
+
+void UIBase::set_input_adaptor(Input* adaptor)
+{
+	input_adaptor_ = adaptor;
 }
 
 size_t UIBase::children_size() const

@@ -18,7 +18,7 @@ class UIList : public UIBase {
         void Draw();
 
     public:
-        static void                           DefineInstanceTemplate(Handle<ObjectTemplate>* object);
+        static void DefineInstanceTemplate(Handle<ObjectTemplate>* object);
 
     private:
         /* function */
@@ -29,6 +29,16 @@ class UIList : public UIBase {
         /* property */
         static Handle<Value> Property_scroll_y(Local<String> property, const AccessorInfo &info);
         static void Property_set_scroll_y(Local<String> property, Local<Value> value, const AccessorInfo& info);
+
+	public:
+        /* function */
+		void addItem(UIBasePtr item);
+		void removeItem(UIBasePtr item);
+		void clearItems();
+		std::vector<UIBasePtr> getItems() const;
+
+        /* property */
+		void set_scroll_y(int scroll_y);
 
     private:
         std::array<ImageHandlePtr,4> scrollbar_base_image_handle_;
