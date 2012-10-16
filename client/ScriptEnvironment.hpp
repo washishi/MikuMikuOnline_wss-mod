@@ -7,6 +7,7 @@
 #include <string>
 #include <functional>
 #include <memory>
+#include <random>
 #include <v8.h>
 #include <boost/thread.hpp>
 #include <boost/timer.hpp>
@@ -77,6 +78,8 @@ class ScriptEnvironment {
         static Handle<Value> Function_Script_clearTimeout(const Arguments& args);
         static Handle<Value> Function_Script_clearInterval(const Arguments& args);
 
+        static Handle<Value> Function_Math_random(const Arguments& args);
+
     private:
         void Error(const Handle<Value>& error);
 
@@ -91,6 +94,8 @@ class ScriptEnvironment {
         boost::thread timelimit_thread_;
         boost::condition_variable condition_;
         boost::mutex mutex_;
+
+		static std::mt19937 random_engine;
 
         static unsigned int max_execution_time;
         static char SCRIPT_PATH[];
