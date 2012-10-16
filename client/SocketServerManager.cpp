@@ -5,7 +5,7 @@
 #include "SocketServerManager.hpp"
 #include "CardManager.hpp"
 
-const char SocketServerManager::DELIMITOR = 0x03;
+const char SocketServerManager::DELIMITOR[] = {0x0d, 0x0a, 0x0};
 
 SocketServerManager::SocketServerManager(const ManagerAccessorPtr& manager_accessor) :
 	manager_accessor_(manager_accessor),
@@ -64,7 +64,7 @@ SocketServerManager::Session::Session(const ManagerAccessorPtr& manager_accessor
 void SocketServerManager::Session::Start()
 {
     boost::asio::async_read_until(socket_,
-        receive_buf_, DELIMITOR,
+        receive_buf_, DELIMITOR[1],
             boost::bind(&SocketServerManager::Session::ReceiveTCP, shared_from_this(),
               boost::asio::placeholders::error));
 }
@@ -78,20 +78,12 @@ void SocketServerManager::Session::ReceiveTCP(const boost::system::error_code& e
         if (length != std::string::npos) {
 
             receive_buf_.consume(length + 1);
-            buffer.erase(length + 1);
+            buffer.erase(length - 1);
 
-            while (!buffer.empty()) {
-                std::string msg;
+            if (!buffer.empty()) {
 
-                while (!buffer.empty() && buffer[0]!=DELIMITOR)
-                {
-                    msg += buffer[0];
-                    buffer.erase(0,1);
-                }
-                buffer.erase(0,1);
-
-				Logger::Debug(_T("Receive command: %d"), unicode::ToTString(msg));
-				card_->Execute(msg, "", 
+				Logger::Debug(_T("Receive command: %d"), unicode::ToTString(buffer));
+				card_->Execute(buffer, "", 
 					[this](const Handle<Value>& value, const std::string error){
 						if (!error.empty()) {
 							std::string return_str(error);
@@ -102,7 +94,7 @@ void SocketServerManager::Session::ReceiveTCP(const boost::system::error_code& e
             }
 
 			boost::asio::async_read_until(socket_,
-				receive_buf_, DELIMITOR,
+				receive_buf_, DELIMITOR[1],
 					boost::bind(&SocketServerManager::Session::ReceiveTCP, shared_from_this(),
 					  boost::asio::placeholders::error));
 

@@ -39,7 +39,7 @@ class SocketServerManager {
 		boost::asio::io_service io_service_;
 		tcp::acceptor acceptor_;
 
-		static const char DELIMITOR;
+		static const char DELIMITOR[];
 };
 typedef std::shared_ptr<SocketServerManager> SocketServerManagerPtr;
 typedef std::weak_ptr<SocketServerManager> SocketServerManagerWeakPtr;
