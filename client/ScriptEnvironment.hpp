@@ -10,6 +10,7 @@
 #include <v8.h>
 #include <boost/thread.hpp>
 #include <boost/timer.hpp>
+#include "ResourceManager.hpp"
 
 using namespace v8;
 typedef std::function<void(const Handle<Value>&, const std::string)> V8ValueCallBack;
@@ -93,6 +94,18 @@ class ScriptEnvironment {
 
         static unsigned int max_execution_time;
         static char SCRIPT_PATH[];
+
+	public:
+		void *operator new(size_t size)
+		{
+			return tlsf_new(ResourceManager::memory_pool(), size);
+		}
+		void *operator new(size_t, void *p){return p;}
+		void operator delete(void *p)
+		{
+			tlsf_delete(ResourceManager::memory_pool(), p);
+		}
+		void operator delete(void *, void *){};
 };
 
 typedef std::shared_ptr<ScriptEnvironment> ScriptEnvironmentPtr;

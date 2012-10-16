@@ -27,6 +27,8 @@ class ManagerAccessor {
         void set_config_manager(ConfigManagerWeakPtr config_manager);
         const WindowManagerWeakPtr& window_manager();
         void set_window_manager(WindowManagerWeakPtr window_manager);
+	    const SocketServerManagerWeakPtr& socket_server_manager();
+        void set_socket_server_manager(SocketServerManagerWeakPtr socket_server_manager);
 
     private:
         CardManagerWeakPtr card_manager_;
@@ -36,6 +38,7 @@ class ManagerAccessor {
         AccountManagerWeakPtr account_manager_;
         ConfigManagerWeakPtr config_manager_;
         WindowManagerWeakPtr window_manager_;
+		SocketServerManagerWeakPtr socket_server_manager_;
 };
 
 typedef std::shared_ptr<ManagerAccessor> ManagerAccessorPtr;

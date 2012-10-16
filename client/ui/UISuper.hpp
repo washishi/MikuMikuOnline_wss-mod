@@ -117,6 +117,18 @@ class UISuper : public std::enable_shared_from_this<UISuper> {
         std::string base_image_;
 
 		ImageHandlePtr icon_image_handle_;
+
+	public:
+		void *operator new(size_t size)
+		{
+			return tlsf_new(ResourceManager::memory_pool(), size);
+		}
+		void *operator new(size_t, void *p){return p;}
+		void operator delete(void *p)
+		{
+			tlsf_delete(ResourceManager::memory_pool(), p);
+		}
+		void operator delete(void *, void *){};
 };
 
 typedef std::shared_ptr<UISuper> UISuperPtr;

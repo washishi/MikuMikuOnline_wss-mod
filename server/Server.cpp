@@ -202,8 +202,8 @@ namespace network {
         }
 
         auto new_session = boost::make_shared<ServerSession>(io_service_);
-         acceptor_.async_accept(new_session->tcp_socket(),
-                 boost::bind(&Server::ReceiveSession, this, new_session, boost::asio::placeholders::error));
+        acceptor_.async_accept(new_session->tcp_socket(),
+                boost::bind(&Server::ReceiveSession, this, new_session, boost::asio::placeholders::error));
 
 		RefreshSession();
     }

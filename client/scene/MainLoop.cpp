@@ -8,8 +8,15 @@
 #include "ChannelChange.hpp"
 #include <vector>
 #include <algorithm>
+#include "../PlayerManager.hpp"
+#include "../CardManager.hpp"
+#include "../CommandManager.hpp"
+#include "../WorldManager.hpp"
+#include "../AccountManager.hpp"
+#include "../ConfigManager.hpp"
 #include "../ResourceManager.hpp"
 #include "../WindowManager.hpp"
+#include "../SocketServerManager.hpp"
 #include "../Core.hpp"
 #include <shlwapi.h>
 #include "ServerChange.hpp"
@@ -25,6 +32,7 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
       account_manager_(manager_accessor->account_manager().lock()),
       config_manager_(manager_accessor->config_manager().lock()),
       window_manager_(std::make_shared<WindowManager>(manager_accessor_)),
+	  socket_server_manager_(std::make_shared<SocketServerManager>(manager_accessor_)),
       inputbox_(std::make_shared<InputBox>(manager_accessor_)),
 	  minimap_(std::make_shared<MiniMap>(manager_accessor)),
 	  snapshot_number_(0),
@@ -45,6 +53,8 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
     world_manager_->Init();	
 
     world_manager_->myself()->Init(unicode::ToTString(account_manager_->model_name()));
+
+	socket_server_manager_->Start();
 }
 
 MainLoop::~MainLoop()

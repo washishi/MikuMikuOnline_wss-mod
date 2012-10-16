@@ -4,6 +4,7 @@
 
 #include "MainLoop.hpp"
 #include "ChannelChange.hpp"
+#include "../CommandManager.hpp"
 #include "../../common/Logger.hpp"
 #include "../../common/network/Utils.hpp"
 #include "../3d/Stage.hpp"

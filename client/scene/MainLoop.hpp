@@ -7,15 +7,10 @@
 #include <memory>
 #include "Base.hpp"
 #include "../Client.hpp"
-#include "../PlayerManager.hpp"
-#include "../CardManager.hpp"
-#include "../CommandManager.hpp"
-#include "../WorldManager.hpp"
-#include "../AccountManager.hpp"
-#include "../ConfigManager.hpp"
 #include "../ManagerAccessor.hpp"
 #include "../ui/InputBox.hpp"
 #include "../MiniMap.hpp"
+//#include "../SocketServer.hpp"
 
 namespace scene {
 
@@ -43,11 +38,14 @@ class MainLoop : public Base {
         AccountManagerPtr account_manager_;
         ConfigManagerPtr config_manager_;
         WindowManagerPtr window_manager_;
+        SocketServerManagerPtr socket_server_manager_;
 		MiniMapPtr minimap_;
         InputBoxPtr inputbox_;
-		int snapshot_number_;
 
+		int snapshot_number_;
 		bool snapshot_;
+
+		//SocketServer socket_server_;
 };
 
 }

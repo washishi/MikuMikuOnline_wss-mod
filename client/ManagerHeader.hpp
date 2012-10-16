@@ -35,3 +35,7 @@ typedef std::weak_ptr<ConfigManager> ConfigManagerWeakPtr;
 class WindowManager;
 typedef std::shared_ptr<WindowManager> WindowManagerPtr;
 typedef std::weak_ptr<WindowManager> WindowManagerWeakPtr;
+
+class SocketServerManager;
+typedef std::shared_ptr<SocketServerManager> SocketServerManagerPtr;
+typedef std::weak_ptr<SocketServerManager> SocketServerManagerWeakPtr;

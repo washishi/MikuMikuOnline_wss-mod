@@ -35,9 +35,33 @@ struct ReadFuncData {
 typedef std::shared_ptr<ReadFuncData> ReadFuncDataPtr;
 
 class ResourceManager {
+	private:
+		static class MemoryPool {
+			private:
+				char mem_block_[1024*1024*512];
+				tlsf_pool pool_;
+			public:
+				MemoryPool()
+				{
+					pool_ = tlsf_create(mem_block_,sizeof(mem_block_));
+				}
+
+				~MemoryPool()
+				{
+					tlsf_destroy(pool_);
+				}
+
+				tlsf_pool& pool()
+				{
+					return pool_;
+				}
+		} mempool;
 
     public:
         static void ClearCache();
+
+    public:
+        static tlsf_pool& memory_pool();
 
     // Fonts
     public:
@@ -115,6 +139,19 @@ class ImageHandle {
 
     private:
         int handle_;
+
+	public:
+		void *operator new(size_t size)
+		{
+			return tlsf_new(ResourceManager::memory_pool(), size);
+		}
+		void *operator new(size_t, void *p){return p;}
+		void operator delete(void *p)
+		{
+			tlsf_delete(ResourceManager::memory_pool(), p);
+		}
+		void operator delete(void *, void *){};
+
 };
 
 class ModelHandle {
@@ -142,4 +179,17 @@ class ModelHandle {
         std::shared_ptr<ptree> property_;
         std::string name_;
         bool async_load_;
+
+	public:
+		void *operator new(size_t size)
+		{
+			return tlsf_new(ResourceManager::memory_pool(), size);
+		}
+		void *operator new(size_t, void *p){return p;}
+		void operator delete(void *p)
+		{
+			tlsf_delete(ResourceManager::memory_pool(), p);
+		}
+		void operator delete(void *, void *){};
+
 };

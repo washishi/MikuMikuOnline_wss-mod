@@ -10,6 +10,8 @@
 #include <algorithm>
 #include "../ResourceManager.hpp"
 #include "../PlayerManager.hpp"
+#include "../CommandManager.hpp"
+#include "../AccountManager.hpp"
 #include "../../common/Logger.hpp"
 
 namespace scene {

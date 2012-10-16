@@ -24,11 +24,11 @@
 #include "GenerateJSON.hpp"
 #include "Music.hpp"
 
-#pragma comment(lib,"libctemplate.lib")
+//#pragma comment(lib,"libctemplate.lib")
 
-#define CTEMPLATE_DLL_DECL
-#include <config.h>
-#include <ctemplate/template.h>
+//#define CTEMPLATE_DLL_DECL
+//#include <config.h>
+//#include <ctemplate/template.h>
 
 
 char Card::STORAGE_DIR[] = "storage";
@@ -83,6 +83,7 @@ Card::Card(
         context->Global()->Set(String::New("Music"),  script_object->Clone());
         context->Global()->Set(String::New("Plugin"),  script_object->Clone());
         context->Global()->Set(String::New("InputBox"),   script_object->Clone());
+        context->Global()->Set(String::New("Socket"),    script_object->Clone());
         context->Global()->Set(String::New("Card"),    script_object->Clone());
         context->Global()->Set(String::New("Screen"),  script_object->Clone());
         context->Global()->Set(String::New("UI"),      script_object->Clone());
@@ -563,7 +564,18 @@ Handle<Value> Card::Function_Music_Rebuild(const Arguments& args)
 	return Undefined();
 }
 
+Handle<Value> Card::Function_Socket_reply(const Arguments& args)
+{
+	if (args.Length() > 0 && args[0]->IsString()) {
+		std::string str = *String::Utf8Value(args[0]->ToString());
+		auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+		if (self && self->on_socket_reply_) {
+			(*self->on_socket_reply_)(str);
+		}
+	}
 
+	return Undefined();
+}
 
 Handle<Value> Card::Property_global(Local<String> property, const AccessorInfo &info)
 {
@@ -1054,6 +1066,14 @@ void Card::SetFunctions()
      * @static
      */
     script_.SetFunction("Account.updateChannel", Function_Account_updateChannel);
+
+    /**
+     * ソケット
+     *
+     * @class Socket
+     * @static
+     */
+	script_.SetFunction("Socket.reply", Function_Socket_reply);
 
     /**
      * カード
@@ -1736,4 +1756,9 @@ void Card::set_max_local_storage_size(int size)
 void Card::set_ui_board(const UISuperPtr& ui_board)
 {
 	ui_board_ = ui_board;
+}
+
+void Card::set_on_socket_reply(const SocketCallbackPtr& func)
+{
+	on_socket_reply_ = func;
 }

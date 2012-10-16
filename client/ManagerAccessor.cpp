@@ -86,3 +86,13 @@ void ManagerAccessor::set_window_manager(WindowManagerWeakPtr window_manager)
 {
     window_manager_ = window_manager;
 }
+
+const SocketServerManagerWeakPtr& ManagerAccessor::socket_server_manager()
+{
+    return socket_server_manager_;
+}
+
+void ManagerAccessor::set_socket_server_manager(SocketServerManagerWeakPtr socket_server_manager)
+{
+    socket_server_manager_ = socket_server_manager;
+}

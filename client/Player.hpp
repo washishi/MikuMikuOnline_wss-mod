@@ -110,6 +110,17 @@ class Player : public std::enable_shared_from_this<Player> {
         std::string ip_address_;
         uint16_t udp_port_;
 
+	public:
+		void *operator new(size_t size)
+		{
+			return tlsf_new(ResourceManager::memory_pool(), size);
+		}
+		void *operator new(size_t, void *p){return p;}
+		void operator delete(void *p)
+		{
+			tlsf_delete(ResourceManager::memory_pool(), p);
+		}
+		void operator delete(void *, void *){};
 
     private:
         const static int BALLOON_BASE_BLOCK_SIZE;
