@@ -50,118 +50,112 @@ typedef boost::weak_ptr<Session> SessionWeakPtr;
     };
 
 	template<header::CommandHeader Header>
-	class CommandTemplate : public Command {
+	class CommandTemplate0 : public Command {
 		public:
-			CommandTemplate() :
+			CommandTemplate0() :
 			  Command(Header, "") {}
 	};
 
-	typedef CommandTemplate<header::ServerStartEncryptedSession>		ServerStartEncryptedSession;
-	typedef CommandTemplate<header::ClientStartEncryptedSession>		ClientStartEncryptedSession;
-	typedef CommandTemplate<header::ClientRequestedPublicKey>			ClientRequestedPublicKey;
-	typedef CommandTemplate<header::ClientRequestedClientInfo>			ClientRequestedClientInfo;
-	typedef CommandTemplate<header::ClientReceiveServerCrowdedError>	ClientReceiveServerCrowdedError;
-	typedef CommandTemplate<header::ServerRequestedFullServerInfo>		ServerRequestedFullServerInfo;
-	typedef CommandTemplate<header::ServerRequestedPlainFullServerInfo>	ServerRequestedPlainFullServerInfo;
-
-    // コネクションの切断
-    class FatalConnectionError : public Command {
-    public:
-        FatalConnectionError();
-        FatalConnectionError(uint32_t user_id);
-    };
-
-    // クライアントからの公開鍵を受信
-    class ServerReceivePublicKey : public Command {
-    public:
-        ServerReceivePublicKey(const std::string& key);
-    };
-
-    // サーバーからの共通鍵を受信
-    class ClientReceiveCommonKey : public Command {
-    public:
-        ClientReceiveCommonKey(const std::string& key,
-                const std::string& sign,
-                uint32_t user_id);
-    };
-
-    // 他のプレイヤーの位置情報が更新された
-    class ClientUpdatePlayerPosition : public Command {
-    public:
-        ClientUpdatePlayerPosition(uint32_t id, int16_t x, int16_t y, int16_t z, uint8_t theta, uint8_t vy);
-    };
-
-    // プレイヤーの位置情報が更新された
-    class ServerUpdatePlayerPosition : public Command {
-    public:
-        ServerUpdatePlayerPosition(int16_t x, int16_t y, int16_t z, uint8_t theta, uint8_t vy);
-    };
-
-    // クライアントの情報を受信した　（公開鍵のフィンガープリント, UDPポート）
-    class ServerReceiveClientInfo : public Command {
-    public:
-        ServerReceiveClientInfo(const std::string& key, uint16_t version, uint16_t udp_port);
-    };
-
-    class ServerRequestedAccountRevisionPatch : public Command {
-    public:
-        ServerRequestedAccountRevisionPatch(uint32_t user_id, int revision);
-    };
-
-    // アカウントデータベースの更新データ
-    class ClientReceiveAccountRevisionPatch : public Command {
-    public:
-        ClientReceiveAccountRevisionPatch(const std::string& patch);
-    };
-
-    // アカウントデータベースの更新通知
-    class ClientReceiveAccountRevisionUpdateNotify : public Command {
-    public:
-        ClientReceiveAccountRevisionUpdateNotify(uint32_t user_id, int revision);
-    };
-
-    class ClientReceiveWriteAverageLimitUpdate : public Command {
-    public:
-        ClientReceiveWriteAverageLimitUpdate(uint16_t byte);
-    };
-
-    class ClientReceiveUnsupportVersionError : public Command {
-    public:
-        ClientReceiveUnsupportVersionError(uint32_t require_version);
-    };
-
-    class ServerReceiveAccountInitializeData : public Command {
-    public:
-        ServerReceiveAccountInitializeData(const std::string& data);
-    };
-
-    class ServerUpdateAccountProperty : public Command {
-    public:
-        ServerUpdateAccountProperty(AccountProperty uint16_t, const std::string& value);
-    };
-
-    class ServerReceiveJSON : public Command {
-    public:
-        ServerReceiveJSON(const std::string& json);
-    };
-
-    class ClientReceiveJSON : public Command {
-    public:
-        ClientReceiveJSON(const std::string& info_json, const std::string& message_json);
-    };
-
-	class ClientReceiveServerInfo : public Command {
-    public:
-        ClientReceiveServerInfo(const std::string& stage);
+	template<header::CommandHeader Header, class T1>
+	class CommandTemplate1 : public Command {
+		public:
+			CommandTemplate1(T1 t1) :
+			  Command(Header, Utils::Serialize(t1)) {}
 	};
 
-	class ClientReceiveFullServerInfo : public Command {
-    public:
-        ClientReceiveFullServerInfo(const std::string& xml);
+	template<header::CommandHeader Header, class T1, class T2>
+	class CommandTemplate2 : public Command {
+		public:
+			CommandTemplate2(T1 t1, T2 t2) :
+			  Command(Header, Utils::Serialize(t1, t2)) {}
 	};
 
-	class ClientReceivePlainFullServerInfo : public Command {
-    public:
-        ClientReceivePlainFullServerInfo(const std::string& xml);
+	template<header::CommandHeader Header, class T1, class T2, class T3>
+	class CommandTemplate3 : public Command {
+		public:
+			CommandTemplate3(T1 t1, T2 t2, T3 t3) :
+			  Command(Header, Utils::Serialize(t1, t2, t3)) {}
 	};
+
+	template<header::CommandHeader Header, class T1, class T2, class T3, class T4>
+	class CommandTemplate4 : public Command {
+		public:
+			CommandTemplate4(T1 t1, T2 t2, T3 t3, T4 t4) :
+			  Command(Header, Utils::Serialize(t1, t2, t3, t4)) {}
+	};
+
+	template<header::CommandHeader Header, class T1, class T2, class T3, class T4, class T5>
+	class CommandTemplate5 : public Command {
+		public:
+			CommandTemplate5(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5) :
+			  Command(Header, Utils::Serialize(t1, t2, t3, t4, t5)) {}
+	};
+
+	template<header::CommandHeader Header, class T1, class T2, class T3, class T4, class T5, class T6>
+	class CommandTemplate6 : public Command {
+		public:
+			CommandTemplate6(T1 t1, T2 t2, T3 t3, T4 t4, T5 t5, T6 t6) :
+			  Command(Header, Utils::Serialize(t1, t2, t3, t4, t5, t6)) {}
+	};
+	
+	typedef CommandTemplate0<header::FatalConnectionError>					FatalConnectionError;
+	typedef CommandTemplate0<header::ServerStartEncryptedSession>			ServerStartEncryptedSession;
+	typedef CommandTemplate0<header::ClientStartEncryptedSession>			ClientStartEncryptedSession;
+	typedef CommandTemplate0<header::ClientRequestedPublicKey>				ClientRequestedPublicKey;
+	typedef CommandTemplate0<header::ClientRequestedClientInfo>				ClientRequestedClientInfo;
+	typedef CommandTemplate0<header::ClientReceiveServerCrowdedError>		ClientReceiveServerCrowdedError;
+	typedef CommandTemplate0<header::ServerRequestedFullServerInfo>			ServerRequestedFullServerInfo;
+	typedef CommandTemplate0<header::ServerRequestedPlainFullServerInfo>	ServerRequestedPlainFullServerInfo;
+
+	typedef CommandTemplate1<header::ServerReceivePublicKey,
+		const std::string&>	ServerReceivePublicKey;
+
+	typedef CommandTemplate1<header::ClientReceiveAccountRevisionPatch,
+		const std::string&>	ClientReceiveAccountRevisionPatch;
+
+	typedef CommandTemplate6<header::ClientUpdatePlayerPosition,
+		uint32_t, int16_t, int16_t, int16_t, uint8_t, uint8_t> ClientUpdatePlayerPosition;
+
+	typedef CommandTemplate5<header::ServerUpdatePlayerPosition,
+		int16_t, int16_t, int16_t, uint8_t, uint8_t> ServerUpdatePlayerPosition;
+
+	typedef CommandTemplate2<header::ServerRequestedAccountRevisionPatch,
+		uint32_t, int> ServerRequestedAccountRevisionPatch;
+
+	typedef CommandTemplate2<header::ClientReceiveAccountRevisionUpdateNotify,
+		uint32_t, int> ClientReceiveAccountRevisionUpdateNotify;
+
+	typedef CommandTemplate3<header::ClientReceiveCommonKey,
+		const std::string&, const std::string&, uint32_t> ClientReceiveCommonKey;
+	
+	typedef CommandTemplate2<header::ServerUpdateAccountProperty,
+		AccountProperty, const std::string&> ServerUpdateAccountProperty;
+
+	typedef CommandTemplate3<header::ServerReceiveClientInfo,
+		const std::string&, uint16_t, uint16_t> ServerReceiveClientInfo;
+
+	typedef CommandTemplate1<header::ClientReceiveWriteAverageLimitUpdate,
+		uint16_t> ClientReceiveWriteAverageLimitUpdate;
+
+	typedef CommandTemplate1<header::ClientReceiveUnsupportVersionError,
+		uint32_t> ClientReceiveUnsupportVersionError;
+
+	typedef CommandTemplate1<header::ServerReceiveAccountInitializeData,
+		const std::string&> ServerReceiveAccountInitializeData;
+
+	typedef CommandTemplate1<header::ServerReceiveJSON,
+		const std::string&> ServerReceiveJSON;
+
+	typedef CommandTemplate2<header::ClientReceiveJSON,
+		const std::string&, const std::string&> ClientReceiveJSON;
+
+	typedef CommandTemplate1<header::ClientReceiveServerInfo,
+		const std::string&> ClientReceiveServerInfo;
+
+	typedef CommandTemplate1<header::ClientReceiveFullServerInfo,
+		const std::string&> ClientReceiveFullServerInfo;
+
+	typedef CommandTemplate1<header::UserFatalConnectionError,
+		uint32_t> UserFatalConnectionError;
+
 }

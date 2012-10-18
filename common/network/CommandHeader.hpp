@@ -7,7 +7,9 @@
 namespace network {
 namespace header {
     enum CommandHeader {
-        FatalConnectionError =                      0x01,
+        FatalConnectionError =                      0xA0,
+        UserFatalConnectionError =                  0xA1,
+
         ServerStartEncryptedSession =               0x02,
         ClientStartEncryptedSession =               0x03,
         ServerReceivePublicKey =                    0x04,

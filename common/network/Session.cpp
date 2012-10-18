@@ -79,7 +79,7 @@ namespace network {
 
     void Session::UpdateReadByteAverage()
     {
-        unsigned long elapsed_time = time(nullptr) - read_start_time_;
+        auto elapsed_time = time(nullptr) - read_start_time_;
         if (elapsed_time >= BYTE_AVERAGE_REFRESH_SECONDS) {
             read_byte_sum_ /= 2;
             read_start_time_ = time(nullptr) - elapsed_time / 2;
@@ -88,7 +88,7 @@ namespace network {
 
     void Session::UpdateWriteByteAverage()
     {
-        unsigned long elapsed_time = time(nullptr) - write_start_time_;
+        auto elapsed_time = time(nullptr) - write_start_time_;
         if (elapsed_time >= BYTE_AVERAGE_REFRESH_SECONDS) {
             write_byte_sum_ /= 2;
             write_start_time_ = time(nullptr) - elapsed_time / 2;
@@ -351,7 +351,7 @@ namespace network {
             online_ = false;
             if (on_receive_) {
                 if (id_ > 0) {
-                    (*on_receive_)(FatalConnectionError(id_));
+                    (*on_receive_)(UserFatalConnectionError(id_));
                 } else {
                     (*on_receive_)(FatalConnectionError());
                 }

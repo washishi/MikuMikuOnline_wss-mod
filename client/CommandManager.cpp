@@ -191,8 +191,9 @@ void CommandManager::FetchCommand(const network::Command& command)
 	case ClientReceiveAccountRevisionPatch:
 	{
 		Logger::Info(_T("Receive account database update data"));
-		assert(command.body().size() > 0);
-		player_manager->ApplyRevisionPatch(command.body());
+		std::string data = network::Utils::Deserialize<std::string>(command.body());
+		assert(!data.empty());
+		player_manager->ApplyRevisionPatch(data);
 	}
 		break;
 

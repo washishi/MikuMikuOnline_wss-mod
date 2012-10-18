@@ -135,6 +135,17 @@ namespace network {
             *first = GetDeserializedValue<First>(buffer);
         }
 
+        template<class T>
+        inline T Deserialize(const std::string& data)
+        {
+            std::string buffer(data);
+
+			T t;
+            GetDeserializedItems(buffer, &t);
+
+			return t;
+        }
+
         template<class T1>
         inline size_t Deserialize(const std::string& data, T1 t1)
         {

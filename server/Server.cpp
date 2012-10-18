@@ -30,7 +30,8 @@ namespace network {
                 [&](network::Command c){
 
             // ログアウト
-            if (c.header() == network::header::FatalConnectionError) {
+            if (c.header() == network::header::FatalConnectionError || 
+				c.header() == network::header::UserFatalConnectionError) {
                 if (callback) {
 					(*callback)(c);
 				}

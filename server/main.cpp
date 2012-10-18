@@ -89,9 +89,9 @@ void server()
 
 		case network::header::ServerRequestedPlainFullServerInfo:
 		{
-			if (auto session = c.session().lock()) {
-				session->Send(network::ClientReceivePlainFullServerInfo(server.GetFullStatus()));
-			}
+			//if (auto session = c.session().lock()) {
+			//	session->Send(network::ClientReceivePlainFullServerInfo(server.GetFullStatus()));
+			//}
 		}
 		break;
 
@@ -113,7 +113,7 @@ void server()
 					break;
 				}
 				
-				std::stringstream message_json(c.body());
+				std::stringstream message_json(network::Utils::Deserialize<std::string>(c.body()));
 
 				using namespace boost::property_tree;
 				ptree message_tree;
@@ -232,7 +232,9 @@ void server()
         case network::header::ServerReceivePublicKey:
         {
             if (auto session = c.session().lock()) {
-                uint32_t user_id = server.account().RegisterPublicKey(c.body());
+				auto public_key = network::Utils::Deserialize<std::string>(c.body());
+                uint32_t user_id = server.account().RegisterPublicKey(public_key);
+
 				assert(user_id > 0);
 
 				session->ResetReadByteAverage();
@@ -273,7 +275,8 @@ void server()
         case network::header::ServerReceiveAccountInitializeData:
         {
             if (auto session = c.session().lock()) {
-                server.account().LoadInitializeData(session->id(), c.body());
+				auto data = network::Utils::Deserialize<std::string>(c.body());
+                server.account().LoadInitializeData(session->id(), data);
 
                 const auto& list = server.account().GetIDList();
                 BOOST_FOREACH(UserID user_id, list) {
@@ -365,11 +368,10 @@ void server()
         break;
 
         // エラー
-        case network::header::FatalConnectionError:
+        case network::header::UserFatalConnectionError:
         {
             if (c.body().size() > 0) {
-                int user_id;
-                network::Utils::Deserialize(c.body(), &user_id);
+                uint32_t user_id = network::Utils::Deserialize<uint32_t>(c.body());
                 server.account().LogOut(user_id);
 
                 server.SendAll(
