@@ -198,6 +198,7 @@ void CommandManager::FetchCommand(const network::Command& command)
 		break;
 
 	case FatalConnectionError:
+	case UserFatalConnectionError:
 	{
 		status_ = STATUS_ERROR;
 	}

@@ -10,6 +10,7 @@
 #include <boost/asio.hpp>
 #include <stdint.h>
 #include "CommandHeader.hpp"
+#include "Utils.hpp"
 #include "../database/AccountProperty.hpp"
 
 namespace network {
