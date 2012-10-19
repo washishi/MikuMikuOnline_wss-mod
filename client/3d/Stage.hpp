@@ -10,13 +10,14 @@
 #include "dx_vector.hpp"
 #include "../ResourceManager.hpp"
 #include "../ui/InputBox.hpp"
+#include "../ConfigManager.hpp"
 
 struct Channel;
 typedef std::shared_ptr<Channel> ChannelPtr;
 
 class Stage {
     public:
-        Stage(const ChannelPtr& channel);
+        Stage(const ChannelPtr& channel,const ConfigManagerPtr &config_manager);
         ~Stage();
         void Draw();
         void DrawAfter();
@@ -45,6 +46,8 @@ class Stage {
 
         void UpdateSkymapPosition(const VECTOR& pos);
 
+		ConfigManagerPtr config_manager() const;
+
     private:
         ModelHandle map_handle_;
         float map_scale_;
@@ -60,6 +63,8 @@ class Stage {
 
 		bool host_change_flag_;
 		ChannelPtr channel_;
+
+		ConfigManagerPtr config_manager_;
 };
 
 typedef std::shared_ptr<Stage> StagePtr;

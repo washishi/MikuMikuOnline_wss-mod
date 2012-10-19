@@ -656,3 +656,65 @@ Handle<Value> UICustom::Function_DrawSphere3D(const Arguments& args)
 
     return Undefined();
 }
+
+std::list<int> UICustom::graphic_handles_ = std::list<int>();
+Handle<Value> UICustom::Function_LoadGraph(const Arguments& args)
+{
+    assert(args.This()->InternalFieldCount() > 0);
+    auto self = std::dynamic_pointer_cast<UICustom>(
+            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+    );
+    assert(self);
+	if(args[0]->IsString())
+	{
+		int handle = LoadGraph(unicode::ToTString(*String::Utf8Value(args[0]->ToString())).c_str());
+		graphic_handles_.push_back(handle);
+		return Int32::New(handle);
+	}
+
+	return Undefined();
+}
+
+Handle<Value> UICustom::Function_DeleteGraph(const Arguments& args)
+{
+    assert(args.This()->InternalFieldCount() > 0);
+    auto self = std::dynamic_pointer_cast<UICustom>(
+            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+    );
+    assert(self);
+	if(args[0]->IsObject())
+	{
+		auto tmp = args[0]->ToObject();
+		assert(tmp->InternalFieldCount() > 0);
+		//auto obj = *static_cast<GraphicObjectPtr>(tmp->GetPointerFromInternalField(0));
+		// ‚ß‚ñ‚Ç‚¢‚©‚çŒã‚Å
+		//auto it = std::find_if(graphics_handle_.begin(),graphics_handle_.end(),[&](GraphicObject src)->bool{return src == obj;});
+		//if(it != graphics_handle_.end())
+		//{
+		//	it = graphics_handle_.erase(it);
+		//}
+	}
+
+	return Undefined();
+}
+
+
+Handle<Value> UICustom::Function_DrawText(const Arguments& args)
+{
+    assert(args.This()->InternalFieldCount() > 0);
+    auto self = std::dynamic_pointer_cast<UICustom>(
+            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+    );
+    assert(self);
+	if(	args[0]->IsInt32() &&
+		args[1]->IsInt32() &&
+		args[2]->IsString())
+	{
+		auto x = args[0]->ToInt32()->Int32Value();
+		auto y = args[1]->ToInt32()->Int32Value();
+		auto str = unicode::ToTString(*String::Utf8Value(args[2]->ToString()));
+		DrawStringToHandle(x,y,str.c_str(),GetColor(0,0,0),ResourceManager::default_font_handle());
+	}
+
+	return Undefined();
+}

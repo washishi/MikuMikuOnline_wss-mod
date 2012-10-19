@@ -47,7 +47,7 @@ void SocketServerManager::ReceiveSession(const SessionPtr& session, const boost:
 SocketServerManager::Session::Session(const ManagerAccessorPtr& manager_accessor, boost::asio::io_service& io_service) :
 
 	socket_(io_service),
-	card_(std::make_shared<Card>(manager_accessor, "", "sock", "",
+	card_(std::make_shared<Card>(manager_accessor, "", "sock", "", "",
                             std::vector<std::string>()))
 {
 	auto callback = std::make_shared<std::function<void(const std::string&)>>(

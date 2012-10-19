@@ -43,12 +43,14 @@ Card::Card(
     std::string source_folder,
     std::string name,
     std::string icon,
+	std::string type,
     const std::vector<std::string>& scripts,
 	bool native) :
     manager_accessor_(manager_accessor),
     source_folder_(source_folder),
     name_(name),
     icon_(icon),
+	type_(type),
     scripts_(scripts),
 	folding_(false),
 	native_(native),
@@ -130,16 +132,11 @@ Card::Card(
 
 
 	auto ui_board_tmp = *static_cast<UIBoardPtr*>(ui_board_obj_->GetPointerFromInternalField(0));
-	auto pos = name_.find_first_of("@");
-	if ( pos != std::string::npos )
+	auto str_array = sprit(type,",");
+	BOOST_FOREACH(auto str,str_array)
 	{
-		std::string plug_dat = name_.substr(pos,name_.length() - pos);
-		auto str_array = sprit(plug_dat,",");
-		BOOST_FOREACH(auto str,str_array)
-		{
-			if(str == "plugin")ui_board_tmp->set_boardvisible(false);
-			if(str == "uiplugin")ui_board_tmp->set_boardvisible(true);
-		}
+		if(str == "plugin")ui_board_tmp->set_boardvisible(false);
+		if(str == "uiplugin")ui_board_tmp->set_boardvisible(true);
 	}
 
 }

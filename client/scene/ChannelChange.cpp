@@ -23,7 +23,7 @@ ChannelChange::ChannelChange(unsigned char channel, const ManagerAccessorPtr& ma
 	command_manager_->Write(network::ServerUpdateAccountProperty(CHANNEL, network::Utils::Serialize(channel_str)));
 
 	auto channel_ptr = command_manager_->channels().at(channel);
-	StagePtr stage = std::make_shared<Stage>(channel_ptr);
+	StagePtr stage = std::make_shared<Stage>(channel_ptr,manager_accessor->config_manager().lock());
 	world_manager_ = std::make_shared<WorldManager>(stage, manager_accessor);
     manager_accessor_->set_world_manager(world_manager_);
 }

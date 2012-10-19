@@ -56,7 +56,7 @@ public:
 
 		model_height_ = data_provider_.model().property().get<float>("character.height",1.58f);
 		flight_duration_ideal_ = sqrt((model_height_*2.0f)/9.8f) + sqrt((model_height_*0.8f)/9.8);	
-		shadow_handle_ = LoadGraph( _T(".\\resources\\textures\\shadow.tga") );
+		shadow_handle_ = LoadGraph( _T(".\\system\\textures\\shadow.tga") );
 		shadow_size_ = data_provider_.model().property().get<float>("character.shadow_size",0.35f);
 	}
 	// キャラクターの影を描画

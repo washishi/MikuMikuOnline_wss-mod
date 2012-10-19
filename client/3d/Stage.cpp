@@ -8,12 +8,13 @@
 #include "../CommandManager.hpp"
 #include <string>
 
-Stage::Stage(const ChannelPtr& channel) :
+Stage::Stage(const ChannelPtr& channel,const ConfigManagerPtr &config_manager) :
     map_handle_(ResourceManager::LoadModelFromName(unicode::ToTString(channel->stage))),
     map_scale_(map_handle_.property().get<float>("scale", 20.0)),
 	min_height_(map_handle_.property().get<float>("min_height", -200.0)),
 	host_change_flag_(false),
-	channel_(channel)
+	channel_(channel),
+	config_manager_(config_manager)
 	{
     MV1SetScale(map_handle_.handle(), VGet(map_scale_, map_scale_, map_scale_));
     MV1SetupCollInfo(map_handle_.handle(), -1, 128, 64, 128);// 元の数値は256,256,256
@@ -341,4 +342,9 @@ float Stage::min_height() const
 const bool& Stage::host_change_flag() const
 {
 	return host_change_flag_;
+}
+
+ConfigManagerPtr Stage::config_manager() const
+{
+	return config_manager_;
 }

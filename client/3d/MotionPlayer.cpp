@@ -26,6 +26,7 @@ void MotionPlayer::Play(int anim_index, bool connect_prev, int blend_time, int a
 	isloop_ = isloop;
 	isloopcheck_ = isloopcheck;
 	if(!isloopcheck_)isplayend_ = false;
+	chain_data_.clear();
 
     prev_attach_index_ = current_attach_index_;
     if (blend_time_ <= 0)
@@ -39,6 +40,45 @@ void MotionPlayer::Play(int anim_index, bool connect_prev, int blend_time, int a
 
     SetBlendRateToModel();
 }
+
+void MotionPlayer::ChainPlay(const std::vector<ChainData> chain_data)
+{
+ 	if(chain_data.size() == 0)
+	{
+		return;
+	}else{
+		prev_anim_index_ = MV1GetAttachAnim(model_handle_,current_attach_index_);
+	}
+	_ChainPlay(chain_data.begin());
+}
+
+void MotionPlayer::_ChainPlay(const std::vector<ChainData>::const_iterator &it)
+{
+
+	// まだ前回の移行期間の最中なら、移行を中止する
+    DetachPrevMotionIfExist();
+
+	chain_data_it_ = it;
+	connect_prev_ = chain_data_it_->connect_prev;
+    prev_blend_rate_ = chain_data_it_->blend_time;
+    blend_time_ = chain_data_it_->blend_time;
+	isloop_ = chain_data_it_->isloop;
+	isloopcheck_ = false;
+	if(!isloopcheck_)isplayend_ = false;
+
+    prev_attach_index_ = current_attach_index_;
+    if (blend_time_ <= 0)
+    {
+        DetachPrevMotionIfExist();
+    }
+	
+    current_attach_index_ = MV1AttachAnim(model_handle_, chain_data_it_->anim_index,
+            chain_data_it_->anim_src_model_handle, chain_data_it_->check_name ? TRUE : FALSE);
+    MV1SetAttachAnimTime(model_handle_, current_attach_index_, 0);
+
+    SetBlendRateToModel();
+}
+
 
 void MotionPlayer::Stop()
 {
@@ -108,7 +148,17 @@ void MotionPlayer::AdvancePlayTime(int diff_time)
 		{
 			Stop();
 			isplayend_ = true;
-			Play(prev_anim_index_,connect_prev_,200,-1,false,true,-1,isloopcheck_);
+			if(!chain_data_.empty()){
+				++chain_data_it_;
+				if(chain_data_it_ == chain_data_.end())
+				{
+					Play(prev_anim_index_,connect_prev_,200,-1,false,true,-1,isloopcheck_);
+				}else{
+					_ChainPlay(chain_data_it_);
+				}
+			}else{
+				Play(prev_anim_index_,connect_prev_,200,-1,false,true,-1,isloopcheck_);
+			}
 			return;
 		}
         anim_time -= anim_total_time;

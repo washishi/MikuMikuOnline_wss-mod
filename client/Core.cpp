@@ -111,6 +111,8 @@ int Core::SetUpDxLib()
     MV1SetLoadModelPhysicsWorldGravity(-100);
     MV1SetLoadModelUsePhysicsMode(DX_LOADMODEL_PHYSICS_LOADCALC);
 
+	SetGlobalAmbientLight(GetColorF(0,0,0,0));
+
     return 0;
 }
 

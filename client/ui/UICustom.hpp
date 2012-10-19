@@ -5,6 +5,8 @@
 #pragma once
 
 #include "UIBase.hpp"
+#include <v8.h>
+#include <list>
 
 class UICustom : public UIBase {
     public:
@@ -48,7 +50,13 @@ class UICustom : public UIBase {
 		static Handle<Value> Function_DrawCone3D(const Arguments& args);
 	
 		static Handle<Value> Function_LoadGraph(const Arguments& args);
+		static Handle<Value> Function_DeleteGraph(const Arguments& args);
 
+		static Handle<Value> Function_DrawText(const Arguments& args);
+
+	private:
+		/* member */
+		static std::list<int> graphic_handles_;
 };
 
 typedef std::shared_ptr<UICustom> UICustomPtr;

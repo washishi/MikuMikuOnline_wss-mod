@@ -187,21 +187,23 @@ _error:
 	}
 };
 
+#define MAX_PATH_L (MAX_PATH * 2)
+
 JsonGen::JsonGen()
 {
 	HANDLE hFind,hPmdFind,hTxtFind;							// Directory Pmd Text
 	WIN32_FIND_DATA win32fd_dir,win32fd_pmd,win32fd_txt;	// Directory Pmd Text
-	TCHAR tcsTmpPath[MAX_PATH] = {0};
-	TCHAR tcsTmpPath_Pmd[MAX_PATH] = {0};
-	TCHAR tcsTmpDir[MAX_PATH] = {0};
+	TCHAR tcsTmpPath[MAX_PATH_L] = {0};
+	TCHAR tcsTmpPath_Pmd[MAX_PATH_L] = {0};
+	TCHAR tcsTmpDir[MAX_PATH_L] = {0};
 
 	std::vector<std::wstring> pmd_paths;
 	std::wstring prejson;
 	DxLib::VECTOR prePos = {0},curPos = {0},lclPos = {0};
 	DxLib::MATRIX chglcl = {0};
 
-	char pmd_model_name_[MAX_PATH] = {0};
-	TCHAR pmd_author_name_[MAX_PATH] = {0};
+	char pmd_model_name_[MAX_PATH_L] = {0};
+	TCHAR pmd_author_name_[MAX_PATH_L] = {0};
 
 	int exist_num_pmd_ = 0;
 
@@ -225,16 +227,16 @@ JsonGen::JsonGen()
 			_tcscat_s(tcsTmpDir,win32fd_dir.cFileName);
 			_tcscat_s(tcsTmpDir,_T("/"));
 
-			ZeroMemory(tcsTmpPath,MAX_PATH);
+			ZeroMemory(tcsTmpPath,MAX_PATH_L);
 			_tcscpy_s(tcsTmpPath,tcsTmpDir);
 			_tcscat_s(tcsTmpPath,_T("info.json"));
 
 			// info.jsonが存在しない場合、pmdに従って作成
 			if(!PathFileExists(tcsTmpPath))
 			{
-				ZeroMemory(tcsTmpPath_Pmd,MAX_PATH);
+				ZeroMemory(tcsTmpPath_Pmd,MAX_PATH_L);
 				_tcscpy_s(tcsTmpPath_Pmd,tcsTmpDir);
-				_tcscat_s(tcsTmpPath_Pmd,_T("*.pm?"));
+				_tcscat_s(tcsTmpPath_Pmd,_T("*.pmd"));
 				hPmdFind = FindFirstFile(tcsTmpPath_Pmd, &win32fd_pmd);
 				if(hPmdFind == (HANDLE)0xffffffff)
 				{
@@ -242,11 +244,11 @@ JsonGen::JsonGen()
 					continue;
 				}
 
-				TCHAR cur_dir[MAX_PATH];
-				ZeroMemory(cur_dir,MAX_PATH);
-				GetCurrentDirectory(MAX_PATH,cur_dir);
+				TCHAR cur_dir[MAX_PATH_L];
+				ZeroMemory(cur_dir,MAX_PATH_L);
+				GetCurrentDirectory(MAX_PATH_L,cur_dir);
 				bool flag = false;
-				/*for(int k = MAX_PATH - 1;k != 0;--k)
+				/*for(int k = MAX_PATH_L - 1;k != 0;--k)
 				{
 					if( cur_dir[k] == _T('/') )
 					{
@@ -294,7 +296,7 @@ JsonGen::JsonGen()
 					}
 					delete []pmd_info_t;
 
-					TCHAR tmp_mv1_path[MAX_PATH] = {0};
+					TCHAR tmp_mv1_path[MAX_PATH_L] = {0};
 					_tcscpy_s(tmp_mv1_path,pmd_paths[i].c_str());
 
 					model_handle_ = MV1LoadModel( tmp_mv1_path );
@@ -333,24 +335,32 @@ JsonGen::JsonGen()
 					_ftot_s(tmp_f,32,floor(prePos.y*2)/10.0f,2);
 					prejson += tmp_f;
 					prejson += _T(",\n\t\t\t\"motions\":\n\t\t\t\t{\n\t\t\t\t\t\"stand\":\"basic_stand.vmd\",\n\t\t\t\t\t\"walk\": \t\"basic_walk.vmd\",\n\t\t\t\t\t\"run\":\t\"basic_run.vmd\"\n\t\t\t\t}\n\t\t}\n}");
-					TCHAR tmp_dir[MAX_PATH];
+					TCHAR tmp_dir[MAX_PATH_L];
 					_tcscpy_s(tmp_dir,_T("./models/"));
 					_tcscat_s(tmp_dir,pmd_author_name_);
 					_tcscat_s(tmp_dir,_T("式"));
+					_tcscat_s(tmp_dir,_T("/"));
+					if(!PathIsDirectory(tmp_dir)){
+						_wmkdir(tmp_dir);
+					}
+					_tcscpy_s(tmp_dir,_T("./models/"));
+					_tcscat_s(tmp_dir,pmd_author_name_);
+					_tcscat_s(tmp_dir,_T("式"));
+					_tcscat_s(tmp_dir,_T("/"));
 					_tcscat_s(tmp_dir,tmp_w_m);
 					_tcscat_s(tmp_dir,_T("/"));
 					_wmkdir(tmp_dir);
 					delete [] tmp_w_m;
 					//delete [] tmp_w_a;
-					TCHAR json_path[MAX_PATH];
+					TCHAR json_path[MAX_PATH_L];
 					_tcscpy_s(json_path,tmp_dir);
 					_tcscat_s(json_path,_T("info.json"));
 					_tfopen_s(&json_file,json_path, _T("w, ccs=UTF-8"));
 					fseek(json_file, 0, SEEK_SET);
 					_ftprintf_s(json_file,prejson.c_str());
 					fclose(json_file);
-					TCHAR tmp_src[MAX_PATH];
-					TCHAR tmp_cpy[MAX_PATH];
+					TCHAR tmp_src[MAX_PATH_L];
+					TCHAR tmp_cpy[MAX_PATH_L];
 
 					// テクスチャのコピー
 					for(int t = 0;t < tex_num;++t)
@@ -361,7 +371,7 @@ JsonGen::JsonGen()
 						_tcscat_s(tmp_cpy,MV1GetTextureName( model_handle_, t));
 						CopyFile(tmp_src,tmp_cpy,TRUE);
 					}
-					TCHAR tmp_txt_f[MAX_PATH];
+					TCHAR tmp_txt_f[MAX_PATH_L];
 					_tcscpy_s(tmp_txt_f,tcsTmpDir);
 					_tcscat_s(tmp_txt_f,_T("*.txt"));
 					hTxtFind = FindFirstFile(tmp_txt_f,&win32fd_txt);

@@ -468,10 +468,6 @@ void Input::ProcessInput(InputManager* input)
         return;
     }
 
-	if ( rightmenu_show_ ) {
-		right_click_list_.ProcessInput(input);
-	}
-
     bool push_mouse_left = (input->GetMouseLeftCount() > 0);
 	bool prev_mouse_left = input->GetPrevMouseLeft();
 
@@ -711,7 +707,6 @@ void Input::ProcessInput(InputManager* input)
 				}
 		}else{
 			if( push_mouse_left ){
-				rightmenu_show_ = false;
 				auto mpos = input->GetMousePos();
 				auto offset_x = mpos.first - (x_ + INPUT_MARGIN_X);
 				auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y);
@@ -755,7 +750,7 @@ void Input::ProcessInput(InputManager* input)
 		if ( push_mouse_right && !prev_mouse_right ) {
 			if( x() <= input->GetMouseX() && input->GetMouseX() <= x() + width() && 
 				y() <= input->GetMouseY() && input->GetMouseY() <= y() + height()){
-					mouse_pos_ = input->GetMousePos();
+					auto mouse_pos_ = input->GetMousePos();
 					if( mouse_pos_.second + right_click_list_.absolute_height() > config_manager_->screen_height()){
 						right_click_list_.set_top(mouse_pos_.second - right_click_list_.absolute_height());
 						if ( mouse_pos_.first + right_click_list_.absolute_width() > config_manager_->screen_width()){
@@ -1102,6 +1097,14 @@ void Input::ProcessInput(InputManager* input)
     if (active()) {
         input->CancelKeyCountAll();
     }
+
+	if ( rightmenu_show_ ) {
+		right_click_list_.ProcessInput(input);
+		if( push_mouse_left ) {
+			rightmenu_show_ = false;
+		}
+	}
+
 }
 
 bool Input::active()

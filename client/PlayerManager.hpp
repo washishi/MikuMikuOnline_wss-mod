@@ -9,6 +9,8 @@
 #include <array>
 #include "Player.hpp"
 #include "ManagerAccessor.hpp"
+#include "ui/UIList.hpp"
+#include "ui/UILabel.hpp"
 
 class CharacterManager;
 class CharacterDataProvider;
@@ -63,6 +65,8 @@ class PlayerManager : public std::enable_shared_from_this<PlayerManager> {
         void AddCharacter(unsigned int character_id, const tstring& model_name);
         void RemoveCharacter(unsigned int user_id);
 
+		UIList user_action_list_;
+		bool show_action_list_;
 };
 
 typedef std::shared_ptr<PlayerManager> PlayerManagerPtr;

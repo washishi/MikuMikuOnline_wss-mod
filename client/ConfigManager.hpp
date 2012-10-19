@@ -74,13 +74,16 @@ class ConfigManager
 		int show_nametag_,
 			show_modelname_,
 			gamepad_type_,
-			camera_direction_;
+			camera_direction_,
+			walk_change_type_;
 
 	public:
 		int show_nametag() const;
 		void set_show_nametag(int value);
 		int show_modelname() const;
 		void set_show_modelname(int value);
+		int walk_change_type() const;
+		void set_walk_change_type(int value);
 
 		int gamepad_type() const;
 		void set_gamepad_type(int value);

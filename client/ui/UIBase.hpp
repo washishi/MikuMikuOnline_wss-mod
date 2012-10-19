@@ -71,7 +71,7 @@ class UIBase : public UISuper {
         static void SetObjectTemplate(const std::string& classname,
                 Handle<ObjectTemplate>* object);
 
-        template<class F>
+		template<class F>
         static void SetFunction(Handle<ObjectTemplate>* object, const std::string& name, F func);
 
         template<class G, class S>

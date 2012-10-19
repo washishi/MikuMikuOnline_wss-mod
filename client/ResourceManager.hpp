@@ -30,6 +30,7 @@ struct ReadFuncData {
 	ReadFuncData(const ptree& info);
     boost::filesystem::wpath model_dir;
     std::list<std::pair<std::string, std::string>> motions;
+    std::unordered_map<std::string, std::string> set_motions;
     std::list<std::pair<std::string, std::string>>::iterator motions_it;
 };
 typedef std::shared_ptr<ReadFuncData> ReadFuncDataPtr;
@@ -115,7 +116,9 @@ class ResourceManager {
 		//Musics
 		static MusicPtr& music();
 
-    private:
+		static std::unordered_map<std::string, std::string>& set_motions();
+
+private:
         static int default_font_handle_;
         static std::unordered_map<tstring, ImageHandlePtr> graph_handles_;
         static std::unordered_map<tstring, std::vector<ImageHandlePtr>> div_graph_handles_;
@@ -129,6 +132,10 @@ class ResourceManager {
 		static MusicPtr music_;
 
 		static const ptree& GetDefaultInfoJSON();
+
+		//Motions
+		static std::unordered_map<std::string, std::string> set_motions_;
+
 };
 
 class ImageHandle {

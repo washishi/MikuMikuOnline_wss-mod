@@ -89,7 +89,7 @@ class Input{
         bool reverse_color_;
         int blink_count_;
 		bool rightmenu_show_;
-		std::pair<int, int> mouse_pos_;
+		//std::pair<int, int> mouse_pos_;
 
 		UIList right_click_list_;
 

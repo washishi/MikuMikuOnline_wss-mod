@@ -46,6 +46,8 @@ class UILabel : public UIBase {
         std::vector<int> char_width_list_;
         int font_handle_;
 
+		int clickchancel_count_;
+
         Color textcolor_, bgcolor_;
 
     private:

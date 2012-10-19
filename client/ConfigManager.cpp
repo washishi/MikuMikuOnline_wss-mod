@@ -61,6 +61,7 @@ void ConfigManager::Load(const std::string& filename)
     show_modelname_ =	pt.get("show_modelname", 1);
     gamepad_type_ =		pt.get("gamepad_type", 0);
     camera_direction_ =	pt.get("camera_direction", 0);
+	walk_change_type_ = pt.get("walk_change_type",0);
 }
 
 void ConfigManager::Save(const std::string& filename)
@@ -183,6 +184,16 @@ void ConfigManager::set_show_modelname(int value)
 {
 	show_modelname_ = value;
 }
+
+int ConfigManager::walk_change_type() const
+{
+	return walk_change_type_;
+}
+void ConfigManager::set_walk_change_type(int value)
+{
+	walk_change_type_ = value;
+}
+
 
 int ConfigManager::gamepad_type() const
 {

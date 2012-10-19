@@ -22,7 +22,8 @@
 const int UILabel::BASE_BLOCK_SIZE = 12;
 
 UILabel::UILabel() :
-                font_handle_(ResourceManager::default_font_handle())
+                font_handle_(ResourceManager::default_font_handle()),
+				clickchancel_count_(-1)
 {
 }
 
@@ -192,7 +193,11 @@ void UILabel::ProcessInput(InputManager* input)
 		}else if(!on_click_function_._Empty()) {
 			on_click_function_(this);
 			input->CancelMouseLeft();
+			clickchancel_count_ = 8;
 		}
+	}else if(clickchancel_count_ >= 0 ){
+			input->CancelMouseLeft();
+			--clickchancel_count_;
 	}else if(hover && !hover_flag_){
 		if(!on_hover_function_._Empty()) {
 			on_hover_function_(this);

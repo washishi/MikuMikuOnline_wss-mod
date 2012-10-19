@@ -202,16 +202,11 @@ void FieldPlayer::SetModel(const ModelHandle& model)
     motion.pre_jmp_ = MV1GetAnimIndex(model_handle_.handle(), _T("jmp_pre"));
 	motion.jmp_ = MV1GetAnimIndex(model_handle_.handle(), _T("jmp"));
 	motion.end_jmp_ = MV1GetAnimIndex(model_handle_.handle(), _T("jmp_end"));
-    motion.sync_n1_ = MV1GetAnimIndex(model_handle_.handle(), _T("1"));
-    motion.sync_n2_ = MV1GetAnimIndex(model_handle_.handle(), _T("2"));
-    motion.sync_n3_ = MV1GetAnimIndex(model_handle_.handle(), _T("3"));
-    motion.sync_n4_ = MV1GetAnimIndex(model_handle_.handle(), _T("4"));
-    motion.sync_n5_ = MV1GetAnimIndex(model_handle_.handle(), _T("5"));
-    motion.sync_n6_ = MV1GetAnimIndex(model_handle_.handle(), _T("6"));
-    motion.sync_n7_ = MV1GetAnimIndex(model_handle_.handle(), _T("7"));
-    motion.sync_n8_ = MV1GetAnimIndex(model_handle_.handle(), _T("8"));
-    motion.sync_n9_ = MV1GetAnimIndex(model_handle_.handle(), _T("9"));
-    motion.sync_n0_ = MV1GetAnimIndex(model_handle_.handle(), _T("0"));
+
+	ptree motion_allocation_ = model_handle_.property().get_child("character.motion_allocation",ptree());
+	BOOST_FOREACH( auto it, motion_allocation_ ){
+		allocated_motion_.insert(std::map<std::string,std::string>::value_type(it.first,it.second.get_value<std::string>()));
+	}
 
     motion_player_.reset(new MotionPlayer(model_handle_.handle()));
 	dummy_move_count_ = 2;
@@ -251,13 +246,17 @@ void FieldPlayer::Update()
         }
 
         motion_player_->Play(current_stat_.motion, connect_prev, 200, -1, false);
+	//}else if(additional_motion_.flag_)
+	//{
+	//	bool connect_prev = true;
+	//	motion_player_->Play(additional_motion_.handle_, connect_prev, 400, -1, false,additional_motion_.isloop_,additional_motion_.nextanim_handle_,additional_motion_.loopcheck_);
+	//	additional_motion_.loopcheck_ = false;
+	//	additional_motion_.flag_ = false;
+	//	additional_motion_.nextanim_handle_ = -1;
 	}else if(additional_motion_.flag_)
 	{
-		bool connect_prev = true;
-		motion_player_->Play(additional_motion_.handle_, connect_prev, 400, -1, false,additional_motion_.isloop_,additional_motion_.nextanim_handle_,additional_motion_.loopcheck_);
-		additional_motion_.loopcheck_ = false;
+		motion_player_->ChainPlay(additional_motion_.chain_data);
 		additional_motion_.flag_ = false;
-		additional_motion_.nextanim_handle_ = -1;
 	}
     // モーション再生時刻更新
     motion_player_->Next(timer_->Delta());
@@ -524,11 +523,27 @@ void FieldPlayer::InputFromUser()
 	}
 
     // Shiftで歩きと走りの切り替え
-//    if (input.GetKeyCount(InputManager::KEYBIND_CHANGE_SPEED) == 1 ||
-//        input.GetKeyCount(InputManager::KEYBIND_CHANGE_SPEED2) == 1)
-//    {
-//        current_stat_.is_walking = !prev_stat_.is_walking;
-//    }
+	switch((*stage_)->config_manager()->walk_change_type()){
+	case 0:
+		// おしっぱ
+		if (input.GetKeyCount(InputManager::KEYBIND_CHANGE_SPEED) > 0 ||
+			input.GetKeyCount(InputManager::KEYBIND_CHANGE_SPEED2) > 0)
+		{
+			current_stat_.is_walking = true;
+		}else{
+			current_stat_.is_walking = false;
+		}
+		break;
+	case 1:
+		// 切り替え
+		if (input.GetKeyCount(InputManager::KEYBIND_CHANGE_SPEED) == 1 ||
+			input.GetKeyCount(InputManager::KEYBIND_CHANGE_SPEED2) == 1)
+		{
+			current_stat_.is_walking = !prev_stat_.is_walking;
+		}
+	default:
+		break;
+	}
 
     if (current_stat_.acc.y == 0 && move_dir != 0)
     {
@@ -599,12 +614,79 @@ void FieldPlayer::InputFromUser()
 			current_stat_.acc.y = -9.8 * (*stage_)->map_scale();
 			current_stat_.vel += VGet(0, jump_height_ * (*stage_)->map_scale(), 0);
 	}
+
+	std::string motion_num = "";
+	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_00) > 0)motion_num = "0";
+	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_01) > 0 && motion_num.empty())motion_num = "1";
+	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_02) > 0 && motion_num.empty())motion_num = "2";
+	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_03) > 0 && motion_num.empty())motion_num = "3";
+	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_04) > 0 && motion_num.empty())motion_num = "4";
+	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_05) > 0 && motion_num.empty())motion_num = "5";
+	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_06) > 0 && motion_num.empty())motion_num = "6";
+	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_07) > 0 && motion_num.empty())motion_num = "7";
+	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_08) > 0 && motion_num.empty())motion_num = "8";
+	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_09) > 0 && motion_num.empty())motion_num = "9";
+	if (!motion_num.empty()){
+		auto type = ResourceManager::set_motions().find(allocated_motion_[motion_num]);
+		if( type != ResourceManager::set_motions().end() )
+		{
+			auto IntToString = [](int num)->std::string{std::stringstream ss;ss << num;return ss.str();};
+			//モーションセット
+			if(type->second == "el"){
+				int cnt = 0;
+				bool flag = true;
+				additional_motion_.chain_data.clear();
+				while(flag){
+					MotionPlayer::ChainData dat;
+					dat.anim_index = MV1GetAnimIndex(model_handle_.handle(),unicode::ToTString((allocated_motion_[motion_num] + "@" + IntToString(cnt))).c_str());
+					if(dat.anim_index != -1){
+						dat.isloop = false;
+						additional_motion_.chain_data.push_back(dat);
+						++cnt;
+					}else if(!additional_motion_.chain_data.empty()){
+						additional_motion_.chain_data[cnt - 1].isloop = true;
+						additional_motion_.flag_ = true;
+						flag = false;
+					}
+				}
+			}else
+			if(type->second == "ch"){
+				int cnt = 0;
+				bool flag = true;
+				additional_motion_.chain_data.clear();
+				while(flag){
+					MotionPlayer::ChainData dat;
+					dat.anim_index = MV1GetAnimIndex(model_handle_.handle(),unicode::ToTString((allocated_motion_[motion_num] + "@" + IntToString(cnt))).c_str());
+					if(dat.anim_index != -1){
+						dat.isloop = false;
+						additional_motion_.chain_data.push_back(dat);
+						++cnt;
+					}else if(!additional_motion_.chain_data.empty()){
+						additional_motion_.flag_ = true;
+						flag = false;
+					}
+				}
+			}else
+			if(type->second == "lp"){
+				PlayMotion(unicode::ToTString(allocated_motion_[motion_num]),true);
+			}
+		}else{
+			//単一モーション
+			PlayMotion(unicode::ToTString(allocated_motion_[motion_num]),false);
+		}
+		data_provider_.set_json("{\"type\":\"motion\",\"data\":\""+allocated_motion_[motion_num]+"\"}");
+	}
 }
 
 void FieldPlayer::PlayMotion(const tstring& name,bool isloop)
 {
-	additional_motion_.handle_ = MV1GetAnimIndex(model_handle_.handle(),name.c_str());
-	additional_motion_.isloop_ = isloop;
+	//additional_motion_.handle_ = MV1GetAnimIndex(model_handle_.handle(),name.c_str());
+	//additional_motion_.isloop_ = isloop;
+	MotionPlayer::ChainData chain_data;
+	chain_data.anim_index = MV1GetAnimIndex(model_handle_.handle(),name.c_str());
+	chain_data.isloop = isloop;
+	additional_motion_.chain_data.clear();
+	additional_motion_.chain_data.push_back(chain_data);
 	additional_motion_.flag_ = true;
 }
 
