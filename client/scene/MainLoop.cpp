@@ -182,6 +182,15 @@ void MainLoop::Draw()
 			}
 		}
 	}
+
+	if (command_manager_->status() == CommandManager::STATUS_ERROR){
+		SetDrawBlendMode(DX_BLENDMODE_MUL, 120);
+		DrawBox(0,0,config_manager_->screen_width(),config_manager_->screen_height(),GetColor(0,0,0),1);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+		auto str = unicode::ToTString("サーバーとの接続が切断されました");
+		auto width = GetDrawStringWidthToHandle(str.c_str(),str.length(),ResourceManager::default_font_handle());
+		DrawStringToHandle(config_manager_->screen_width()/2.0f - width,config_manager_->screen_height()/2.0f - ResourceManager::default_font_size(),str.c_str(),GetColor(255,255,255),ResourceManager::default_font_handle());
+	}
 }
 
 void MainLoop::End()

@@ -76,6 +76,7 @@ Stage::Stage(const ChannelPtr& channel,const ConfigManagerPtr &config_manager) :
 
     float skymap_scale = skymap_handle_.property().get<float>("scale", 80.0);
     MV1SetScale(skymap_handle_.handle(), VGet(skymap_scale, skymap_scale, skymap_scale));
+
 }
 
 Stage::~Stage()
@@ -322,6 +323,11 @@ void Stage::UpdateSkymapPosition(const VECTOR& pos)
 const ModelHandle& Stage::map_handle() const
 {
     return map_handle_;
+}
+
+const ModelHandle& Stage::skymap_handle() const
+{
+    return skymap_handle_;
 }
 
 const std::vector<VECTOR>& Stage::start_points() const

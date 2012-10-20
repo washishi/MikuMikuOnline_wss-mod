@@ -35,6 +35,7 @@ class Stage {
         bool IsNearPoint(const VECTOR& point) const;
 
         const ModelHandle& map_handle() const;
+        const ModelHandle& skymap_handle() const;
         float map_scale() const;
         float min_height() const;
 
