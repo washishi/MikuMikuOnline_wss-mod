@@ -382,8 +382,8 @@ void LightStatus::Calc()
 
 	light_distance_ = 100;
 
-	VectorRotationX(&light_pos_,&VGet(0,0,-light_distance_),altitude);
-	VectorRotationY(&light_pos_,&light_pos_,-direction);
+	VectorRotationX(&light_pos_,&VGet(0,0,light_distance_),TORADIAN(altitude));
+	VectorRotationY(&light_pos_,&light_pos_,TORADIAN(-direction));
 
 	SetGrobalAmbientColorMatchToTime();
 }
