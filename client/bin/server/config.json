@@ -9,8 +9,7 @@
 		[
 			"m2op.net"
 		],
-	
-	"stage": "stage:ケロリン町",
+		
 	"capacity": 20,
 	
 	"receive_limit_1": 50,

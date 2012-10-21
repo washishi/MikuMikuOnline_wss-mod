@@ -10,6 +10,8 @@ class Channel {
 		Channel();
 
 		const boost::property_tree::ptree& pt() const;
+		std::string GetDefaultStage() const;
+		int GetDefaultCapacity() const;
 
 	private:
 		void Load();

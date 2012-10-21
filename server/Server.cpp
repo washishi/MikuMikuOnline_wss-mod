@@ -104,7 +104,7 @@ namespace network {
 						% MMO_VERSION_MAJOR % MMO_VERSION_MINOR % MMO_VERSION_REVISION
 						% GetUserCount()
 						% config_.capacity()
-						% config_.stage()
+						% channel_.GetDefaultStage()
 					).str();
 
 		return msg;
