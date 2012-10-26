@@ -268,6 +268,7 @@ namespace network {
 
                 while (!buffer.empty()) {
                     std::string msg;
+					msg.reserve(buffer.size());
 
                     while (!buffer.empty() && buffer[0]!=NETWORK_UTILS_DELIMITOR)
                     {

@@ -102,7 +102,7 @@ class ResourceManager {
         // models
         static void BuildModelFileTree();
         static void CacheBakedModel();
-        static ModelHandle LoadModelFromName(const tstring&, bool async = false);
+        static ModelHandle LoadModelFromName(const tstring&);
 
         static void RequestModelFromName(const tstring&);
         static bool IsCachedModelName(const tstring&);

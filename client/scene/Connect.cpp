@@ -93,11 +93,10 @@ void Connect::Update()
 		message_.set_text(_T("エラー：サーバーとクライアントのバージョンが対応していません"));
 		command_manager_->set_client(ClientUniqPtr());
 		break;
-	//case CommandManager::STATUS_ERROR_NOSTAGE:
-	//	message_.set_text((tformat(_T("エラー：接続するにはステージデータ「%s」が必要です")) % 
-	//		unicode::ToTString(command_manager_->stage())).str());
-	//	command_manager_->set_client(ClientUniqPtr());
-	//	break;
+	case CommandManager::STATUS_ERROR_NOSTAGE:
+		message_.set_text(_T("エラー：必要なステージデータが見つかりません"));
+		command_manager_->set_client(ClientUniqPtr());
+		break;
 	}
 
     button_.Update();

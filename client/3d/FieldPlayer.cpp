@@ -180,11 +180,7 @@ void FieldPlayer::RescuePosition()
 
 void FieldPlayer::LoadModel(const tstring& name)
 {
-    if (model_handle_) {
-		loading_model_handle_ = ResourceManager::LoadModelFromName(name, true);
-	} else {
-		SetModel(ResourceManager::LoadModelFromName(name));
-	}
+	SetModel(ResourceManager::LoadModelFromName(name));
 	ResourceManager::SetModelEdgeSize(model_handle_.handle());
 }
 

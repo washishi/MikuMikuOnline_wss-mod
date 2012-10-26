@@ -28,6 +28,7 @@ namespace network {
         std::string ByteStuffingEncode(const std::string& in)
         {
             std::string out;
+			out.reserve(in.size() * 1.2);
 
 			BOOST_FOREACH(const char& c, in) {
 				if (c == 0x7e || c == 0x7d) {
@@ -44,6 +45,7 @@ namespace network {
         std::string ByteStuffingDecode(const std::string& in)
         {
             std::string out;
+			out.reserve(in.size());
 
             bool escape = false;
 

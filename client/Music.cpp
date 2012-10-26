@@ -7,8 +7,8 @@
 #include "../common/Logger.hpp"
 #include "../common/unicode.hpp"
 
+// TODO: ‚Ç‚±‚ÌŠÖ”‚È‚Ì‚©•ª‚©‚ç‚È‚¢‚Ì‚Å«—ˆ“I‚ÉC³‚Ì•K—v‚ ‚è
 extern int LoadFile(const TCHAR *FilePath, void **FileImageAddr, int *FileSize);
-
 
 Music::Music() :
 bgm_handle_(),
