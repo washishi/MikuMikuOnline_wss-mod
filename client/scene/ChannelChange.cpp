@@ -16,16 +16,10 @@ ChannelChange::ChannelChange(unsigned char channel, const ManagerAccessorPtr& ma
     command_manager_(manager_accessor->command_manager().lock()),
     account_manager_(manager_accessor->account_manager().lock()),
     config_manager_(manager_accessor->config_manager().lock()),
-    player_manager_(manager_accessor->player_manager().lock())
+    player_manager_(manager_accessor->player_manager().lock()),
+	channel_(channel)
 {
 
-	auto channel_str = (unsigned char)channel;
-	command_manager_->Write(network::ServerUpdateAccountProperty(CHANNEL, network::Utils::Serialize(channel_str)));
-
-	auto channel_ptr = command_manager_->channels().at(channel);
-	StagePtr stage = std::make_shared<Stage>(channel_ptr,manager_accessor->config_manager().lock());
-	world_manager_ = std::make_shared<WorldManager>(stage, manager_accessor);
-    manager_accessor_->set_world_manager(world_manager_);
 }
 
 ChannelChange::~ChannelChange()
@@ -34,7 +28,16 @@ ChannelChange::~ChannelChange()
 
 void ChannelChange::Begin()
 {
+	// 古いステージを削除
+	player_manager_->ResetStage();
+	manager_accessor_->set_world_manager(WorldManagerPtr());
 
+	command_manager_->Write(network::ServerUpdateAccountProperty(CHANNEL, network::Utils::Serialize(channel_)));
+
+	auto channel_ptr = command_manager_->channels().at(channel_);
+	StagePtr stage = std::make_shared<Stage>(channel_ptr,manager_accessor_->config_manager().lock());
+	world_manager_ = std::make_shared<WorldManager>(stage, manager_accessor_);
+    manager_accessor_->set_world_manager(world_manager_);
 }
 
 void ChannelChange::End()

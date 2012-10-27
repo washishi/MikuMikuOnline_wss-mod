@@ -29,6 +29,8 @@ class ChannelChange : public Base{
         ConfigManagerPtr config_manager_;
         WorldManagerPtr world_manager_;
 		PlayerManagerPtr player_manager_;
+
+		unsigned char channel_;
 };
 
 }

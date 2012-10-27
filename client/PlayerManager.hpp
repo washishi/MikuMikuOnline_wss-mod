@@ -32,6 +32,8 @@ class PlayerManager : public std::enable_shared_from_this<PlayerManager> {
         void Update();
         void Draw();
 
+		void ResetStage();
+
         uint32_t GetCurrentUserRevision(uint32_t user_id);
         void ApplyRevisionPatch(const std::string& patch);
 
