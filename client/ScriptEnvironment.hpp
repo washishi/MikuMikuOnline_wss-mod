@@ -37,8 +37,6 @@ class ScriptEnvironment {
                 const std::string& filename = "",
                 const V8ValueCallBack& callback = V8ValueCallBack());
 
-        std::string CompileCoffeeScript(const std::string& script);
-
         void Load(const std::string& filename, const V8ValueCallBack& callback =
                 V8ValueCallBack());
 

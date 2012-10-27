@@ -47,19 +47,6 @@ ScriptEnvironment::ScriptEnvironment() :
     // 組み込み関数をセット
     SetBuiltins();
 
-    // CoffeeScriptコンパイラをロード
-    Load("coffee-script.js");
-    With([&](const Handle<Context>& context)
-    {
-        // Javascript側から隠蔽する
-            Handle<String> key = String::New("CoffeeScript");
-            if (context->Global()->Has(key)) {
-                context->Global()->SetHiddenValue(key,
-                        context->Global()->Get(key)->ToObject());
-                context->Global()->Delete(key);
-            }
-        });
-
     // ライブラリをロード
     Load("sugar-1.3.5.min.js");
 
@@ -451,34 +438,6 @@ void ScriptEnvironment::ParseJSON(const std::string& json,
                     }
                 }
             });
-}
-
-std::string ScriptEnvironment::CompileCoffeeScript(const std::string& script)
-{
-    std::string complied_code(script);
-    With(
-            [&](const Handle<Context>& context)
-            {
-                Handle<String> key = String::New("CoffeeScript");
-                Handle<Object> compiler = context->Global()->GetHiddenValue(key)->ToObject();
-                if (compiler->Has(String::New("compile"))) {
-                    Handle<Value> args[2];
-                    args[0] = String::New(script.c_str());
-                    args[1] = Object::New();
-
-                    // グローバル汚染防止を無効化
-                    args[1]->ToObject()->Set(String::New("bare"), v8::True());
-
-                    v8::TryCatch trycatch;
-                    Handle<Value> result = compiler->Get(String::New("compile")).As<Function>()
-                            ->CallAsFunction(context->Global(), 2, args);
-
-                    if (!result.IsEmpty() && result->IsString()) {
-                        complied_code = *String::Utf8Value(result->ToString());
-                    }
-                }
-            });
-    return complied_code;
 }
 
 std::string ScriptEnvironment::GetInfo()

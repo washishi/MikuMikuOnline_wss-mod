@@ -34,7 +34,7 @@ class Stage {
         bool IsVisiblePoint(const VECTOR& point) const;
         bool IsNearPoint(const VECTOR& point) const;
 
-        const ModelHandle& map_handle() const;
+        const ModelHandle2& map_handle() const;
         const ModelHandle& skymap_handle() const;
         float map_scale() const;
         float min_height() const;
@@ -50,7 +50,7 @@ class Stage {
 		ConfigManagerPtr config_manager() const;
 
     private:
-        ModelHandle map_handle_;
+        ModelHandle2 map_handle_;
         float map_scale_;
 		float min_height_;
 

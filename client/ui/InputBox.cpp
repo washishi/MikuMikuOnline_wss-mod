@@ -108,6 +108,7 @@ InputBox::InputBox(const ManagerAccessorPtr& manager_accessor) :
 
 InputBox::~InputBox()
 {
+
 }
 
 void InputBox::DrawTabs()

@@ -21,9 +21,13 @@ class ImageHandle;
 class ModelHandle;
 class Music;
 
+class SharedModelData;
+class ModelHandle2;
+
 typedef std::shared_ptr<ImageHandle> ImageHandlePtr;
 typedef std::shared_ptr<ModelHandle> ModelHandlePtr;
 typedef std::shared_ptr<Music> MusicPtr;
+typedef std::shared_ptr<SharedModelData> SharedModelDataPtr;
 
 struct ReadFuncData {
 	ReadFuncData(){};
@@ -104,6 +108,9 @@ class ResourceManager {
         static void CacheBakedModel();
         static ModelHandle LoadModelFromName(const tstring&);
 
+        static ModelHandle2 LoadModelFromName2(const tstring&);
+        static void ClearModelHandle2();
+
         static void RequestModelFromName(const tstring&);
         static bool IsCachedModelName(const tstring&);
 		static const std::vector<std::string>& GetModelNameList();
@@ -126,6 +133,9 @@ private:
         static ptree model_name_tree_;
         static std::unordered_map<tstring, tstring> model_names_;
         static std::unordered_map<tstring, ModelHandle> model_handles_;
+
+        static std::unordered_map<tstring, SharedModelDataPtr> shared_model_data_;
+
 		static std::vector<std::string> model_name_list_;
 		static float model_edge_size_;
 		//Musics
@@ -199,4 +209,44 @@ class ModelHandle {
 		}
 		void operator delete(void *, void *){};
 
+};
+
+typedef std::shared_ptr<ptree> PtreePtr;
+
+class SharedModelData {
+	public:
+		SharedModelData(int base_handle, const PtreePtr& property);
+		~SharedModelData();
+
+		const ptree& property() const;
+		int DuplicateHandle();
+
+	private:
+		int base_handle_;
+		std::list<int> handles_;
+		PtreePtr property_;
+};
+
+class ModelHandle2 {
+	public:
+		ModelHandle2(const SharedModelDataPtr& shared_data = SharedModelDataPtr());
+		operator bool() const;
+	    int handle() const;
+        const ptree& property() const;
+
+	private:
+		SharedModelDataPtr shared_data_;
+		int handle_;
+
+	public:
+		void *operator new(size_t size)
+		{
+			return tlsf_new(ResourceManager::memory_pool(), size);
+		}
+		void *operator new(size_t, void *p){return p;}
+		void operator delete(void *p)
+		{
+			tlsf_delete(ResourceManager::memory_pool(), p);
+		}
+		void operator delete(void *, void *){};
 };

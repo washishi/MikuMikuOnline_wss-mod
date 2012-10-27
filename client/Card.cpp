@@ -1388,38 +1388,17 @@ void Card::Run()
 void Card::Execute(const std::string& script, const std::string& filename,
              const V8ValueCallBack& callback)
 {
-    auto compiled_code = script_.CompileCoffeeScript(script);
-    script_.Execute(compiled_code, filename, callback);
+    script_.Execute(script, filename, callback);
 }
 
 void Card::Update()
 {
 	MMO_PROFILE_FUNCTION;
-
-  //  static int cnt = 0;
-  //  if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
-		//auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
-		//if (ptr->children_size() > 0) {
-		//	ptr->Update();
-		//	if (cnt % 2 == 0) {
-		//		ptr->AsyncUpdate();
-		//	}
-		//}
-  //  }
-  //  cnt++;
 }
 
 void Card::Draw()
 {
 	MMO_PROFILE_FUNCTION;
-
-   // if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
-   //     auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
-
-   //     if (ptr->children_size() > 0) {
-			//ptr->Draw();
-   //     }
-   // }
 }
 
 UISuperPtr Card::GetWindow() const
@@ -1441,28 +1420,6 @@ UISuperPtr Card::GetWindow() const
 void Card::ProcessInput(InputManager* input)
 {
 	MMO_PROFILE_FUNCTION;
-
- //   CheckFunctionKey(KEY_INPUT_F1,  "F1",  *input);
- //   CheckFunctionKey(KEY_INPUT_F2,  "F2",  *input);
- //   CheckFunctionKey(KEY_INPUT_F3,  "F3",  *input);
- //   CheckFunctionKey(KEY_INPUT_F4,  "F4",  *input);
- //   CheckFunctionKey(KEY_INPUT_F5,  "F5",  *input);
- //   CheckFunctionKey(KEY_INPUT_F6,  "F6",  *input);
- //   CheckFunctionKey(KEY_INPUT_F7,  "F7",  *input);
- //   CheckFunctionKey(KEY_INPUT_F8,  "F8",  *input);
- //   CheckFunctionKey(KEY_INPUT_F9,  "F9",  *input);
- //   CheckFunctionKey(KEY_INPUT_F10, "F10", *input);
- //   CheckFunctionKey(KEY_INPUT_F11, "F11", *input);
- //   CheckFunctionKey(KEY_INPUT_F12, "F12", *input);
-
-	//script_.With([&](const Handle<Context>& context){
-	//	if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
-	//		auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
-	//		if (ptr->children_size() > 0) {
-	//			ptr->ProcessInput(input);
-	//		}
-	//	}
-	//});
 }
 
 void Card::CheckFunctionKey(int keynum, const std::string& name, const InputManager& input)
@@ -1509,17 +1466,6 @@ void Card::OnReceiveJSON(const std::string& info_json, const std::string& msg_js
         script_.TimedWith(
                 [&](const Handle<Context>& context)
                 {
-                    // HandleScope handle;
-
-                    /*
-                    v8::Handle<v8::Value> player = v8::Undefined();
-                    if (auto player_manager = manager_accessor_->player_manager().lock()) {
-                        if (auto player_ptr = player_manager->GetFromId(user_id)) {
-                            player = player_ptr->GetJSObject();
-                        }
-                    }
-                    */
-
                     Handle<Value> args[2];
                     args[0] = String::New(info_json.data(), info_json.size());
                     args[1] = String::New(msg_json.data(), msg_json.size());

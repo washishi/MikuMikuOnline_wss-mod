@@ -103,6 +103,8 @@ const ptree& ResourceManager::GetDefaultInfoJSON()
 
 std::unordered_map<tstring, tstring> ResourceManager::model_names_;
 std::unordered_map<tstring, ModelHandle> ResourceManager::model_handles_;
+std::unordered_map<tstring, SharedModelDataPtr> ResourceManager::shared_model_data_;
+
 std::vector<std::string> ResourceManager::model_name_list_;
 ptree ResourceManager::model_name_tree_;
 void ResourceManager::BuildModelFileTree()
@@ -397,6 +399,70 @@ ModelHandle ResourceManager::LoadModelFromName(const tstring& name)
     }
 }
 
+ModelHandle2 ResourceManager::LoadModelFromName2(const tstring& name)
+{
+ 	auto fullpath = ptree::path_type(unicode::ToString(NameToFullPath(name)), ':');
+	ptree p = model_name_tree_.get_child(fullpath, ptree());
+
+	ptree info = p.get_child("_info_", ptree());
+	tstring filepath = unicode::ToTString(info.get<std::string>("modelpath", ""));
+	if(!filepath.size())
+	{
+		fullpath = ptree::path_type(unicode::ToString(NameToFullPath(UNKNOWN_MODEL_NAME)), ':');
+		p = model_name_tree_.get_child(fullpath, ptree());
+		info = p.get_child("_info_", ptree());
+		filepath = unicode::ToTString(info.get<std::string>("modelpath", ""));
+	}
+    if (filepath.size() > 0) {
+        auto it = shared_model_data_.find(unicode::ToTString(filepath));
+        if (it != shared_model_data_.end()) {
+            return ModelHandle2(it->second);
+        }else{
+			auto funcdata = std::make_shared<ReadFuncData>(info);
+			set_motions_ = funcdata->set_motions;
+
+			//void *FileImage ;
+			std::shared_ptr<char> FileImage;
+            int FileSize ;
+
+            LoadFile(unicode::ToTString(filepath).c_str(), &FileImage, &FileSize );
+
+			int handle = MV1LoadModelFromMem( FileImage.get(), FileSize, FileReadFunc, FileReleaseFunc, &(*funcdata));
+
+			auto material_num = MV1GetMaterialNum(handle);
+			for(int i = 0; i < material_num; ++i){
+				MV1SetMaterialType(handle,i,DX_MATERIAL_TYPE_TOON_2);
+			}
+
+			SetMotionNames(handle, *funcdata);
+
+			SharedModelDataPtr shared_data = 
+				std::make_shared<SharedModelData>(handle, std::make_shared<ptree>(info));
+
+            shared_model_data_[unicode::ToTString(filepath)] = shared_data;
+
+            Logger::Debug(_T("Model %d"), handle);
+            return ModelHandle2(shared_data);
+		}
+    } else {
+        return ModelHandle2();
+    }
+}
+
+void ResourceManager::ClearModelHandle2()
+{
+	std::list<tstring> erase_keys;
+	BOOST_FOREACH(const auto& it, shared_model_data_) {
+		if (it.second.unique()) {
+			erase_keys.push_back(it.first);
+		}
+	}
+
+	BOOST_FOREACH(const tstring& key, erase_keys) {
+		shared_model_data_.erase(key);
+	}
+}
+
 void ResourceManager::SetModelEdgeSize(int handle)
 {
 	int MaterialNum = MV1GetMaterialNum( handle );
@@ -574,4 +640,54 @@ const ptree& ModelHandle::property() const
 std::string ModelHandle::name() const
 {
     return name_;
+}
+
+SharedModelData::SharedModelData(int base_handle, const PtreePtr& property) :
+	base_handle_(base_handle),
+	property_(property)
+{
+
+}
+
+const ptree& SharedModelData::property() const
+{
+	return *property_;
+}
+
+int SharedModelData::DuplicateHandle()
+{
+	int handle = MV1DuplicateModel(base_handle_);
+	assert(handle != -1);
+	handles_.push_back(handle);
+	return handle;
+}
+
+SharedModelData::~SharedModelData()
+{
+	BOOST_FOREACH(int handle, handles_) {
+		MV1DeleteModel(handle);
+	}
+	MV1DeleteModel(base_handle_);
+}
+
+ModelHandle2::ModelHandle2(const SharedModelDataPtr& shared_data) :
+	shared_data_(shared_data),
+	handle_(shared_data->DuplicateHandle())
+{
+
+}
+
+ModelHandle2::operator bool() const
+{
+	return static_cast<bool>(shared_data_);
+}
+
+int ModelHandle2::handle() const
+{
+	return handle_;
+}
+
+const ptree& ModelHandle2::property() const
+{
+	return shared_data_->property();
 }
