@@ -89,8 +89,12 @@ namespace network {
 	int Server::GetUserCount() const
 	{
 		auto count = std::count_if(sessions_.begin(), sessions_.end(),
-			[](const SessionWeakPtr& s){ 
-				return !s.expired() && s.lock()->online() && s.lock()->id() > 0; 
+			[](const SessionWeakPtr& s) -> bool {
+				if (auto session = s.lock()) {
+					return !s.expired() && session->online() && session->id() > 0;
+				} else {
+					return false;
+				}
 			});
 
 		return count;
@@ -124,12 +128,14 @@ namespace network {
 			ptree player_array;
 			auto id_list = account_.GetIDList();
 			BOOST_FOREACH(const auto& s, sessions_) {
-				if (!s.expired() && s.lock()->online() && s.lock()->id() > 0) {
-					auto id = s.lock()->id();
-					ptree player;
-					player.put("name", account_.GetUserName(id));
-					player.put("model_name", account_.GetUserModelName(id));
-					player_array.push_back(std::make_pair("", player));
+				if (auto session = s.lock()) {
+					if (!s.expired() && session->online() && session->id() > 0) {
+						auto id = session->id();
+						ptree player;
+						player.put("name", account_.GetUserName(id));
+						player.put("model_name", account_.GetUserModelName(id));
+						player_array.push_back(std::make_pair("", player));
+					}
 				}
 			}
 			xml_ptree.put_child("players", player_array);
@@ -183,8 +189,9 @@ namespace network {
 
     void Server::ReceiveSession(const SessionPtr& session, const boost::system::error_code& error)
     {
-		
 		config_.Reload();
+
+		if (!session) return;
 
 		const auto address = session->tcp_socket().remote_endpoint().address();
 
@@ -253,12 +260,18 @@ namespace network {
     void Server::SendTo(const Command& command, uint32_t user_id)
 	{
 		auto it = std::find_if(sessions_.begin(), sessions_.end(),
-			[user_id](SessionWeakPtr& ptr){
-				return ptr.lock()->id() == user_id;
+			[user_id](SessionWeakPtr& ptr) -> bool {
+				if (auto session = ptr.lock()) {
+					return session->id() == user_id;
+				} else {
+					return false;
+				}
 			});
 		
 		if (it != sessions_.end()) {
-			it->lock()->Send(command);
+			if (auto session = it->lock()) {
+				session->Send(command);
+			}
 		}
 	}
 
@@ -344,7 +357,7 @@ namespace network {
     {
         uint8_t header;
         std::string body;
-        SessionWeakPtr session;
+        SessionWeakPtr weak_session;
 
 		// IPアドレスとポートからセッションを特定
 		auto it = std::find_if(sessions_.begin(), sessions_.end(),
@@ -363,8 +376,10 @@ namespace network {
 			});
 
 		if (it != sessions_.end()) {
-			session = *it;
-			Logger::Debug("Receive UDP Command: %d", session.lock()->id());
+			weak_session = *it;
+			if (auto session = weak_session.lock()) {
+				Logger::Debug("Receive UDP Command: %d", session->id());
+			}
 		} else {
 			Logger::Debug("Receive anonymous UDP Command");
 		}
@@ -374,18 +389,20 @@ namespace network {
 		}
 
         // 復号
-        if (session.lock() && header == header::ENCRYPT_HEADER) {
-            body.erase(0, sizeof(header));
-			body = session.lock()->encrypter().Decrypt(body);
-            Utils::Deserialize(body, &header);
-			body = buffer.substr(sizeof(header));
-        }
+		if (auto session = weak_session.lock()) {
+			if (header == header::ENCRYPT_HEADER) {
+				body.erase(0, sizeof(header));
+				body = session->encrypter().Decrypt(body);
+				Utils::Deserialize(body, &header);
+				body = buffer.substr(sizeof(header));
+			}
+		}
 
 		if (header == network::header::ServerRequstedStatus) {
 			SendUDP(GetStatusJSON(), endpoint);
 		} else {
 			if (callback_) {
-				(*callback_)(Command(static_cast<network::header::CommandHeader>(header), body, session));
+				(*callback_)(Command(static_cast<network::header::CommandHeader>(header), body, weak_session));
 			}
 		}
 

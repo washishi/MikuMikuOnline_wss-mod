@@ -160,10 +160,11 @@ void FieldPlayer::ResetPosition()
 
 void FieldPlayer::RescuePosition()
 {
-    const auto& points = (*stage_)->start_points();
-    const auto& new_pos =
-            std::min_element(points.begin(), points.end(),
-            [this](const VECTOR& a, const VECTOR& b){
+	static int rotation = 0;
+
+    auto points = (*stage_)->start_points();
+	std::sort(points.begin(), points.end(),
+		[this](const VECTOR& a, const VECTOR& b){
                         return ((a.x - current_stat_.pos.x) * (a.x - current_stat_.pos.x) +
                                 (a.y - current_stat_.pos.y) * (a.y - current_stat_.pos.y) +
                                 (a.z - current_stat_.pos.z) * (a.z - current_stat_.pos.z)) <
@@ -172,7 +173,22 @@ void FieldPlayer::RescuePosition()
                                 (b.z - current_stat_.pos.z) * (b.z - current_stat_.pos.z));
             });
 
-    current_stat_.pos = *new_pos;
+	const auto& nearest_pos = points[0];
+	float nearest_dist = 
+		((nearest_pos.x - current_stat_.pos.x) * (nearest_pos.x - current_stat_.pos.x) +
+		(nearest_pos.z - current_stat_.pos.z) * (nearest_pos.z - current_stat_.pos.z));
+
+	// 同じリスポーンポイントで嵌らないようにポイントをずらす
+	VECTOR new_pos;
+	if (nearest_dist < 20 && points.size() > 1) {
+		rotation++;
+		new_pos = points[rotation % points.size()];
+	} else {
+		rotation = 0;
+		new_pos = points[0];
+	}
+
+    current_stat_.pos = new_pos;
     current_stat_.pos.y = (*stage_)->GetFloorY(current_stat_.pos - VGet(0, 100, 0), current_stat_.pos + VGet(0, 100, 0));
 	current_stat_.acc.y = 0;
 	current_stat_.vel.y = 0;
