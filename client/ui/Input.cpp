@@ -286,7 +286,7 @@ void Input::Draw()
 								c, text_color, font_handle_);
 							width += GetDrawStringWidthToHandle(c,1,font_handle_);
 						}
-						for(int i = select_start;i < ((select_end > it.size()) ? it.size() : select_end); ++i){
+						for(int i = select_start;i < ((select_end > static_cast<int>(it.size())) ? it.size() : select_end); ++i){
 							c[0] = it[i];
 							SetDrawBlendMode(DX_BLENDMODE_ALPHA, 180);
 							DrawBox(internal_x + width,internal_y + current_line * font_height_,
@@ -296,7 +296,7 @@ void Input::Draw()
 							width += GetDrawStringWidthToHandle(c,1,font_handle_);
 							SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 						}
-						for(int i = ((select_end > it.size()) ? it.size() : select_end);i < it.size(); ++i){
+						for(int i = ((select_end > static_cast<int>(it.size())) ? it.size() : select_end);i < it.size(); ++i){
 							c[0] = it[i];
 							DrawStringToHandle(internal_x + width, internal_y + current_line * font_height_,
 								c, text_color, font_handle_);
@@ -335,7 +335,7 @@ void Input::Draw()
 						width += GetDrawStringWidthToHandle(c,1,font_handle_);
 						SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 					}
-					for(int i = select_end;i < it.size(); ++i){
+					for(unsigned int i = select_end;i < it.size(); ++i){
 						c[0] = it[i];
 						DrawStringToHandle(internal_x + width, internal_y + current_line * font_height_,
 							c, text_color, font_handle_);
@@ -626,7 +626,7 @@ void Input::ProcessInput(InputManager* input)
 							for(int i = 0;i < line_num; ++i){
 								cnt += lines_[i].size();
 							}
-							for(int i = 0;i < lines_[line_num].size(); ++i){
+							for(unsigned int i = 0;i < lines_[line_num].size(); ++i){
 								auto tmp_x = GetDrawStringWidthToHandle(&lines_[line_num][i],1,font_handle_);
 								if( tmp + tmp_x < offset_x ){
 									tmp += tmp_x;
@@ -637,7 +637,7 @@ void Input::ProcessInput(InputManager* input)
 						}
 					}else{
 						int tmp = 0,cnt = 0;
-						for(int i = 0;i < lines_[0].size(); ++i){
+						for(unsigned int i = 0;i < lines_[0].size(); ++i){
 							auto tmp_x = GetDrawStringWidthToHandle(&lines_[0][i],1,font_handle_);
 							if( tmp + tmp_x < offset_x ){
 								tmp += tmp_x;
@@ -671,7 +671,7 @@ void Input::ProcessInput(InputManager* input)
 							for(int i = 0;i < line_num; ++i,++cnt){
 								cnt += lines_[i].size();
 							}
-							for(int i = 0;i < lines_[line_num].size(); ++i){
+							for(unsigned int i = 0;i < lines_[line_num].size(); ++i){
 								auto tmp_x = GetDrawStringWidthToHandle(&lines_[line_num][i],1,font_handle_);
 								if( tmp + tmp_x < offset_x ){
 									tmp += tmp_x;
@@ -682,7 +682,7 @@ void Input::ProcessInput(InputManager* input)
 						selecting_coursorpoint_ = std::make_pair<int,int>(prev_cursor_pos,cnt);
 					}else{
 						int tmp = 0,cnt = 0;
-						for(int i = 0;i < lines_[0].size(); ++i){
+						for(unsigned int i = 0;i < lines_[0].size(); ++i){
 							auto tmp_x = GetDrawStringWidthToHandle(&lines_[0][i],1,font_handle_);
 							if( tmp + tmp_x < offset_x ){
 								tmp += tmp_x;
@@ -719,7 +719,7 @@ void Input::ProcessInput(InputManager* input)
 						for(int i = 0;i < line_num; ++i){
 							cnt += lines_[i].size();
 						}
-						for(int i = 0;i < lines_[line_num].size(); ++i){
+						for(unsigned int i = 0;i < lines_[line_num].size(); ++i){
 							auto tmp_x = GetDrawStringWidthToHandle(&lines_[line_num][i],1,font_handle_);
 							if( tmp + tmp_x < offset_x ){
 								tmp += tmp_x;
@@ -730,7 +730,7 @@ void Input::ProcessInput(InputManager* input)
 					}
 				}else{
 					int tmp = 0,cnt = 0;
-					for(int i = 0;i < lines_[0].size(); ++i){
+					for(unsigned int i = 0;i < lines_[0].size(); ++i){
 						auto tmp_x = GetDrawStringWidthToHandle(&lines_[0][i],1,font_handle_);
 						if( tmp + tmp_x < offset_x ){
 							tmp += tmp_x;

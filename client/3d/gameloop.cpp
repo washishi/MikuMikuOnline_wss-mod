@@ -266,7 +266,7 @@ void GameLoop::MoveCamera(InputManager* input)
         }
     }
 
-    float pad_rz = input->GetGamepadManagedAnalogRy();
+    float pad_rz = static_cast<float>(input->GetGamepadManagedAnalogRy());
     if (pad_rz > 0) {
         if (camera.radius > CAMERA_MIN_RADIUS) {
             camera.radius -= 0.5f * pad_rz;
@@ -503,9 +503,9 @@ float LightStatus::SolarPosition4(float julius_year)
 
 float LightStatus::SolarAltitude(float latitude,float sidereal_hour,float solar_declination,float right_ascension)
 {
-	long float a = (sidereal_hour - solar_declination) * (DX_PI_F / 180.0L);
-	long float h = sin(TORADIAN(right_ascension)) * sin(TORADIAN(latitude)) + cos(TORADIAN(right_ascension)) * cos(TORADIAN(latitude)) * cos(a);
-	h = asin(h) * 180.0 / DX_PI_F;
+	float a =(sidereal_hour - solar_declination) * (DX_PI_F / 180.0L);
+	float h = sin(TORADIAN(right_ascension)) * sin(TORADIAN(latitude)) + cos(TORADIAN(right_ascension)) * cos(TORADIAN(latitude)) * cos(a);
+	h = static_cast<float>(asin(h) * 180.0 / DX_PI_F);
 	return h;
 }
 
@@ -533,7 +533,7 @@ float LightStatus::SolarApparentAltitude1(float altitude,float distance)
 {
 	auto e = 0.035333333 * sqrt(altitude);
 	auto p = 0.002442818 / distance;
-	return p - e;
+	return static_cast<float>(p - e);
 }
 
 float LightStatus::SolarApparentAltitude2(float altitude,float distance)
@@ -541,7 +541,7 @@ float LightStatus::SolarApparentAltitude2(float altitude,float distance)
 	auto s = 0.266994444 / distance;
 	auto r = 0.585555555;
 	auto k = SolarApparentAltitude1(altitude, distance) - s - r;
-	return k;
+	return static_cast<float>(k);
 }
 
 void LightStatus::SetGrobalAmbientColorMatchToTime()

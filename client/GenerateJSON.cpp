@@ -266,7 +266,7 @@ JsonGen::JsonGen()
 				} while (FindNextFile(hPmdFind, &win32fd_pmd));
 				FindClose(hPmdFind);
 
-				for(int i = 0;i < pmd_paths.size();++i){
+				for(unsigned int i = 0;i < pmd_paths.size();++i){
 					char pmd_info[PMDINFO_SIZE+1];
 					int fd = _topen(pmd_paths[i].c_str(),O_RDONLY);
 					read(fd,pmd_info,PMDINFO_SIZE);
@@ -275,7 +275,7 @@ JsonGen::JsonGen()
 					// ƒ‚ƒfƒ‹–¼Žæ“¾
 					strcpy_s(pmd_model_name_,pmd_info+7);
 					Trim(pmd_model_name_);
-					int cnt = 0x1b;
+					unsigned int cnt = 0x1b;
 					size_t info_size = ADFUNC_DXconvAnsiToWide(0,0,pmd_info+cnt);
 					TCHAR *pmd_info_t = new TCHAR[info_size + 1];
 					ADFUNC_DXconvAnsiToWide(info_size,pmd_info_t,pmd_info+cnt);

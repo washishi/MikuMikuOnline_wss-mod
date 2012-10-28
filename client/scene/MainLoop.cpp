@@ -171,8 +171,8 @@ void MainLoop::Draw()
 
 			if (world_manager_->stage()->IsVisiblePoint(point)) {
 				auto screen_pos = ConvWorldPosToScreenPos(point);
-				int x = (screen_pos.x / 2) * 2;
-				int y = (screen_pos.y / 2) * 2 - 16;
+				int x = static_cast<int>(screen_pos.x / 2) * 2;
+				int y = static_cast<int>(screen_pos.y / 2) * 2 - 16;
 
 				UILabel label_;
 				label_.set_width(160);
@@ -200,7 +200,10 @@ void MainLoop::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		auto str = unicode::ToTString(_T("サーバーとの接続が切断されました"));
 		auto width = GetDrawStringWidthToHandle(str.c_str(),str.length(),ResourceManager::default_font_handle());
-		DrawStringToHandle(config_manager_->screen_width()/2.0f - width,config_manager_->screen_height()/2.0f - ResourceManager::default_font_size(),str.c_str(),GetColor(255,255,255),ResourceManager::default_font_handle());
+		DrawStringToHandle(
+			config_manager_->screen_width() / 2 - width,
+			config_manager_->screen_height() / 2 - ResourceManager::default_font_size(),
+			str.c_str(),GetColor(255,255,255),ResourceManager::default_font_handle());
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 

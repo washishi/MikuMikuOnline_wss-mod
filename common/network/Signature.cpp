@@ -56,7 +56,7 @@ std::string Signature::GetPublicKey()
     ByteQueue queue;
     public_key_.Save(queue);
 
-    size_t length = queue.CurrentSize();
+    size_t length = static_cast<size_t>(queue.CurrentSize());
     std::unique_ptr<char[]> outbuf(new char [length]);
     queue.Get((byte*)outbuf.get(), length);
 
@@ -76,7 +76,7 @@ std::string Signature::GetPrivateKey()
     ByteQueue queue;
     private_key_.Save(queue);
 
-    size_t length = queue.CurrentSize();
+    size_t length = static_cast<size_t>(queue.CurrentSize());
     std::unique_ptr<char[]> outbuf(new char [length]);
     queue.Get((byte*)outbuf.get(), length);
 
