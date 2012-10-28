@@ -9,7 +9,7 @@
 #include <string>
 
 Stage::Stage(const ChannelPtr& channel,const ConfigManagerPtr &config_manager) :
-    map_handle_(ResourceManager::LoadModelFromName2(unicode::ToTString(channel->stage))),
+    map_handle_(ResourceManager::LoadModelFromName(unicode::ToTString(channel->stage))),
     map_scale_(map_handle_.property().get<float>("scale", 20.0)),
 	min_height_(map_handle_.property().get<float>("min_height", -200.0)),
 	host_change_flag_(false),
@@ -320,7 +320,7 @@ void Stage::UpdateSkymapPosition(const VECTOR& pos)
     MV1SetPosition(skymap_handle_.handle(), VGet(pos.x, 800, pos.z));
 }
 
-const ModelHandle2& Stage::map_handle() const
+const ModelHandle& Stage::map_handle() const
 {
     return map_handle_;
 }

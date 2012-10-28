@@ -37,3 +37,4 @@ log_*.txt
 /client/bin/log
 /client/bin/Log.txt
 /client/bin/user
+/client/bin/cache

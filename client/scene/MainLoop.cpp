@@ -36,7 +36,8 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
       inputbox_(std::make_shared<InputBox>(manager_accessor_)),
 	  minimap_(std::make_shared<MiniMap>(manager_accessor)),
 	  snapshot_number_(0),
-	  snapshot_(false)
+	  snapshot_(false),
+	  fade_counter_(0)
 {
     manager_accessor_->set_window_manager(window_manager_);
 
@@ -55,6 +56,7 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
     world_manager_->myself()->Init(unicode::ToTString(account_manager_->model_name()));
 
 	socket_server_manager_->Start();
+
 }
 
 MainLoop::~MainLoop()
@@ -79,6 +81,15 @@ void MainLoop::Update()
     world_manager_->Update();
 	ResourceManager::music()->Update();
 
+	static int cleanup_counter = 0;
+	if (cleanup_counter % (60 * 30) == 0) {
+		ResourceManager::ClearModelHandle();
+	}
+	cleanup_counter++;
+
+	if (fade_counter_ < 120) {
+		fade_counter_++;
+	}
 }
 
 void MainLoop::ProcessInput(InputManager* input)
@@ -187,9 +198,18 @@ void MainLoop::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_MUL, 120);
 		DrawBox(0,0,config_manager_->screen_width(),config_manager_->screen_height(),GetColor(0,0,0),1);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-		auto str = unicode::ToTString("サーバーとの接続が切断されました");
+		auto str = unicode::ToTString(_T("サーバーとの接続が切断されました"));
 		auto width = GetDrawStringWidthToHandle(str.c_str(),str.length(),ResourceManager::default_font_handle());
 		DrawStringToHandle(config_manager_->screen_width()/2.0f - width,config_manager_->screen_height()/2.0f - ResourceManager::default_font_size(),str.c_str(),GetColor(255,255,255),ResourceManager::default_font_handle());
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+	}
+
+	if (fade_counter_ < 120) {
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 255 * (120 - fade_counter_) / 120);
+		int width, height;
+		GetScreenState(&width, &height, nullptr);
+		DrawBox(0, 0, width, height, GetColor(0, 0, 0), TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 	}
 }
 

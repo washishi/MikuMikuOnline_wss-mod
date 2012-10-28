@@ -4,10 +4,22 @@
 
 #include <fstream>
 #include <boost/filesystem.hpp>
+#include <boost/crc.hpp>
 #include "ResourceManager.hpp"
 #include "../common/Logger.hpp"
 #include "../common/unicode.hpp"
 #include "Music.hpp"
+
+
+// MV1書き出し関数
+namespace DxLib
+{
+extern int MV1SaveModelToMV1File( int MHandle, const char *FileName,
+	int SaveType = ((0x0001) | (0x0002)), int AnimMHandle = -1,
+	int AnimNameCheck = TRUE, int Normal8BitFlag = 1,
+	int Position16BitFlag = 1, int Weight8BitFlag = 0,
+	int Anim16BitFlag = 1 );
+};
 
 ResourceManager::MemoryPool ResourceManager::mempool;
 
@@ -109,10 +121,10 @@ std::vector<std::string> ResourceManager::model_name_list_;
 ptree ResourceManager::model_name_tree_;
 void ResourceManager::BuildModelFileTree()
 {
-    using namespace boost::filesystem;
-    using namespace std;
+	using namespace boost::filesystem;
+	using namespace std;
 
-    model_name_tree_.clear();
+	model_name_tree_.clear();
 	model_name_list_.clear();
 
 	std::function<void(const path& p)> search_dir;
@@ -120,51 +132,55 @@ void ResourceManager::BuildModelFileTree()
 
 		using namespace boost::filesystem;
 
-        if (exists(p) && is_directory(p)) {
-            for (auto it_dir = directory_iterator(p); it_dir != directory_iterator(); ++it_dir) {
-                if (is_directory(*it_dir)) {
-                    path json_path = it_dir->path() / "info.json";
-                    if (exists(json_path)) {
+		if (exists(p) && is_directory(p)) {
+			for (auto it_dir = directory_iterator(p); it_dir != directory_iterator(); ++it_dir) {
+				if (is_directory(*it_dir)) {
+					path json_path = it_dir->path() / "info.json";
+					if (exists(json_path)) {
 
-                        path model_path;
-                        for (auto it = directory_iterator(*it_dir); it != directory_iterator(); ++it) {
-                            auto extension = it->path().extension().string();
+						path model_path;
+						for (auto it = directory_iterator(*it_dir); it != directory_iterator(); ++it) {
+							auto extension = it->path().extension().string();
 
-                            if (extension == ".mv1" || extension == ".x"
-                             || extension == ".pmd" || extension == ".pmx") {
-                                model_path = it->path();
-                                break;
-                            }
-                        }
+							if (extension == ".mv1" || extension == ".x"
+								|| extension == ".pmd" || extension == ".pmx") {
+									model_path = it->path();
+									break;
+							}
+						}
 
-                        if (!model_path.empty()) {
-                            ptree pt_json;
-                            read_json(json_path.string(), pt_json);
+						if (!model_path.empty()) {
+							ptree pt_json;
+							read_json(json_path.string(), pt_json);
 							MergePtree(&pt_json, GetDefaultInfoJSON());
 
-                            std::string name = pt_json.get<std::string>("name", "");
-                            pt_json.put<std::string>("modelpath", unicode::sjis2utf8(model_path.string()));
+							std::string name = pt_json.get<std::string>("name", "");
+							auto model_path_str = unicode::sjis2utf8(model_path.string());
+
+							pt_json.put<std::string>("modelpath", model_path_str);
 							if (!name.empty()) {
 								model_name_list_.push_back(name);
-							}
+								model_name_tree_.put_child(ptree::path_type(name + ":_info_", ':'), pt_json);
 
-                            if (name.size() > 0) {
-                                model_name_tree_.put_child(ptree::path_type(name + ":_info_", ':'), pt_json);
-                            }
-                        }
-                    } else {
+								// ステージデータをキャッシュ
+								if (name.find("stage:") == 0) {
+									CreateModelCache(model_path_str, pt_json);
+								}
+							}
+						}
+					} else {
 						search_dir(it_dir->path());
 					}
-                }
-            }
-        }
+				}
+			}
+		}
 	};
 
-    try {
+	try {
 		search_dir("./models");
-    } catch (const filesystem_error& ex) {
-        Logger::Error(_T("%s"), unicode::ToTString(ex.what()));
-    }
+	} catch (const filesystem_error& ex) {
+		Logger::Error(_T("%s"), unicode::ToTString(ex.what()));
+	}
 
 }
 
@@ -272,6 +288,49 @@ void SetMotionNames(int handle, const ReadFuncData& funcdata)
 	}
 }
 
+std::string ResourceManager::GetCacheFilename(const ptree& info, const std::shared_ptr<char>& fileimage, int filesize)
+{
+	boost::crc_32_type crc;
+	crc.process_block(static_cast<void*>(fileimage.get()),
+		static_cast<void*>(fileimage.get() + filesize));
+
+	boost::crc_32_type crc_info;
+	std::stringstream stream;
+	boost::archive::text_oarchive oa(stream);
+	oa << info;
+	while(stream.good()) {
+		crc_info.process_byte(stream.get());
+	}
+
+	auto cache_filename = "./cache/" + 
+		boost::lexical_cast<std::string>(crc.checksum()) + "_" +
+		boost::lexical_cast<std::string>(crc_info.checksum()) +
+		".mv1";
+
+	return cache_filename;
+}
+
+void ResourceManager::CreateModelCache(std::string filepath, const ptree& info)
+{
+	auto funcdata = std::make_shared<ReadFuncData>(info);
+
+	std::shared_ptr<char> fileimage;
+    int filesize;
+
+    LoadFile(unicode::ToTString(filepath).c_str(), &fileimage, &filesize );
+	auto cache_filename = GetCacheFilename(info, fileimage, filesize);
+
+	if (!boost::filesystem::exists(cache_filename)) {
+		int handle = MV1LoadModelFromMem(fileimage.get(), filesize, FileReadFunc, FileReleaseFunc, &(*funcdata));
+
+		if (!boost::filesystem::exists("./cache")) {
+			boost::filesystem::create_directory("./cache");
+		}
+		MV1SaveModelToMV1File(handle, cache_filename.c_str());
+		MV1DeleteModel(handle);
+	}
+}
+
 void ResourceManager::RequestModelFromName(const tstring& name)
 {
 	if (!IsCachedModelName(name)) {
@@ -293,7 +352,7 @@ ReadFuncData::ReadFuncData(const ptree& info)
 {
 	tstring filepath = unicode::ToTString(info.get<std::string>("modelpath", ""));
 	auto path = boost::filesystem::wpath(unicode::ToWString(filepath));
-    model_dir = path.parent_path();
+	model_dir = path.parent_path();
 
 	if (path.extension() == _T(".pmd") || path.extension() == _T(".pmx")) {
 		auto motions_array = info.get_child("character.motions", ptree());
@@ -345,61 +404,13 @@ ReadFuncData::ReadFuncData(const ptree& info)
 			}
 		}
 	}
-    motions_it = motions.begin();
+	motions_it = motions.begin();
 }
 
 std::unordered_map<std::string, std::string> ResourceManager::set_motions_ = std::unordered_map<std::string, std::string>();
 float ResourceManager::model_edge_size_ = 1.0f;
+
 ModelHandle ResourceManager::LoadModelFromName(const tstring& name)
-{
- 	auto fullpath = ptree::path_type(unicode::ToString(NameToFullPath(name)), ':');
-	ptree p = model_name_tree_.get_child(fullpath, ptree());
-
-	ptree info = p.get_child("_info_", ptree());
-	tstring filepath = unicode::ToTString(info.get<std::string>("modelpath", ""));
-	if(!filepath.size())
-	{
-		fullpath = ptree::path_type(unicode::ToString(NameToFullPath(UNKNOWN_MODEL_NAME)), ':');
-		p = model_name_tree_.get_child(fullpath, ptree());
-		info = p.get_child("_info_", ptree());
-		filepath = unicode::ToTString(info.get<std::string>("modelpath", ""));
-	}
-    if (filepath.size() > 0) {
-        auto it = model_handles_.find(unicode::ToTString(filepath));
-        if (it != model_handles_.end()) {
-            return it->second.Clone();
-        }else{
-			auto funcdata = std::make_shared<ReadFuncData>(info);
-			set_motions_ = funcdata->set_motions;
-
-			//void *FileImage ;
-			std::shared_ptr<char> FileImage;
-            int FileSize ;
-
-            LoadFile(unicode::ToTString(filepath).c_str(), &FileImage, &FileSize );
-
-			int handle = MV1LoadModelFromMem( FileImage.get(), FileSize, FileReadFunc, FileReleaseFunc, &(*funcdata));
-
-			auto material_num = MV1GetMaterialNum(handle);
-			for(int i = 0; i < material_num; ++i){
-				MV1SetMaterialType(handle,i,DX_MATERIAL_TYPE_TOON_2);
-			}
-
-
-			SetMotionNames(handle, *funcdata);
-
-            auto model_handle = ModelHandle(handle, funcdata, std::make_shared<ptree>(info));
-            model_handles_[unicode::ToTString(filepath)] = model_handle;
-
-            Logger::Debug(_T("Model %d"), handle);
-            return model_handle.Clone();
-		}
-    } else {
-        return ModelHandle();
-    }
-}
-
-ModelHandle2 ResourceManager::LoadModelFromName2(const tstring& name)
 {
  	auto fullpath = ptree::path_type(unicode::ToString(NameToFullPath(name)), ':');
 	ptree p = model_name_tree_.get_child(fullpath, ptree());
@@ -416,16 +427,23 @@ ModelHandle2 ResourceManager::LoadModelFromName2(const tstring& name)
     if (filepath.size() > 0) {
         auto it = shared_model_data_.find(unicode::ToTString(filepath));
         if (it != shared_model_data_.end()) {
-            return ModelHandle2(it->second);
+            return ModelHandle(it->second);
         }else{
 			auto funcdata = std::make_shared<ReadFuncData>(info);
 			set_motions_ = funcdata->set_motions;
 
-			//void *FileImage ;
 			std::shared_ptr<char> FileImage;
-            int FileSize ;
+            int FileSize;
 
             LoadFile(unicode::ToTString(filepath).c_str(), &FileImage, &FileSize );
+			
+			// キャッシュ読み込み
+			// モーションなしのモデルでないと上手くいかない
+			auto cache_filename = GetCacheFilename(info, FileImage, FileSize);
+			if (boost::filesystem::exists(cache_filename)) {
+				FileImage.reset();
+				LoadFile(unicode::ToTString(cache_filename).c_str(), &FileImage, &FileSize);
+			}
 
 			int handle = MV1LoadModelFromMem( FileImage.get(), FileSize, FileReadFunc, FileReleaseFunc, &(*funcdata));
 
@@ -436,20 +454,22 @@ ModelHandle2 ResourceManager::LoadModelFromName2(const tstring& name)
 
 			SetMotionNames(handle, *funcdata);
 
+			// CreateModelCache(handle, info, FileImage, FileSize);
+
 			SharedModelDataPtr shared_data = 
 				std::make_shared<SharedModelData>(handle, std::make_shared<ptree>(info));
 
             shared_model_data_[unicode::ToTString(filepath)] = shared_data;
 
             Logger::Debug(_T("Model %d"), handle);
-            return ModelHandle2(shared_data);
+            return ModelHandle(shared_data);
 		}
     } else {
-        return ModelHandle2();
+        return ModelHandle();
     }
 }
 
-void ResourceManager::ClearModelHandle2()
+void ResourceManager::ClearModelHandle()
 {
 	std::list<tstring> erase_keys;
 	BOOST_FOREACH(const auto& it, shared_model_data_) {
@@ -577,71 +597,6 @@ ImageHandle::operator int() const
     return handle_;
 }
 
-ModelHandle::ModelHandle(int handle, const ReadFuncDataPtr& funcdata, const std::shared_ptr<ptree>& property, bool async_load) :
-        handle_(handle),
-		funcdata_(funcdata),
-        property_(property),
-        name_(property_->get<std::string>("name", "")),
-        async_load_(async_load)
-{
-
-}
-
-ModelHandle ModelHandle::Clone()
-{
-    if (CheckHandleASyncLoad(handle_) == TRUE) {
-        return ModelHandle(handle_, funcdata_, property_, true);
-    } else {
-        return ModelHandle(MV1DuplicateModel(handle_), funcdata_, property_);
-    }
-}
-
-bool ModelHandle::CheckLoaded()
-{
-	if (!async_load_) {
-		return true;
-	} else if (async_load_ && CheckHandleASyncLoad(handle_) == FALSE) {
-        handle_ = MV1DuplicateModel(handle_);
-		SetMotionNames(handle_, *funcdata_);
-		async_load_ = false;
-		return true;
-	} else {
-		return false;
-	}
-}
-
-ModelHandle::operator bool() const
-{
-	return handle_ != -1;
-}
-
-ModelHandle::ModelHandle() :
-        handle_(-1),
-        property_(std::make_shared<ptree>())
-{
-
-}
-
-ModelHandle::~ModelHandle()
-{
-
-}
-
-int ModelHandle::handle() const
-{
-    return handle_;
-}
-
-const ptree& ModelHandle::property() const
-{
-    return *property_;
-}
-
-std::string ModelHandle::name() const
-{
-    return name_;
-}
-
 SharedModelData::SharedModelData(int base_handle, const PtreePtr& property) :
 	base_handle_(base_handle),
 	property_(property)
@@ -670,24 +625,34 @@ SharedModelData::~SharedModelData()
 	MV1DeleteModel(base_handle_);
 }
 
-ModelHandle2::ModelHandle2(const SharedModelDataPtr& shared_data) :
+ModelHandle::ModelHandle(const SharedModelDataPtr& shared_data) :
 	shared_data_(shared_data),
 	handle_(shared_data->DuplicateHandle())
 {
 
 }
 
-ModelHandle2::operator bool() const
+ModelHandle::ModelHandle()
+{
+
+}
+
+ModelHandle::operator bool() const
 {
 	return static_cast<bool>(shared_data_);
 }
 
-int ModelHandle2::handle() const
+int ModelHandle::handle() const
 {
 	return handle_;
 }
 
-const ptree& ModelHandle2::property() const
+const ptree& ModelHandle::property() const
 {
 	return shared_data_->property();
+}
+
+std::string ModelHandle::name() const
+{
+    return property().get<std::string>("name", "");
 }

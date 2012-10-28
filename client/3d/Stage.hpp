@@ -34,7 +34,7 @@ class Stage {
         bool IsVisiblePoint(const VECTOR& point) const;
         bool IsNearPoint(const VECTOR& point) const;
 
-        const ModelHandle2& map_handle() const;
+        const ModelHandle& map_handle() const;
         const ModelHandle& skymap_handle() const;
         float map_scale() const;
         float min_height() const;
@@ -50,13 +50,12 @@ class Stage {
 		ConfigManagerPtr config_manager() const;
 
     private:
-        ModelHandle2 map_handle_;
+        ModelHandle map_handle_;
+		ModelHandle skymap_handle_;
         float map_scale_;
 		float min_height_;
 
 		std::unordered_set<int> draw_after_meshes_;
-
-        ModelHandle skymap_handle_;
 		std::vector<ModelHandle> warpobj_handles_;
 
         std::vector<VECTOR> start_points_;

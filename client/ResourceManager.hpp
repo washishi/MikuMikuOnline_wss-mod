@@ -22,7 +22,7 @@ class ModelHandle;
 class Music;
 
 class SharedModelData;
-class ModelHandle2;
+class ModelHandle;
 
 typedef std::shared_ptr<ImageHandle> ImageHandlePtr;
 typedef std::shared_ptr<ModelHandle> ModelHandlePtr;
@@ -106,10 +106,12 @@ class ResourceManager {
         // models
         static void BuildModelFileTree();
         static void CacheBakedModel();
-        static ModelHandle LoadModelFromName(const tstring&);
 
-        static ModelHandle2 LoadModelFromName2(const tstring&);
-        static void ClearModelHandle2();
+        static ModelHandle LoadModelFromName(const tstring&);
+        static void ClearModelHandle();
+
+		static std::string GetCacheFilename(const ptree& info, const std::shared_ptr<char>& fileimage, int filesize);
+		static void CreateModelCache(std::string filepath, const ptree& info);
 
         static void RequestModelFromName(const tstring&);
         static bool IsCachedModelName(const tstring&);
@@ -171,46 +173,6 @@ class ImageHandle {
 
 };
 
-class ModelHandle {
-    friend class ResourceManager;
-
-    private:
-        ModelHandle(int handle, const ReadFuncDataPtr& funcdata, const std::shared_ptr<ptree>& property, bool async_load = false);
-        ModelHandle Clone();
-
-    public:
-        ModelHandle();
-        ~ModelHandle();
-
-        int handle() const;
-        const ptree& property() const;
-        std::string name() const;
-		
-        operator bool() const;
-
-		bool CheckLoaded();
-
-    private:
-        int handle_;
-		ReadFuncDataPtr funcdata_;
-        std::shared_ptr<ptree> property_;
-        std::string name_;
-        bool async_load_;
-
-	public:
-		void *operator new(size_t size)
-		{
-			return tlsf_new(ResourceManager::memory_pool(), size);
-		}
-		void *operator new(size_t, void *p){return p;}
-		void operator delete(void *p)
-		{
-			tlsf_delete(ResourceManager::memory_pool(), p);
-		}
-		void operator delete(void *, void *){};
-
-};
-
 typedef std::shared_ptr<ptree> PtreePtr;
 
 class SharedModelData {
@@ -227,12 +189,14 @@ class SharedModelData {
 		PtreePtr property_;
 };
 
-class ModelHandle2 {
+class ModelHandle {
 	public:
-		ModelHandle2(const SharedModelDataPtr& shared_data = SharedModelDataPtr());
+		ModelHandle(const SharedModelDataPtr& shared_data);
+		ModelHandle();
 		operator bool() const;
 	    int handle() const;
         const ptree& property() const;
+        std::string name() const;
 
 	private:
 		SharedModelDataPtr shared_data_;

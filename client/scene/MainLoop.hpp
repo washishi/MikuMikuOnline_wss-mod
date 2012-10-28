@@ -45,6 +45,7 @@ class MainLoop : public Base {
 		int snapshot_number_;
 		bool snapshot_;
 
+		int fade_counter_;
 		//SocketServer socket_server_;
 };
 

@@ -236,7 +236,6 @@ public:
 				}
 
                 // 床へのめり込みを防止
-                float floor_y;
 				std::pair<bool, VECTOR> floor_coll;
 					// 足で接地検査
 					floor_coll = (*stage_)->FloorExists(moved_pos,model_height_,0);

@@ -31,6 +31,7 @@ class ChannelChange : public Base{
 		PlayerManagerPtr player_manager_;
 
 		unsigned char channel_;
+		int fade_counter_;
 };
 
 }

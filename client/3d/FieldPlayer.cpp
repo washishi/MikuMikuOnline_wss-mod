@@ -211,10 +211,6 @@ void FieldPlayer::SetModel(const ModelHandle& model)
 
 void FieldPlayer::Update()
 {
-	if (loading_model_handle_ && loading_model_handle_.CheckLoaded()) {
-		SetModel(loading_model_handle_);
-		loading_model_handle_ = ModelHandle();
-	}
 
 	// 落ちた時に強制復帰
 	if (prev_stat_.pos.y < (*stage_)->min_height()) {
