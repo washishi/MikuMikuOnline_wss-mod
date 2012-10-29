@@ -174,6 +174,7 @@ void MiniMap::DrawPosAndCalc()
 	auto player_manager = manager_accessor_->player_manager().lock();
 	auto world_manager = manager_accessor_->world_manager().lock();
 	auto command_manager = manager_accessor_->command_manager().lock();
+	auto current_channel = command_manager->current_channel();
 
 	const auto& providers = player_manager->char_data_providers();
 	auto myself_pos = player_manager->char_data_providers()[player_manager->charmgr()->my_character_id()]->position();
@@ -184,8 +185,6 @@ void MiniMap::DrawPosAndCalc()
 	float tmp_pos_x = 0, tmp_pos_z = 0;
 	auto theta = 0.0f, mtheta = player_manager->char_data_providers()[player_manager->charmgr()->my_character_id()]->theta();
 
-	// êÊÇ…é©ï™ÇÃà íuÇï`âÊÅyíÜâõå≈íËÅz
-	DrawCircle( absolute_x() + absolute_width()/2, absolute_y() + absolute_height()/2, 2, GetColor(206,52,95));
 
 	auto it = providers.begin();
 	for(it; it != providers.end(); ++it)
@@ -203,6 +202,24 @@ void MiniMap::DrawPosAndCalc()
 		if(tmp_pos_z > absolute_y() + absolute_height() -12 - 16)tmp_pos_z = absolute_y() + absolute_height() - 12 - 16;
 		DrawCircle( tmp_pos_x, tmp_pos_z, 2, GetColor(23,162,175),TRUE);
 	}
+	if(current_channel){
+	BOOST_FOREACH(auto it,current_channel->warp_points)
+	{
+		direction = VSub(VGet(it.x,it.y,it.z),myself_pos);
+		direction.y = 0;
+		theta = atan2( -direction.x, -direction.z);
+		tmp_pos_x = ( sin(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager->stage()->map_scale()) )/ 3.0f + absolute_x() + absolute_width()/2;
+		tmp_pos_z = ( cos(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager->stage()->map_scale()) )/ 3.0f + absolute_y() + absolute_height()/2; // yç¿ïWâªÇ∑ÇÈ
+		if(tmp_pos_x < absolute_x() + 12)tmp_pos_x = absolute_x() + 12;
+		if(tmp_pos_x > absolute_x() + absolute_width() - 12)tmp_pos_x = absolute_x() + absolute_width() - 12;
+		if(tmp_pos_z < absolute_y() + 12)tmp_pos_z = absolute_y() + 12;
+		if(tmp_pos_z > absolute_y() + absolute_height() -12 - 16)tmp_pos_z = absolute_y() + absolute_height() - 12 - 16;
+		DrawCircle( tmp_pos_x, tmp_pos_z, 3, GetColor(255,255,255),TRUE);
+	}
+	}
+	// ç≈å„Ç…é©ï™ÇÃà íuÇï`âÊÅyíÜâõå≈íËÅz
+	DrawCircle( absolute_x() + absolute_width()/2, absolute_y() + absolute_height()/2, 2, GetColor(206,52,95));
+
 	prev_myself_pos_on_map_ = player_manager->char_data_providers()[player_manager->charmgr()->my_character_id()]->position();
 
 	tstring login_num;
