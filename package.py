@@ -36,6 +36,7 @@ def make_full_package(model = True):
 	zip.write(os.path.join(base_dir, 'mmd.txt'), 'mmd.txt')
 
 	zip.write(os.path.join(bin_path, 'server/config.json'), 'server/config.json')
+	zip.write(os.path.join(bin_path, 'server/channels/ch000/config.json'), 'server/channels/ch000/config.json')
 
 	zip.write(os.path.join(bin_path, 'config.json'), 'config.json')
 	zip.write(os.path.join(bin_path, 'server/server.exe'), 'server/server.exe')
@@ -96,6 +97,7 @@ def make_server_package():
 	bin_path = os.path.join(base_dir, 'client/bin/')
 	zip.write(os.path.join(bin_path, 'server/server.exe'), 'server.exe')
 	zip.write(os.path.join(bin_path, 'server/config.json'), 'config.json')
+	zip.write(os.path.join(bin_path, 'server/channels/ch000/config.json'), 'channels/ch000/config.json')
 	        
 	zip.close()
 	

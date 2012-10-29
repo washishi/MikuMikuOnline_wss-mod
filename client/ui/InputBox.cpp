@@ -44,7 +44,7 @@ InputBox::InputBox(const ManagerAccessorPtr& manager_accessor) :
                 manager_accessor_(manager_accessor),
                 card_(std::make_shared<Card>(manager_accessor_, "", "immo", "", "",
                             std::vector<std::string>())),
-				input_(manager_accessor->config_manager().lock())
+				input_()
 
 {
 	absolute_rect_ = Rect(100, 100, 800, 100);
@@ -103,7 +103,6 @@ InputBox::InputBox(const ManagerAccessorPtr& manager_accessor) :
 
         return true;
     });
-	input_.Init();
 }
 
 InputBox::~InputBox()

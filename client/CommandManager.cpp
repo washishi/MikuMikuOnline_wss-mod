@@ -119,7 +119,7 @@ void CommandManager::FetchCommand(const network::Command& command)
 			channels_[id] = ptr;
 		}
 
-		// 存在しないチャンネルへのワープポイントを削除
+		// 存在しない・ステージデータがないチャンネルへのワープポイントを削除
 		BOOST_FOREACH(const auto& channel, channels_) {
 			auto& warp_points = channel.second->warp_points;
 			auto end_it = std::remove_if(warp_points.begin(),
@@ -127,6 +127,12 @@ void CommandManager::FetchCommand(const network::Command& command)
 				[this](Channel::WarpPoint& point) -> bool {
 				auto it = channels_.find(point.channel);
 				if (it != channels_.end()) {
+
+					if (ResourceManager::NameToFullPath(
+						unicode::ToTString(it->second->stage)).empty()) {
+						return true;
+					}
+
 					point.name = it->second->name;
 					return false;
 				} else {

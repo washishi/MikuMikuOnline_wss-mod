@@ -15,7 +15,6 @@
     		"start_points":
     			[
     				{"x":0.0, "y":0.0, "z":0.0}
-    			],
-    		"skydome": "skydome:入道雲のある風景"
+    			]
     	}
 }

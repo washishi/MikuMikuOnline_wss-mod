@@ -46,32 +46,7 @@ Stage::Stage(const ChannelPtr& channel,const ConfigManagerPtr &config_manager) :
 		warpobj_handles_.push_back(handle);
 	}
 
-	/*
-    auto warp_points_array = map_handle_.property().get_child("stage.warp_points", ptree());
-    for (auto it = warp_points_array.begin(); it != warp_points_array.end(); ++it) {
-        float x = it->second.get<float>("x", 0);
-        float y = it->second.get<float>("y", 0);
-        float z = it->second.get<float>("z", 0);
-        warp_points_.push_back(VGet(x, y, z));
-    }
-    if (warp_points_.empty()) {
-        warp_points_.push_back(VGet(0,0,0));
-    }
-	auto warpobj_name = map_handle_.property().get<std::string>("stage.warpobj_name", unicode::ToString(_T("warpobj:デフォルトワープオブジェクト")));
-	warpobj_handle_ = ResourceManager::LoadModelFromName(unicode::ToTString(warpobj_name));
-
-	float warpobj_scale = warpobj_handle_.property().get<float>("scale",12.5f);
-	if(warpobj_scale != 1.0f)MV1SetScale(warpobj_handle_.handle(), VGet(warpobj_scale, warpobj_scale, warpobj_scale));
-	auto warpobj_push_it = warp_points_.begin();
-	for( warpobj_push_it; warpobj_push_it != warp_points_.end(); ++warpobj_push_it)
-	{
-		auto tmp = ResourceManager::LoadModelFromName(unicode::ToTString(warpobj_name));
-		MV1SetScale(tmp.handle(), VGet(warpobj_scale, warpobj_scale, warpobj_scale));
-		MV1SetPosition(tmp.handle(),*warpobj_push_it);
-		warpobj_array_.push_back(tmp);
-	}
-	*/
-    auto skymap_name = map_handle_.property().get<std::string>("stage.skydome", unicode::ToString(_T("skydome:入道雲のある風景")));
+    auto skymap_name = unicode::ToString(_T("skydome:スカイドーム"));
     skymap_handle_ = ResourceManager::LoadModelFromName(unicode::ToTString(skymap_name));
 
     float skymap_scale = skymap_handle_.property().get<float>("scale", 80.0);
@@ -96,18 +71,16 @@ void Stage::Draw()
 		}
 	}
 
+	auto skymep_rotate = MV1GetRotationXYZ(skymap_handle_.handle());
+	skymep_rotate.y += 0.0001;
+	MV1SetRotationXYZ(skymap_handle_.handle(), skymep_rotate);
+
     MV1DrawModel(skymap_handle_.handle());
 
 	BOOST_FOREACH(const auto& warp_point_handle, warpobj_handles_) {
 		MV1DrawModel(warp_point_handle.handle());
 	}
 
-	/*
-	BOOST_FOREACH(auto warp_handle,warpobj_array_)
-	{
-		MV1DrawModel(warp_handle.handle());
-	}
-	*/
 }
 
 void Stage::DrawAfter()

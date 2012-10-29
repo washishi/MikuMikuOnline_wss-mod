@@ -176,13 +176,14 @@ void MainLoop::Draw()
 
 				UILabel label_;
 				label_.set_width(160);
+				auto text = _T("Åy") + unicode::ToTString(warp_point.name) + _T("Åz");
 				if (distance < 50) {
-					label_.set_text(unicode::ToTString(warp_point.name) + _T("\nÇlÉLÅ[Ç≈ì]ëóÇµÇ‹Ç∑"));
+					text += _T("\nÇlÉLÅ[Ç≈ì]ëóÇµÇ‹Ç∑");
 					label_.set_bgcolor(UIBase::Color(255,0,0,150));
 				} else {
-					label_.set_text(unicode::ToTString(warp_point.name));
 					label_.set_bgcolor(UIBase::Color(0,0,0,150));
 				}
+				label_.set_text(text);
 				label_.set_textcolor(UIBase::Color(255,255,255,255));
 
 				label_.set_left(x - 60);

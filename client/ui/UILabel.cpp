@@ -255,6 +255,7 @@ void UILabel::UpdatePosition()
 
     for (auto it = char_width_list_.begin(); it != char_width_list_.end(); ++it) {
         if ( text_[text_cursor] == _T('\n')) {
+			line_width = 0;
             line_num++;
             substr_list_.push_back(text_cursor);
             substr_list_.push_back(text_cursor + 1);

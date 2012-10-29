@@ -45,6 +45,8 @@ void ChannelChange::Update()
 		player_manager_->ResetStage();
 		manager_accessor_->set_world_manager(WorldManagerPtr());
 
+		ResourceManager::ClearModelHandle();
+
 		command_manager_->Write(network::ServerUpdateAccountProperty(CHANNEL, network::Utils::Serialize(channel_)));
 
 		auto channel_ptr = command_manager_->channels().at(channel_);
