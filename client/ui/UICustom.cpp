@@ -23,6 +23,11 @@ UICustom::UICustom()
 
 UICustom::~UICustom()
 {
+	if( !graphic_handles_.empty() ){
+		BOOST_FOREACH(auto handle,graphic_handles_){
+			DeleteGraph(handle);
+		}
+	}
 }
 
 Handle<Value> UICustom::Property_processinput(Local<String> property, const AccessorInfo &info)
@@ -98,6 +103,25 @@ void UICustom::DefineInstanceTemplate(Handle<ObjectTemplate>* object)
 
 	SetFunction(object, "DrawLine", Function_DrawLine);
 	SetFunction(object, "DrawBox", Function_DrawBox);
+	SetFunction(object, "DrawEdgeBox", Function_DrawEdgeBox);
+	SetFunction(object, "DrawCircle", Function_DrawCircle);
+	SetFunction(object, "DrawOval", Function_DrawOval);
+	SetFunction(object, "DrawTriangle", Function_DrawTriangle);
+	SetFunction(object, "DrawQuadrangle", Function_DrawQuadrangle);
+	SetFunction(object, "DrawPixel", Function_DrawPixel);
+	SetFunction(object, "Paint", Function_DrawLine);
+	SetFunction(object, "DrawPixelSet", Function_DrawBox);
+	SetFunction(object, "DrawLineSet", Function_DrawEdgeBox);
+	SetFunction(object, "DrawPixel3D", Function_DrawCircle);
+	SetFunction(object, "DrawCube", Function_DrawOval);
+	SetFunction(object, "DrawSphere", Function_DrawTriangle);
+	SetFunction(object, "DrawCapsule3D", Function_DrawQuadrangle);
+	SetFunction(object, "DrawCone3D", Function_DrawPixel);
+
+	SetFunction(object, "LoadGraph", Function_LoadGraph);
+	SetFunction(object, "DeleteGraph", Function_DeleteGraph);
+
+	SetFunction(object, "DrawText", Function_DrawText);
 }
 
 void UICustom::ProcessInput(InputManager* input)

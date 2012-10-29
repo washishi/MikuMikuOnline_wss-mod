@@ -955,17 +955,51 @@ void* tlsf_realloc(tlsf_pool tlsf, void* ptr, size_t size)
 	return p;
 }
 
+#include <map>
+static std::map<int,int> tlsf_addresses;
+
 void * tlsf_new(tlsf_pool mempool,size_t size){
 	void *p = tlsf_malloc(mempool,size);
 	if(!p){
 		std::bad_alloc b;
 		throw b;
 	}
+	TCHAR tmp[32],str[128];
+	_itot_s((int)p,tmp,10);
+	_tcscpy_s(str,L"tlsf new address : ");
+	_tcscat_s(str,tmp);
+	_tcscat_s(str,L"\r\n");
+	OutputDebugString(str);
+	tlsf_addresses.insert(std::make_pair<int,int>((int)p,size));
 	return p;
 }
 
 
 void tlsf_delete(tlsf_pool mempool,void *p)
 {
+	TCHAR tmp[32],str[128];
+	_itot_s((int)p,tmp,10);
+	_tcscpy_s(str,L"tlsf delete address : ");
+	_tcscat_s(str,tmp);
+	_tcscat_s(str,L"\r\n");
+	OutputDebugString(str);
+	auto it = tlsf_addresses.find((int)p);
+	tlsf_addresses.erase(it);
 	if(p)tlsf_free(mempool,p);
+}
+
+void output_tlsf_leak()
+{
+	for(auto it = tlsf_addresses.begin();it != tlsf_addresses.end();++it)
+	{
+		TCHAR tmp[32],str[128];
+		_itot_s(it->first,tmp,10);
+		_tcscpy_s(str,L"leak address : ");
+		_tcscat_s(str,tmp);
+		_itot_s(it->second,tmp,10);
+		_tcscat_s(str,L"\tsize : ");
+		_tcscat_s(str,tmp);
+		_tcscat_s(str,L"\r\n");
+		OutputDebugString(str);
+	}
 }

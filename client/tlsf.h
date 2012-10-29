@@ -51,6 +51,7 @@ size_t tlsf_overhead();
 
 void *tlsf_new(tlsf_pool mempool,size_t size);
 void tlsf_delete(tlsf_pool mempool,void *p);
+void output_tlsf_leak();
 
 template<typename T>
 T *tlsf_new(tlsf_pool mempool,size_t size){

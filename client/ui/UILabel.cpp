@@ -22,8 +22,7 @@
 const int UILabel::BASE_BLOCK_SIZE = 12;
 
 UILabel::UILabel() :
-                font_handle_(ResourceManager::default_font_handle()),
-				clickchancel_count_(-1)
+                font_handle_(ResourceManager::default_font_handle())
 {
 }
 
@@ -192,12 +191,9 @@ void UILabel::ProcessInput(InputManager* input)
 			on_click_.As<Function>()->CallAsFunction(Context::GetCurrent()->Global(), 0, nullptr);
 		}else if(!on_click_function_._Empty()) {
 			on_click_function_(this);
+			parent_c_->set_visible(false);
 			input->CancelMouseLeft();
-			clickchancel_count_ = 8;
 		}
-	}else if(clickchancel_count_ >= 0 ){
-			input->CancelMouseLeft();
-			--clickchancel_count_;
 	}else if(hover && !hover_flag_){
 		if(!on_hover_function_._Empty()) {
 			on_hover_function_(this);
@@ -255,7 +251,6 @@ void UILabel::UpdatePosition()
 
     for (auto it = char_width_list_.begin(); it != char_width_list_.end(); ++it) {
         if ( text_[text_cursor] == _T('\n')) {
-			line_width = 0;
             line_num++;
             substr_list_.push_back(text_cursor);
             substr_list_.push_back(text_cursor + 1);

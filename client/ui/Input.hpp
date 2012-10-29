@@ -8,16 +8,20 @@
 #include <functional>
 #include "../ResourceManager.hpp"
 #include "../InputManager.hpp"
+#include "../ConfigManager.hpp"
+#include "include.hpp"
+#include <boost/enable_shared_from_this.hpp>
 
-class Input {
+class Input{
         typedef std::function<bool(const std::string&)> CallbackFunc;
 
     public:
-        Input();
+        Input(ConfigManagerPtr config_manager);
 
         void Draw();
         void Update();
         void ProcessInput(InputManager* input);
+		void Init();
 
         bool active();
         void set_active(bool flag);
@@ -44,6 +48,11 @@ class Input {
         void set_multiline(bool flag);
 
         void set_on_enter(const CallbackFunc& func);
+
+		tstring selecting_text() const;
+		void paste_text(tstring text);
+
+		void set_click_chancel_count(int count);
 
     public:    
         void CancelSelect();
@@ -73,12 +82,22 @@ class Input {
         std::vector<std::pair<int, int>> selecting_lines_;
         std::vector<std::pair<int, int>> clause_lines_;
         std::vector<std::pair<int, int>> selecting_clause_lines_;
+		std::pair<int, int> selecting_coursorpoint_;
+		bool drag_flag_;
 
         CallbackFunc on_enter_;
         tstring message_;
 
         bool reverse_color_;
         int blink_count_;
+		bool rightmenu_show_;
+		//std::pair<int, int> mouse_pos_;
+
+		UIList right_click_list_;
+
+		ConfigManagerPtr config_manager_;
+
+		int click_cancel_count_;
 
     private:
         const static size_t TEXT_BUFFER_SIZE;
