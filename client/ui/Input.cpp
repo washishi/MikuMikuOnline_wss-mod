@@ -632,8 +632,9 @@ void Input::ProcessInput(InputManager* input)
         message_lines_.push_back(line_buffer);
     }
 
-    if (active() && input->GetMouseX() >= x() && input->GetMouseX() <= x() + width() &&
-		input->GetMouseY() >= y() && input->GetMouseY() <= y() + height()) {
+    if (active()) {
+		if(input->GetMouseX() >= x() && input->GetMouseX() <= x() + width() &&
+		input->GetMouseY() >= y() && input->GetMouseY() <= y() + height()){
 		if ( !right_click_list_.visible() &&
 			!( right_click_list_.visible() && right_click_list_.absolute_x()<= input->GetMouseX() && input->GetMouseX() <= right_click_list_.absolute_x()+ right_click_list_.absolute_width()
 			&& right_click_list_.absolute_y() <= input->GetMouseY() && input->GetMouseY() <= right_click_list_.absolute_y() + right_click_list_.absolute_height())) {
@@ -816,6 +817,7 @@ void Input::ProcessInput(InputManager* input)
 					right_click_list_.set_visible(true);
 					//rightmenu_show_ = true;
 			}
+		}
 		}
 
         // カーソル位置（文字単位）を取得
