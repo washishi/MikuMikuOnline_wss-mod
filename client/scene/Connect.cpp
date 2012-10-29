@@ -104,7 +104,7 @@ void Connect::Update()
     message_.Update();
 
     if (command_manager_->status() == CommandManager::STATUS_READY) {
-        next_scene_= std::make_shared<scene::ChannelChange>(0, manager_accessor_);
+        next_scene_= std::make_shared<scene::ChannelChange>(0, std::shared_ptr<VECTOR>(), manager_accessor_);
 	} else if (return_flag_) {
 		next_scene_= std::make_shared<scene::Title>(manager_accessor_);
     }

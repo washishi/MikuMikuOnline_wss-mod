@@ -50,11 +50,6 @@ MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
 
 	window_manager_->RestorePosition();
 
-    player_manager_->Init();
-    world_manager_->Init();	
-
-    world_manager_->myself()->Init(unicode::ToTString(account_manager_->model_name()));
-
 	socket_server_manager_->Start();
 
 }
@@ -120,12 +115,24 @@ void MainLoop::ProcessInput(InputManager* input)
 
 	if (const auto& channel = command_manager_->current_channel()) {
 		BOOST_FOREACH(const auto& warp_point, channel->warp_points) {
-			auto point = VGet(warp_point.x, warp_point.y + 30, warp_point.z);
+			auto point = warp_point.position;
+			point.y += 30;
 			const auto& pos = player_manager_->GetMyself()->position();
 
-			auto distance = VSize(VGet(warp_point.x - pos.x, warp_point.y - pos.y, warp_point.z - pos.z));
+			auto distance = VSize(warp_point.position - VGet(pos.x, pos.y, pos.z));
 			if (distance < 50 && input->GetKeyCount(KEY_INPUT_M) == 1) {
-				next_scene_ = std::make_shared<scene::ChannelChange>(warp_point.channel, manager_accessor_);
+
+				// “¯ˆêƒ`ƒƒƒ“ƒlƒ‹‚Ìê‡‚ÍˆÚ“®‚·‚é‚¾‚¯
+				if (player_manager_->GetMyself()->channel() == warp_point.channel) {
+					if (warp_point.destination) {
+						world_manager_->myself()->ResetPosition(warp_point.destination);
+					}
+				} else {
+					next_scene_ = std::make_shared<scene::ChannelChange>(
+						warp_point.channel,
+						warp_point.destination,
+						manager_accessor_);
+				}
 			}
 		}
 	}
@@ -164,10 +171,11 @@ void MainLoop::Draw()
 	
 	if (const auto& channel = command_manager_->current_channel()) {
 		BOOST_FOREACH(const auto& warp_point, channel->warp_points) {
-			auto point = VGet(warp_point.x, warp_point.y + 30, warp_point.z);
+			auto point = warp_point.position;
+			point.y += 30;
 			const auto& pos = player_manager_->GetMyself()->position();
-
-			auto distance = VSize(VGet(warp_point.x - pos.x, warp_point.y - pos.y, warp_point.z - pos.z));
+			
+			auto distance = VSize(warp_point.position - VGet(pos.x, pos.y, pos.z));
 
 			if (world_manager_->stage()->IsVisiblePoint(point)) {
 				auto screen_pos = ConvWorldPosToScreenPos(point);
