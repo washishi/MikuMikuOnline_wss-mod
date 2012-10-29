@@ -53,8 +53,8 @@ public:
 
     void Draw() const;
     void Update();
-    void Init(tstring model_path);
-    void ResetPosition();
+    void Init(tstring model_path, const std::shared_ptr<VECTOR>& init_position);
+    void ResetPosition(const std::shared_ptr<VECTOR>& init_position);
     void RescuePosition();
 
 	void LoadModel(const tstring& name);

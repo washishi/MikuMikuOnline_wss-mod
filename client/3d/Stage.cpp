@@ -41,7 +41,7 @@ Stage::Stage(const ChannelPtr& channel,const ConfigManagerPtr &config_manager) :
 	BOOST_FOREACH(const auto& warp_point, channel_->warp_points) {
 		auto handle = ResourceManager::LoadModelFromName(_T("warpobj:ワープオブジェクト"));
 		float scale = handle.property().get<float>("scale", 80.0);
-		MV1SetPosition(handle.handle(), VGet(warp_point.x, warp_point.y, warp_point.z));
+		MV1SetPosition(handle.handle(), warp_point.position);
 		MV1SetScale(handle.handle(), VGet(scale, scale, scale));
 		warpobj_handles_.push_back(handle);
 	}
