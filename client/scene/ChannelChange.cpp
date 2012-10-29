@@ -5,16 +5,12 @@
 #include "MainLoop.hpp"
 #include "ChannelChange.hpp"
 #include "../CommandManager.hpp"
-#include "../AccountManager.hpp"
 #include "../../common/Logger.hpp"
 #include "../../common/network/Utils.hpp"
 #include "../3d/Stage.hpp"
 
 namespace scene {
-ChannelChange::ChannelChange(
-	unsigned char channel,
-	const std::shared_ptr<VECTOR>& init_position,
-	const ManagerAccessorPtr& manager_accessor) :
+ChannelChange::ChannelChange(unsigned char channel, const ManagerAccessorPtr& manager_accessor) :
 	manager_accessor_(manager_accessor),
     card_manager_(manager_accessor->card_manager().lock()),
     command_manager_(manager_accessor->command_manager().lock()),
@@ -22,8 +18,7 @@ ChannelChange::ChannelChange(
     config_manager_(manager_accessor->config_manager().lock()),
     player_manager_(manager_accessor->player_manager().lock()),
 	channel_(channel),
-	fade_counter_(0),
-	init_position_(init_position)
+	fade_counter_(0)
 {
 
 }
@@ -58,10 +53,6 @@ void ChannelChange::Update()
 		StagePtr stage = std::make_shared<Stage>(channel_ptr,manager_accessor_->config_manager().lock());
 		world_manager_ = std::make_shared<WorldManager>(stage, manager_accessor_);
 		manager_accessor_->set_world_manager(world_manager_);
-
-		player_manager_->Init();
-		world_manager_->Init();	
-		world_manager_->myself()->Init(unicode::ToTString(account_manager_->model_name()), init_position_);
 
 		next_scene_ = std::make_shared<scene::MainLoop>(manager_accessor_);
 	}

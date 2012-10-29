@@ -13,10 +13,7 @@ namespace scene {
 class ChannelChange : public Base{
 
 	public:
-		ChannelChange(
-			unsigned char channel,
-			const std::shared_ptr<VECTOR>& destination,
-			const ManagerAccessorPtr&);
+		ChannelChange(unsigned char channel, const ManagerAccessorPtr&);
 		~ChannelChange();
         void Begin();
         void Update();
@@ -35,7 +32,6 @@ class ChannelChange : public Base{
 
 		unsigned char channel_;
 		int fade_counter_;
-		std::shared_ptr<VECTOR> init_position_;
 };
 
 }
