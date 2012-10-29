@@ -205,7 +205,7 @@ void MiniMap::DrawPosAndCalc()
 	if(current_channel){
 	BOOST_FOREACH(auto it,current_channel->warp_points)
 	{
-		direction = VSub(VGet(it.x,it.y,it.z),myself_pos);
+		direction = VSub(it.position,myself_pos);
 		direction.y = 0;
 		theta = atan2( -direction.x, -direction.z);
 		tmp_pos_x = ( sin(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager->stage()->map_scale()) )/ 3.0f + absolute_x() + absolute_width()/2;
