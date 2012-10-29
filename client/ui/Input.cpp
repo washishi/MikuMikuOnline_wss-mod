@@ -632,7 +632,6 @@ void Input::ProcessInput(InputManager* input)
         message_lines_.push_back(line_buffer);
     }
 
-
     if (active() && input->GetMouseX() >= x() && input->GetMouseX() <= x() + width() &&
 		input->GetMouseY() >= y() && input->GetMouseY() <= y() + height()) {
 		if ( !right_click_list_.visible() &&

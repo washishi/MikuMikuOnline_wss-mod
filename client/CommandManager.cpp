@@ -113,7 +113,16 @@ void CommandManager::FetchCommand(const network::Command& command)
 				auto x = warp_point.second.get<float>("position.x", 0);
 				auto y = warp_point.second.get<float>("position.y", 0);
 				auto z = warp_point.second.get<float>("position.z", 0);
-				Channel::WarpPoint point = {x, y, z, channel, ""};
+
+				std::shared_ptr<VECTOR> destination;
+				if (!warp_point.second.get_child("destination", ptree()).empty()) {
+					auto dest_x = warp_point.second.get<float>("destination.x", 0);
+					auto dest_y = warp_point.second.get<float>("destination.y", 0);
+					auto dest_z = warp_point.second.get<float>("destination.z", 0);
+					destination = std::make_shared<VECTOR>(VGet(dest_x, dest_y, dest_z));
+				}
+				Channel::WarpPoint point = {VGet(x, y, z), channel, "", destination};
+
 				ptr->warp_points.push_back(point);
 			}
 			channels_[id] = ptr;

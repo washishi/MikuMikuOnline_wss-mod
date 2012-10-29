@@ -15,9 +15,10 @@ namespace network {
 struct Channel {
 	public:
 		struct WarpPoint {
-			float x, y, z;
+			VECTOR position;
 			unsigned int channel;
 			std::string name;
+			std::shared_ptr<VECTOR> destination;
 		};
 
 	public:

@@ -142,19 +142,23 @@ void FieldPlayer::Draw() const
     // DrawLine3D(current_stat_.pos, current_stat_.pos + VGet(0, 0, 2 * (*stage_)->map_scale()), GetColor(0, 0, 255));
 }
 
-void FieldPlayer::Init(tstring model_name)
+void FieldPlayer::Init(tstring model_name, const std::shared_ptr<VECTOR>& init_position)
 {
     LoadModel(model_name);
-    ResetPosition();
+    ResetPosition(init_position);
 }
 
-void FieldPlayer::ResetPosition()
+void FieldPlayer::ResetPosition(const std::shared_ptr<VECTOR>& init_position)
 {
-    const auto& points = (*stage_)->start_points();
-    std::mt19937 engine(time(nullptr));
-    std::uniform_int_distribution<int> distribution(0, points.size() - 1);
+	if (init_position) {
+		current_stat_.pos = *init_position;
+	} else {
+		const auto& points = (*stage_)->start_points();
+		std::mt19937 engine(time(nullptr));
+		std::uniform_int_distribution<int> distribution(0, points.size() - 1);
+		current_stat_.pos = points[distribution(engine)];
+	}
 
-    current_stat_.pos = points[distribution(engine)];
     current_stat_.pos.y = (*stage_)->GetFloorY(current_stat_.pos + VGet(0, 20, 0), current_stat_.pos - VGet(0, 20, 0));
 }
 
