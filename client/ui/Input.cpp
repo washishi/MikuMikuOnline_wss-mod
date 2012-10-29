@@ -632,7 +632,8 @@ void Input::ProcessInput(InputManager* input)
         message_lines_.push_back(line_buffer);
     }
 
-    if (active()) {
+    if (active() && input->GetMouseX() >= x() && input->GetMouseX() <= x() + width() &&
+		input->GetMouseY() >= y() && input->GetMouseY() <= y() + height()) {
 		if ( !right_click_list_.visible() &&
 			!( right_click_list_.visible() && right_click_list_.absolute_x()<= input->GetMouseX() && input->GetMouseX() <= right_click_list_.absolute_x()+ right_click_list_.absolute_width()
 			&& right_click_list_.absolute_y() <= input->GetMouseY() && input->GetMouseY() <= right_click_list_.absolute_y() + right_click_list_.absolute_height())) {
@@ -718,6 +719,7 @@ void Input::ProcessInput(InputManager* input)
 					SetKeyInputSelectArea(selecting_coursorpoint_.first,selecting_coursorpoint_.second,input_handle_);
 					SetKeyInputCursorPosition(selecting_coursorpoint_.second,input_handle_);
 					drag_flag_ = true;
+					input->CancelMouseLeft();
 				}
 				// マウス左ボタンが離され、且つ前回ドラッグされていた時
 				if (!push_mouse_left && prev_mouse_left && drag_flag_ ) {
@@ -756,6 +758,7 @@ void Input::ProcessInput(InputManager* input)
 						}
 						SetKeyInputCursorPosition(line_num + cnt,input_handle_);
 					}
+					input->CancelMouseLeft();
 				}else{
 					int tmp = 0,cnt = 0;
 					for(unsigned int i = 0;i < lines_[0].size(); ++i){
