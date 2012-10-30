@@ -642,7 +642,7 @@ void Input::ProcessInput(InputManager* input)
 				if (push_mouse_left && !prev_mouse_left) {
 					auto mpos = input->GetMousePos();
 					auto offset_x = mpos.first - (x_ + INPUT_MARGIN_X);
-					auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y);
+					auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y) + ResourceManager::default_font_size() * message_lines_.size();
 					// カレット変更
 					if( multiline_ ) {
 						auto line_num = offset_y / font_height_;
@@ -688,7 +688,7 @@ void Input::ProcessInput(InputManager* input)
 					}
 					auto mpos = input->GetMousePos();
 					auto offset_x = mpos.first - (x_ + INPUT_MARGIN_X);
-					auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y);
+					auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y) + ResourceManager::default_font_size() * message_lines_.size();
 					// カレット変更
 					if( multiline_ ) {
 						auto line_num = offset_y / font_height_;
@@ -740,7 +740,7 @@ void Input::ProcessInput(InputManager* input)
 			if( push_mouse_left ){
 				auto mpos = input->GetMousePos();
 				auto offset_x = mpos.first - (x_ + INPUT_MARGIN_X);
-				auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y);
+				auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y) + ResourceManager::default_font_size() * message_lines_.size();
 				// カレット変更
 				if( multiline_ ) {
 					auto line_num = offset_y / font_height_;
