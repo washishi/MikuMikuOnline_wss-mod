@@ -273,21 +273,27 @@ void Input::Draw()
 		int select_start = 0,select_end = 0;
 		GetKeyInputSelectArea(&select_start,&select_end,input_handle_);
 		if( select_start > select_end )std::swap(select_start,select_end);
-
+		tstring str = text();
 		if( select_start > -1 && select_end != select_start ) {
-			if ( multiline_ ) {
+				int cnt = 0;
 				BOOST_FOREACH(auto it,lines_){
 					int width = 0;
 					TCHAR c[2] = {0};
 					if( select_start >= it.size() && select_start != -1 ) {
 						DrawStringToHandle(internal_x, internal_y + current_line * font_height_,
 							it.c_str(), text_color, font_handle_);
+						cnt += it.size();
 						if(select_start == it.size()){
 							select_start -= it.size();
-						}else{
+							select_end -= it.size() + 1;
+						}else if(str[cnt] == _T('\n')){
 							select_start -= it.size() + 1;
+							select_end -= it.size() + 1;
+							++cnt;
+						}else{
+							select_start -= it.size();
+							select_end -= it.size();
 						}
-						select_end -= it.size() + 1;
 						++current_line;
 					}else if(select_start != -1){
 						for(int i = 0;i < select_start;++i){
@@ -312,11 +318,31 @@ void Input::Draw()
 								c, text_color, font_handle_);
 							width += GetDrawStringWidthToHandle(c,1,font_handle_);
 						}
-						if(select_end > it.size()){
-							select_end -= it.size() + 1;
-							select_start = 0;
+						cnt += it.size();
+						if(cnt < str.size())
+						{
+							if(str[cnt] == '\n'){
+								select_end -= it.size() + 1;
+								select_start = 0;
+								if(select_end <= 0)
+								{
+									select_start = -1;
+								}
+							}else if(select_end > it.size()){
+								select_end -= it.size();
+								select_start = 0;
+								++cnt;
+							}else{
+								select_start = -1;
+							}
 						}else{
-							select_start = -1;
+							if(select_end > it.size()){
+								select_end -= it.size() + 1;
+								select_start = 0;
+								++cnt;
+							}else{
+								select_start = -1;
+							}
 						}
 						++current_line;
 					}else if(select_start == -1){
@@ -325,34 +351,6 @@ void Input::Draw()
 						++current_line;
 					}
 				}
-			}else{
-				BOOST_FOREACH(auto it,lines_){
-					int width = 0;
-					TCHAR c[2] = {0};
-					for(int i = 0;i < select_start;++i){
-						c[0] = it[i];
-						DrawStringToHandle(internal_x + width, internal_y + current_line * font_height_,
-							c, text_color, font_handle_);
-						width += GetDrawStringWidthToHandle(c,1,font_handle_);
-					}
-					for(int i = select_start;i < select_end; ++i){
-						c[0] = it[i];
-				        SetDrawBlendMode(DX_BLENDMODE_ALPHA, 180);
-						DrawBox(internal_x + width,internal_y + current_line * font_height_,
-							internal_x + width + GetDrawStringWidthToHandle(c,1,font_handle_),internal_y + ( current_line + 1 ) * font_height_,text_color,1);
-						DrawStringToHandle(internal_x + width, internal_y + current_line * font_height_,
-							c, !reverse_color_ ? GetColor(255, 255, 255) : GetColor(0, 0, 0), font_handle_);
-						width += GetDrawStringWidthToHandle(c,1,font_handle_);
-						SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-					}
-					for(unsigned int i = select_end;i < it.size(); ++i){
-						c[0] = it[i];
-						DrawStringToHandle(internal_x + width, internal_y + current_line * font_height_,
-							c, text_color, font_handle_);
-						width += GetDrawStringWidthToHandle(c,1,font_handle_);
-					}
-				}
-			}
 		}else{
 			for (auto it = lines_.begin(); it != lines_.end(); ++it) {
 				auto line = *it;
@@ -642,84 +640,87 @@ void Input::ProcessInput(InputManager* input)
 				if (push_mouse_left && !prev_mouse_left) {
 					auto mpos = input->GetMousePos();
 					auto offset_x = mpos.first - (x_ + INPUT_MARGIN_X);
-					auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y) + ResourceManager::default_font_size() * message_lines_.size();
+					auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y) - ResourceManager::default_font_size() * message_lines_.size();
 					// カレット変更
-					if( multiline_ ) {
 						auto line_num = offset_y / font_height_;
 						//if( ( offset_y % font_height_ ) != 0 )++line_num;
 						int tmp = 0,cnt = 0;
+						auto str = text();
 						if( line_num < (int)lines_.size() && line_num >= 0 ){
-							for(int i = 0;i < line_num; ++i){
+							for(int i = 0;i < line_num; ++i,++cnt){
 								cnt += lines_[i].size();
+								if(str[cnt] != '\n')
+								{
+									--cnt;
+								}
 							}
 							for(unsigned int i = 0;i < lines_[line_num].size(); ++i){
 								auto tmp_x = GetDrawStringWidthToHandle(&lines_[line_num][i],1,font_handle_);
-								if( tmp + tmp_x < offset_x ){
+								if( tmp + tmp_x <= offset_x ){
 									tmp += tmp_x;
 									++cnt;
 								}
 							}
-							SetKeyInputCursorPosition(line_num + cnt,input_handle_);
+							SetKeyInputCursorPosition(cnt,input_handle_);
 						}
-					}else{
-						int tmp = 0,cnt = 0;
-						for(unsigned int i = 0;i < lines_[0].size(); ++i){
-							auto tmp_x = GetDrawStringWidthToHandle(&lines_[0][i],1,font_handle_);
-							if( tmp + tmp_x < offset_x ){
-								tmp += tmp_x;
-								++cnt;
-							}
-						}
-						if( selecting_coursorpoint_.first = selecting_coursorpoint_.second ) {
-							SetKeyInputSelectArea( -1, -1, input_handle_ );
-						}else{
-							SetKeyInputSelectArea(selecting_coursorpoint_.first,selecting_coursorpoint_.second,input_handle_);
-						}
-						SetKeyInputCursorPosition(cnt,input_handle_);
-					}
 				}
 				// マウス左ボタンがドラッグされた時
-				if (push_mouse_left && prev_mouse_left ) {
+				if (push_mouse_left && prev_mouse_left) {
+					static std::vector<int> prev_line_size;
 					int prev_cursor_pos = 0;
+					bool clear_select = false;
 					if( !drag_flag_ ){
 						prev_cursor_pos = GetKeyInputCursorPosition(input_handle_);
+						prev_line_size.clear();
+						BOOST_FOREACH(auto line,lines_)
+						{
+							prev_line_size.push_back(line.size());
+						}
 					}else{
 						prev_cursor_pos = selecting_coursorpoint_.first;
+						auto prev_line = prev_line_size.begin();
+						auto line = lines_.begin();
+						for(;line != lines_.end() && prev_line != prev_line_size.end();++line,++prev_line)
+						{
+							if((*line).size() != (*prev_line))
+							{
+								clear_select = true;
+							}
+						}
 					}
-					auto mpos = input->GetMousePos();
-					auto offset_x = mpos.first - (x_ + INPUT_MARGIN_X);
-					auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y) + ResourceManager::default_font_size() * message_lines_.size();
-					// カレット変更
-					if( multiline_ ) {
+					if(!clear_select)
+					{
+						auto mpos = input->GetMousePos();
+						auto offset_x = mpos.first - (x_ + INPUT_MARGIN_X);
+						auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y) - ResourceManager::default_font_size() * message_lines_.size();
+						// カレット変更
 						auto line_num = offset_y / font_height_;
 						int tmp = 0,cnt = 0;
+						auto str = text();
 						if( line_num < (int)lines_.size() && line_num >= 0){
 							for(int i = 0;i < line_num; ++i,++cnt){
 								cnt += lines_[i].size();
+								if(str[cnt] != '\n')
+								{
+									--cnt;
+								}
 							}
 							for(unsigned int i = 0;i < lines_[line_num].size(); ++i){
 								auto tmp_x = GetDrawStringWidthToHandle(&lines_[line_num][i],1,font_handle_);
-								if( tmp + tmp_x < offset_x ){
+								if( tmp + tmp_x <= offset_x ){
 									tmp += tmp_x;
 									++cnt;
 								}
 							}
 						}
 						selecting_coursorpoint_ = std::make_pair<int,int>(prev_cursor_pos,cnt);
+						SetKeyInputSelectArea(selecting_coursorpoint_.first,selecting_coursorpoint_.second,input_handle_);
+						SetKeyInputCursorPosition(selecting_coursorpoint_.second,input_handle_);
+						drag_flag_ = true;
 					}else{
-						int tmp = 0,cnt = 0;
-						for(unsigned int i = 0;i < lines_[0].size(); ++i){
-							auto tmp_x = GetDrawStringWidthToHandle(&lines_[0][i],1,font_handle_);
-							if( tmp + tmp_x < offset_x ){
-								tmp += tmp_x;
-								++cnt;
-							}
-						}
-						selecting_coursorpoint_ = std::make_pair<int,int>(prev_cursor_pos,cnt);
+						SetKeyInputSelectArea(-1,-1,input_handle_);
+						selecting_coursorpoint_.first = selecting_coursorpoint_.second;
 					}
-					SetKeyInputSelectArea(selecting_coursorpoint_.first,selecting_coursorpoint_.second,input_handle_);
-					SetKeyInputCursorPosition(selecting_coursorpoint_.second,input_handle_);
-					drag_flag_ = true;
 					input->CancelMouseLeft();
 				}
 				// マウス左ボタンが離され、且つ前回ドラッグされていた時
@@ -740,42 +741,30 @@ void Input::ProcessInput(InputManager* input)
 			if( push_mouse_left ){
 				auto mpos = input->GetMousePos();
 				auto offset_x = mpos.first - (x_ + INPUT_MARGIN_X);
-				auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y) + ResourceManager::default_font_size() * message_lines_.size();
+				auto offset_y = mpos.second - (y_ + INPUT_MARGIN_Y) - ResourceManager::default_font_size() * message_lines_.size();
 				// カレット変更
-				if( multiline_ ) {
 					auto line_num = offset_y / font_height_;
 					//if( ( offset_y % font_height_ ) != 0 )++line_num;
 					int tmp = 0,cnt = 0;
+					auto str = text();
 					if( line_num < (int)lines_.size() && line_num >= 0 ){
-						for(int i = 0;i < line_num; ++i){
+						for(int i = 0;i < line_num; ++i,++cnt){
 							cnt += lines_[i].size();
+							if(str[cnt] != '\n')
+							{
+								--cnt;
+							}
 						}
 						for(unsigned int i = 0;i < lines_[line_num].size(); ++i){
 							auto tmp_x = GetDrawStringWidthToHandle(&lines_[line_num][i],1,font_handle_);
-							if( tmp + tmp_x < offset_x ){
+							if( tmp + tmp_x <= offset_x ){
 								tmp += tmp_x;
 								++cnt;
 							}
 						}
-						SetKeyInputCursorPosition(line_num + cnt,input_handle_);
+						SetKeyInputCursorPosition(cnt,input_handle_);
 					}
 					input->CancelMouseLeft();
-				}else{
-					int tmp = 0,cnt = 0;
-					for(unsigned int i = 0;i < lines_[0].size(); ++i){
-						auto tmp_x = GetDrawStringWidthToHandle(&lines_[0][i],1,font_handle_);
-						if( tmp + tmp_x < offset_x ){
-							tmp += tmp_x;
-							++cnt;
-						}
-					}
-					if( selecting_coursorpoint_.first = selecting_coursorpoint_.second ) {
-						SetKeyInputSelectArea( -1, -1, input_handle_ );
-					}else{
-						SetKeyInputSelectArea(selecting_coursorpoint_.first,selecting_coursorpoint_.second,input_handle_);
-					}
-					SetKeyInputCursorPosition(cnt,input_handle_);
-				}
 			}
 		}
 		// マウス右ボタンが押されたとき
@@ -1239,27 +1228,17 @@ tstring Input::selecting_text() const
 		tstring selecting_text;
 
 		if( select_start > -1 && select_end != select_start ) {
-			if ( multiline_ ) {
-				BOOST_FOREACH(auto it,lines_){
-					TCHAR c[2] = {0};
-					if( select_start > it.size() && select_start != -1 ) {
-						select_start -= it.size();
-						select_end -= it.size();
-					}else{
-						for(int i = select_start;i < select_end; ++i){
-							c[0] = it[i];
-						    selecting_text += c;
-						}
-						select_start = -1;
-					}
-				}
-			}else{
-				BOOST_FOREACH(auto it,lines_){
-					TCHAR c[2] = {0};
+			BOOST_FOREACH(auto it,lines_){
+				TCHAR c[2] = {0};
+				if( select_start > it.size() && select_start != -1 ) {
+					select_start -= it.size();
+					select_end -= it.size();
+				}else{
 					for(int i = select_start;i < select_end; ++i){
 						c[0] = it[i];
-				        selecting_text += c;
+						selecting_text += c;
 					}
+					select_start = -1;
 				}
 			}
 		}
