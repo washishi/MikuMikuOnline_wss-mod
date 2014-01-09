@@ -10,16 +10,16 @@
 #include "../common/unicode.hpp"
 #include "Music.hpp"
 
-
+// ※ DXライブラリの仕様変更によりコメント(DXlib.hに定義が含まれている、またファイル名のデータ型が異なる)
 // MV1書き出し関数
-namespace DxLib
-{
-extern int MV1SaveModelToMV1File( int MHandle, const char *FileName,
-	int SaveType = ((0x0001) | (0x0002)), int AnimMHandle = -1,
-	int AnimNameCheck = TRUE, int Normal8BitFlag = 1,
-	int Position16BitFlag = 1, int Weight8BitFlag = 0,
-	int Anim16BitFlag = 1 );
-};
+//namespace DxLib
+//{
+// extern int MV1SaveModelToMV1File( int MHandle, const char *FileName,
+//	int SaveType = ((0x0001) | (0x0002)), int AnimMHandle = -1,
+//	int AnimNameCheck = TRUE, int Normal8BitFlag = 1,
+//	int Position16BitFlag = 1, int Weight8BitFlag = 0,
+//	int Anim16BitFlag = 1 );
+//};
 
 ResourceManager::MemoryPool ResourceManager::mempool;
 
@@ -326,7 +326,8 @@ void ResourceManager::CreateModelCache(std::string filepath, const ptree& info)
 		if (!boost::filesystem::exists("./cache")) {
 			boost::filesystem::create_directory("./cache");
 		}
-		MV1SaveModelToMV1File(handle, cache_filename.c_str());
+//		MV1SaveModelToMV1File(handle, cache_filename.c_str()) ; // ※ DXライブラリの仕様変更により修正
+		MV1SaveModelToMV1File(handle, unicode::ToTString(cache_filename).c_str()) ;
 		MV1DeleteModel(handle);
 	}
 }

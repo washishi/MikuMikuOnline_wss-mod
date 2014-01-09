@@ -839,7 +839,7 @@ void Input::ProcessInput(InputManager* input)
         // int selecting_clause = -1;
         selecting_candidate_ = -1;
 
-        IMEINPUTDATA *ImeData = GetIMEInputData();
+		IMEINPUTDATA const *ImeData = GetIMEInputData() ;
         if (ImeData && active()) {
             for (int i = 0; i < ImeData->ClauseNum; i++) {
                 clauses.push_back(
