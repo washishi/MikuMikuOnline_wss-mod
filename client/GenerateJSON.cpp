@@ -238,7 +238,8 @@ JsonGen::JsonGen()
 				_tcscpy_s(tcsTmpPath_Pmd,tcsTmpDir);
 				_tcscat_s(tcsTmpPath_Pmd,_T("*.pmd"));
 				hPmdFind = FindFirstFile(tcsTmpPath_Pmd, &win32fd_pmd);
-				if(hPmdFind == (HANDLE)0xffffffff)
+//				if(hPmdFind == (HANDLE)0xffffffff)
+				if(hPmdFind == INVALID_HANDLE_VALUE) // Å¶ 64bitÇ≈ÉrÉãÉhÇµÇƒÇ‡ñ‚ëËÇ»Ç¢ÇÊÇ§Ç…èCê≥
 				{
 					FindClose(hPmdFind);
 					continue;
