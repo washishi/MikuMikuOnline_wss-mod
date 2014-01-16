@@ -141,8 +141,8 @@ void Lobby::Server::Start(const std::string& host)
 		}));
 
     } catch (const std::exception& e) {
-        Logger::Error(_T("%s"), unicode::ToTString(e.what()));
-    }
+		Logger::Error(_T("%s"), unicode::ToTString(e.what()));
+	}
 
 	if (session_) {
 		session_->Start();
@@ -167,42 +167,48 @@ bool Lobby::Reload(const std::string& lobby_server)
 	servers_.clear();
 
 	using boost::asio::ip::tcp;
-    boost::asio::io_service io_service;
+	boost::asio::io_service io_service;
+	try {  // ※ 名前解決できない場合に例外が発生するのでトラップ
+		tcp::resolver resolver(io_service);
+		tcp::resolver::query query(tcp::v4(), lobby_server.c_str(), "39380");
+		tcp::resolver::iterator iterator = resolver.resolve(query);
 
-    tcp::resolver resolver(io_service);
-    tcp::resolver::query query(tcp::v4(), lobby_server.c_str(), "39380");
-    tcp::resolver::iterator iterator = resolver.resolve(query);
-	
-	boost::system::error_code error;
-    tcp::socket s(io_service);
-    boost::asio::connect(s, iterator, error);
+		boost::system::error_code error;
+		tcp::socket s(io_service);
+		boost::asio::connect(s, iterator, error);
 
-	boost::asio::streambuf buf;
-    size_t reply_length = boost::asio::read_until(s, buf, ';', error);
+		boost::asio::streambuf buf;
+		size_t reply_length = boost::asio::read_until(s, buf, ';', error);
 
-	if (error) {
-		Logger::Error(_T("Cannot connect to lobby servers"));
-		return false;
-	} else {
-		std::istream is(&buf);
-		std::string line;
-		std::getline(is, line);
+		if (error) {
+			Logger::Error(_T("Cannot connect to lobby servers"));
+			return false;
+		} else {
+			std::istream is(&buf);
+			std::string line;
+			std::getline(is, line);
 
-		std::vector<std::string> result;
-		boost::algorithm::split(result, line.substr(0, line.size() - 1), boost::is_any_of(","));
+			std::vector<std::string> result;
+			boost::algorithm::split(result, line.substr(0, line.size() - 1), boost::is_any_of(","));
 
-		
-		BOOST_FOREACH(const auto& host, result) {
-			//for (int i = 0; i < 6; i++) {
+
+			BOOST_FOREACH(const auto& host, result) {
+				//for (int i = 0; i < 6; i++) {
 				auto ptr = std::make_shared<Server>();
 				boost::thread([ptr, host]() {
 					ptr->Start(host);
 				});
 				servers_.push_back(ptr);
-			//}
+				//}
+			}
+			return true;
 		}
-		return true;
 	}
+	catch (const std::exception& e) {
+		Logger::Error(_T("Cannot resolve Hostname:%s"),unicode::ToTString(lobby_server));
+		return false;
+	}
+
 }
 
 const std::vector<Lobby::ServerPtr>& Lobby::servers() const

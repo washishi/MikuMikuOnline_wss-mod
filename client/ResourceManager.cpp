@@ -327,7 +327,8 @@ void ResourceManager::CreateModelCache(std::string filepath, const ptree& info)
 			boost::filesystem::create_directory("./cache");
 		}
 //		MV1SaveModelToMV1File(handle, cache_filename.c_str()) ; // ※ DXライブラリの仕様変更により修正
-		MV1SaveModelToMV1File(handle, unicode::ToTString(cache_filename).c_str()) ;
+//		MV1SaveModelToMV1File(handle, unicode::ToTString(cache_filename).c_str()) ; // ※ 座標精度を変更(MODクライアント互換)
+		MV1SaveModelToMV1File(handle, unicode::ToTString(cache_filename).c_str(),MV1_SAVETYPE_NORMAL,-1,1,0,0,0,0);
 		MV1DeleteModel(handle);
 	}
 }
