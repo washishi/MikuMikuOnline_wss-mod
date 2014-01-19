@@ -444,20 +444,22 @@ std::string ScriptEnvironment::GetInfo()
 {
     std::string info;
     info += std::string("V8 Javascript Engine ") + V8::GetVersion() + std::string("\n");
-
-    With(
-            [&](const Handle<Context>& context)
-            {
-                Handle<String> key = String::New("CoffeeScript");
-                Handle<Object> compiler = context->Global()->GetHiddenValue(key)->ToObject();
-                if (compiler->Has(String::New("VERSION"))) {
-                    info += "CoffeeScript ";
-                    info += *String::AsciiValue(compiler->Get(String::New("VERSION"))->ToString());
-                    info += "\n";
-                }
-            });
-
-    info += "Sugar Library v1.2.5";
+// ※ CoffeeScriptを利用していないため例外で落ちるのでコメント また SugarLibraryのバージョンも修正
+//  With(
+//          [&](const Handle<Context>& context)
+//          {
+//              Handle<String> key = String::New("CoffeeScript");
+//              Handle<Object> compiler = context->Global()->GetHiddenValue(key)->ToObject();
+//              if (compiler->Has(String::New("VERSION"))) {
+//                  info += "CoffeeScript ";
+//                  info += *String::AsciiValue(compiler->Get(String::New("VERSION"))->ToString());
+//                  info += "\n";
+//              }
+//          });
+//
+//  info += "Sugar Library v1.2.5";
+    info += "Sugar Library v1.3.5";
+// ここまで
 
     return info;
 }

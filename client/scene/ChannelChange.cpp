@@ -51,9 +51,11 @@ void ChannelChange::Update()
 		manager_accessor_->set_world_manager(WorldManagerPtr());
 
 		ResourceManager::ClearModelHandle();
-
+// ※ ログイン通知のユーザ名が???になるのでユーザ名を送るように修正
+        auto name=account_manager_->name();
+        command_manager_->Write(network::ServerUpdateAccountProperty(NAME, name));
+// ここまで
 		command_manager_->Write(network::ServerUpdateAccountProperty(CHANNEL, network::Utils::Serialize(channel_)));
-
 		auto channel_ptr = command_manager_->channels().at(channel_);
 		StagePtr stage = std::make_shared<Stage>(channel_ptr,manager_accessor_->config_manager().lock());
 		world_manager_ = std::make_shared<WorldManager>(stage, manager_accessor_);
