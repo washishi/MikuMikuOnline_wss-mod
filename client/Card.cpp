@@ -23,6 +23,7 @@
 #include "Profiler.hpp"
 #include "GenerateJSON.hpp"
 #include "Music.hpp"
+#include "3d/PlayerCharacter.hpp"  // ※ 他プレイヤーのモーションを変更できるようにするために追加(MODクライアント互換)
 
 //#pragma comment(lib,"libctemplate.lib")
 
@@ -257,6 +258,37 @@ Handle<Value> Card::Function_Player_stopMotion(const Arguments& args)
 
     return Undefined();
 }
+
+// ※ 他プレイヤーのモーションを変更できるように追加(MODクライアント互換)
+Handle<Value> Card::Function_Player_playMotionId(const Arguments& args)
+{
+    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+
+	if (args.Length() >= 2 && args[0]->IsUint32() && args[1]->IsString()) {
+        auto name = std::string(*String::Utf8Value(args[1]->ToString()));
+		auto command_manager = self->manager_accessor_->command_manager().lock();
+        auto myid = command_manager->user_id();
+		auto player_manager = self->manager_accessor_->player_manager().lock();
+		auto charmgr = player_manager->charmgr();
+		auto selectedid = args[0]->Uint32Value();
+		if (selectedid==0 || selectedid==myid) {
+			// 自分のキャラ
+			auto myself = std::dynamic_pointer_cast<FieldPlayer>(charmgr->Get(charmgr->my_character_id()));
+			if (std::string(*String::Utf8Value(args[2]->ToString()))=="false") {
+				myself->PlayMotion(unicode::ToTString(name),false);
+			} else {
+				myself->PlayMotion(unicode::ToTString(name),true);
+			}
+		} else {
+			// 他のキャラ
+			auto selectedplayer = std::dynamic_pointer_cast<PlayerCharacter>(charmgr->Get(selectedid));
+			selectedplayer->PlayMotion(unicode::ToTString(name));
+		}
+    }
+
+	return Undefined();
+}
+// ここまで
 
 Handle<Value> Card::Function_Music_playBGM(const Arguments& args)
 {
@@ -540,12 +572,10 @@ Handle<Value> Card::Function_Model_Rebuild(const Arguments& args)
 {
 	JsonGen jsongen;
 	ResourceManager::BuildModelFileTree();
-
     auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
     if (auto card_manager = self->manager_accessor_->card_manager().lock()) {
 		card_manager->OnModelReload();
     }
-
 	return Undefined();
 }
 
@@ -890,6 +920,18 @@ void Card::SetFunctions()
      * @static
      */
     script_.SetFunction("Player.stopMotion", Function_Player_stopMotion);
+
+	//  ※ 他プレイヤーのモーションを変更できるように追加(MODクライアント互換)
+	/**
+     * プレイヤーIDを指定してモーションを再生します
+     *
+     * @method playMotion
+     * @param {String} name モーション名
+     * @param {Integer} プレイヤーのID
+     * @static
+     */
+    script_.SetFunction("Player.playMotionId", Function_Player_playMotionId);
+	// ここまで
 
     /**
      * 音楽を再生します
