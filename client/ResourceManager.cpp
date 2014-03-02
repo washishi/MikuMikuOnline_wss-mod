@@ -481,6 +481,19 @@ void ResourceManager::ClearModelHandle()
 	}
 
 	BOOST_FOREACH(const tstring& key, erase_keys) {
+		// ※ モデル解放時にモデルの種別がワープオブジェクトまたはスカイドームの場合は解放しないように修正
+		auto path = key.substr(0,key.rfind('\\'))+ _T("\\info.json");
+		auto json_path = boost::filesystem::wpath(unicode::ToWString(path));
+		if (exists(json_path)) {
+			ptree pt_json;
+			read_json(json_path.string(), pt_json);
+			auto type = pt_json.get<std::string>("name", "");
+			type = type.substr(0,type.find(':'));
+			if (type=="skydome"||type=="warpobj" ) {
+				continue; // 以下のモデル解放をスキップする
+			}
+		}
+		// ※ ここまで
 		shared_model_data_.erase(key);
 	}
 }

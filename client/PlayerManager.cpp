@@ -173,9 +173,10 @@ void PlayerManager::Update()
 		const auto& current_model = player->current_model_name();
 		auto model = player->model_name();
 
-		if (player->channel() != GetMyself()->channel()) {
-			model = "";
-		}
+		// ※チャンネル移動時にモデルをRemoveしないようにコメント
+		//if (player->channel() != GetMyself()->channel()) {
+		//	model = "";
+		//}
 
 		if (player->current_model_name() != model) {
 			if (player->id() != 0) {
@@ -186,6 +187,12 @@ void PlayerManager::Update()
 			}
 			player->set_current_model_name("");
 		}
+
+		// ※他チャンネルのユーザのモデルチェンジ時にモデルを読み込まないように追加
+		if (player->channel() != GetMyself()->channel()) {
+			model = "";
+		}
+		// ※ここまで
 
 		if (player->current_model_name().empty() && !model.empty()) {
 			if (player->id() != GetMyself()->id()) {

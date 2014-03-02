@@ -392,7 +392,9 @@ JsonGen::JsonGen()
 					CopyFile(pmd_paths[i].c_str(),tmp_type,TRUE);
 				}
 				pmd_paths.clear();
-				DeleteDirectory(tcsTmpDir);
+				if (_tcscmp(tcsTmpDir,_T("./models/キャラクター/")) !=0){ // ※ キャラクター直下の場合は削除しない
+					DeleteDirectory(tcsTmpDir);
+				}
 			}
 		}
 	} while (FindNextFile(hFind, &win32fd_dir));

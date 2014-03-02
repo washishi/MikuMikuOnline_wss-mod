@@ -190,7 +190,11 @@ void MiniMap::DrawPosAndCalc()
 	for(it; it != providers.end(); ++it)
 	{
 		if(it->first == player_manager->charmgr()->my_character_id())continue;
-
+		// ※ 自分と異なるチャンネルは描画しないように変更
+		if (player_manager->GetMyself()->channel() != player_manager->GetFromId(it->first)->channel()) {
+			continue; // チャンネルが異なるので描画しない
+		}
+		// ※ ここまで
 		direction = VSub(it->second->position(),myself_pos);
 		direction.y = 0;
 		theta = atan2( -direction.x, -direction.z);

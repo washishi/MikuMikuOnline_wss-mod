@@ -12,8 +12,10 @@
 #include "BasicMotion.hpp"
 #include "PMDLoader.hpp"
 #include "Stage.hpp"
+#include "PlayerManager.hpp" // ※ 追加
 #include "../ConfigManager.hpp"
 #include "../../common/Logger.hpp"
+
 
 int KeyChecker::Check()
 {
@@ -86,20 +88,28 @@ int GameLoop::Update()
 
 int GameLoop::Draw()
 {
-    //std::cout << "\nDraw" << std::endl;
+	//std::cout << "\nDraw" << std::endl;
 
-    FixCameraPosition();
+	FixCameraPosition();
 
-    stage_->Draw();
+	stage_->Draw();
+	for (auto it = charmgr_->GetAll().begin(); it != charmgr_->GetAll().end(); ++it) {
+		auto character = *it;
 
-    for (auto it = charmgr_->GetAll().begin(); it != charmgr_->GetAll().end(); ++it) {
-        auto character = *it;
-        character.second->Draw();
+		// ※ チャンネル移動時にキャラクタデータを解放しなくした関係で別チャンネルのユーザを描画しないように ここから
+		if (character.first != 0) { // id:0は自分なので常に描画
+			auto player_manager = manager_accessor_->player_manager().lock();
+			if (player_manager->GetMyself()->channel() !=  player_manager->GetFromId(character.first)->channel()) {
+				continue; // キャラクターを描画しない
+			}
+		}
+		// ※ ここまで
+		character.second->Draw();
 	}
 
-    stage_->DrawAfter();
+	stage_->DrawAfter();
 
-    return 0;
+	return 0;
 }
 
 FieldPlayerPtr GameLoop::myself() const
