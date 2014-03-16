@@ -573,6 +573,20 @@ Handle<Value> Card::Function_Model_Rebuild(const Arguments& args)
 	JsonGen jsongen;
 	ResourceManager::BuildModelFileTree();
     auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+	// ※ 代替モデルを使っていた場合はモデルチェンジさせるためにカレントモデルを消す　ここから
+    if (auto player_manager = self->manager_accessor_->player_manager().lock()) {
+		auto players = player_manager->GetAll();
+		for (auto it = players.begin(); it != players.end(); ++it) {
+			auto player = *it;
+			auto current_model_name = player->current_model_name();
+			// 代替モデルはBuildModelFileTree()の際にキャッシュフラグ消去済みなのでそれで調べる
+			auto test = unicode::ToTString(current_model_name);
+			if (ResourceManager::IsCachedModelName(unicode::ToTString(current_model_name)) == false) {
+				player->set_current_model_name("");
+			}
+		}
+	}
+	// ※ ここまで
     if (auto card_manager = self->manager_accessor_->card_manager().lock()) {
 		card_manager->OnModelReload();
     }
@@ -597,7 +611,13 @@ Handle<Value> Card::Function_Socket_reply(const Arguments& args)
 		std::string str = *String::Utf8Value(args[0]->ToString());
 		auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
 		if (self && self->on_socket_reply_) {
-			(*self->on_socket_reply_)(str);
+// ※ ソケットへの書き込みが失敗した場合は以降処理しないように修正 ここから
+//			(*self->on_socket_reply_)(str);
+			if((*self->on_socket_reply_)(str) == false) {
+				// ソケットの書き込みに失敗した場合は以降コールバックさせない
+				self->set_on_socket_reply(nullptr);
+			}
+// ※ ここまで
 		}
 	}
 

@@ -26,6 +26,7 @@ class ConfigManager
         bool fullscreen_;
         int screen_width_;
         int screen_height_;
+		std::list<std::string> lobby_servers_; // ※ロビーサーバをjsonで変更するために追加
         bool antialias_;
         std::string host_;
         int port_;
@@ -50,6 +51,7 @@ class ConfigManager
         bool fullscreen() const;
         int screen_width() const;
         int screen_height() const;
+		const std::list<std::string>& lobby_servers() const; // ※ロビーサーバをjsonで変更するために追加
         bool antialias() const;
         std::string host() const;
         int port() const;
@@ -74,6 +76,7 @@ class ConfigManager
 		int show_nametag_,
 			show_modelname_,
 			gamepad_type_,
+			gamepad_enable_, // ※ ゲームパッド有効をウインドウアクティブ時のみにもできる様に追加
 			camera_direction_,
 			walk_change_type_;
 
@@ -87,6 +90,11 @@ class ConfigManager
 
 		int gamepad_type() const;
 		void set_gamepad_type(int value);
+
+		// ※ ここから ゲームパッド有効をウインドウアクティブ時のみにもできる様に追加
+		int gamepad_enable() const;
+		void set_gamepad_enable(int value);
+		// ※ ここまで
 	
 		int camera_direction() const;
 		void set_camera_direction(int value);

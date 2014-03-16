@@ -398,6 +398,27 @@ InputTab::InputTab(const ManagerAccessorPtr& manager_accessor) :
 		}),
 		manager_accessor_));
 
+		// ※ ここから ゲームパッド有効をウインドウアクティブ時のみにもできる様に追加
+		items_.push_back(std::make_shared<RadioButtonItem>(
+		_LT("option.input.gamepad_enable"),
+		_LT("option.input.gamepad_enable_json"),
+		std::make_shared<RadioButtonItemGetter>(
+		[manager_accessor]() -> int{
+			auto config_manager = 
+				manager_accessor->config_manager().lock();
+			return config_manager->gamepad_enable();
+		}),
+		std::make_shared<RadioButtonItemSetter>(
+		[manager_accessor](int value){
+			if (auto config_manager = 
+				manager_accessor->config_manager().lock()) {
+				InputManager::SetGamepadEnable(value);
+				config_manager->set_gamepad_enable(value);
+			}
+		}),
+		manager_accessor_));
+		// ※ ここまで
+
 	items_.push_back(std::make_shared<RadioButtonItem>(
 		_LT("option.input.camera_direction"),
 		_LT("option.input.camera_direction_json"),

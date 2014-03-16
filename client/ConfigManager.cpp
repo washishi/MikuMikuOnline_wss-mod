@@ -5,6 +5,7 @@
 #include "ConfigManager.hpp"
 #include "../common/Logger.hpp"
 #include <stdint.h>
+#include <boost/filesystem.hpp> // ※ロビーサーバをjson参照するために追加
 
 const int ConfigManager::MIN_SCREEN_WIDTH = 800;
 const int ConfigManager::MIN_SCREEN_HEIGHT = 600;
@@ -43,9 +44,14 @@ void ConfigManager::LoadConfigure()
 	model_edge_size_ = pt.get<float>("edge_size",1.0f);
 	stage_ = pt.get<std::string>("stage","ケロリン町");
 	language_ = pt.get<std::string>("language","日本語");
-
 	screen_width_ =  std::max(screen_width_, MIN_SCREEN_WIDTH);
 	screen_height_ = std::max(screen_height_, MIN_SCREEN_HEIGHT);
+	// ※ロビーサーバをjsonで変更できるように追加
+	auto lobby_servers = pt.get_child("lobby_servers", ptree());
+	BOOST_FOREACH(const auto& item, lobby_servers) {
+		lobby_servers_.push_back(item.second.get_value<std::string>());
+	}
+	// ここまで
 }
 
 void ConfigManager::Load(const std::string& filename)
@@ -60,6 +66,7 @@ void ConfigManager::Load(const std::string& filename)
     show_nametag_ =		pt.get("show_nametag", 1);
     show_modelname_ =	pt.get("show_modelname", 1);
     gamepad_type_ =		pt.get("gamepad_type", 0);
+    gamepad_enable_ =	pt.get("gamepad_enable", 0); // ※ ゲームパッド有効をウインドウアクティブ時のみにもできる様に追加
     camera_direction_ =	pt.get("camera_direction", 0);
 	walk_change_type_ = pt.get("walk_change_type",0);
 }
@@ -77,6 +84,7 @@ void ConfigManager::Save(const std::string& filename)
     pt.put("show_nametag", show_nametag_);
     pt.put("show_modelname", show_modelname_);
     pt.put("gamepad_type", gamepad_type_);
+    pt.put("gamepad_enable", gamepad_enable_); // ※ ゲームパッド有効をウインドウアクティブ時のみにもできる様に追加
     pt.put("camera_direction", camera_direction_);
 
 	write_xml(filename, pt);
@@ -205,6 +213,18 @@ void ConfigManager::set_gamepad_type(int value)
 	gamepad_type_ = value;
 }
 
+// ※ ここから ゲームパッド有効をウインドウアクティブ時のみにもできる様に追加
+int ConfigManager::gamepad_enable() const
+{
+	return gamepad_enable_;
+}
+
+void ConfigManager::set_gamepad_enable(int value)
+{
+	gamepad_enable_ = value;
+}
+// ※ ここまで
+
 int ConfigManager::camera_direction() const
 {
 	return camera_direction_;
@@ -213,4 +233,9 @@ int ConfigManager::camera_direction() const
 void ConfigManager::set_camera_direction(int value)
 {
 	camera_direction_ = value;
+}
+
+const std::list<std::string>& ConfigManager::lobby_servers() const
+{
+	return lobby_servers_;
 }

@@ -34,6 +34,8 @@
 					"name":					"入力設定",
 					"gamepad_type":			"ゲームパッドタイプ",
 					"gamepad_type_json":	"{\"タイプ1\":0,\"タイプ2\":1,\"タイプ3\":2}",
+					"gamepad_enable":			"ゲームパッド有効",
+					"gamepad_enable_json":	"{\"常に有効\":0,\"ウィンドウアクティブ時のみ\":1}",
 					"camera_direction":		"カメラの向き",
 					"camera_direction_json":"{\"常に背面\":0,\"自由\":1}"
 				},

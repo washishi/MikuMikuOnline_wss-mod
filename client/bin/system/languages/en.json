@@ -34,6 +34,8 @@
 					"name":					"Input",
 					"gamepad_type":			"Gamepad type",
 					"gamepad_type_json":	"{\"Type1\":0,\"Type2\":1,\"Type3\":2}",
+					"gamepad_enable":			"Gamepad Enable",
+					"gamepad_enable_json":	"{\"Always\":0,\"Only Window Active\":1}",
 					"camera_direction":		"Camera direction",
 					"camera_direction_json":"{\"Always behind\":0,\"Independent\":1}"
 				},

@@ -41,46 +41,46 @@ tlsf_pool& ResourceManager::memory_pool()
 int ResourceManager::default_font_handle_ = -1;
 int ResourceManager::default_font_handle()
 {
-    if (default_font_handle_ < 0) {
-        //TCHAR font_name[] = CHAT_FONT_NAME;
-        const TCHAR* font_name = CHAT_FONT_NAME;
-        default_font_handle_ = CreateFontToHandle(font_name, CHAT_FONT_SIZE, CHAT_FONT_THICK, CHAT_FONT_TYPE);
-    }
+	if (default_font_handle_ < 0) {
+		//TCHAR font_name[] = CHAT_FONT_NAME;
+		const TCHAR* font_name = CHAT_FONT_NAME;
+		default_font_handle_ = CreateFontToHandle(font_name, CHAT_FONT_SIZE, CHAT_FONT_THICK, CHAT_FONT_TYPE);
+	}
 
-    return default_font_handle_;
+	return default_font_handle_;
 
 }
 
 int ResourceManager::default_font_size()
 {
-    return CHAT_FONT_SIZE;
+	return CHAT_FONT_SIZE;
 }
 
 std::unordered_map<tstring, ImageHandlePtr> ResourceManager::graph_handles_;
 std::unordered_map<tstring, std::vector<ImageHandlePtr>> ResourceManager::div_graph_handles_;
 ImageHandlePtr ResourceManager::LoadCachedGraph(const tstring& filename)
 {
-    ImageHandlePtr handle;
-    if(graph_handles_.find(filename) == graph_handles_.end()) {
-        handle = std::make_shared<ImageHandle>(DxLib::LoadGraph(filename.c_str()));
-        graph_handles_[filename] = handle;
-    } else {
-        handle = graph_handles_[filename];
-    }
-    return ImageHandlePtr(handle);
+	ImageHandlePtr handle;
+	if(graph_handles_.find(filename) == graph_handles_.end()) {
+		handle = std::make_shared<ImageHandle>(DxLib::LoadGraph(filename.c_str()));
+		graph_handles_[filename] = handle;
+	} else {
+		handle = graph_handles_[filename];
+	}
+	return ImageHandlePtr(handle);
 }
 
 void ResourceManager::ClearCache()
 {
-    graph_handles_.clear();
-    div_graph_handles_.clear();
+	graph_handles_.clear();
+	div_graph_handles_.clear();
 
-    model_names_.clear();
-    model_handles_.clear();
-    model_name_tree_.clear();
+	model_names_.clear();
+	model_handles_.clear();
+	model_name_tree_.clear();
 
-    InitGraph();
-    MV1InitModel();
+	InitGraph();
+	MV1InitModel();
 }
 
 namespace {
@@ -161,7 +161,14 @@ void ResourceManager::BuildModelFileTree()
 							if (!name.empty()) {
 								model_name_list_.push_back(name);
 								model_name_tree_.put_child(ptree::path_type(name + ":_info_", ':'), pt_json);
-
+								// ※ /reload で即指定されたモデルが表示されるように修正 ここから
+								auto name1 = unicode::ToTString(name);
+								auto name2 = model_names_.find(unicode::ToTString(name));
+								if (name2 != model_names_.end() && name1 != name2->second ) {
+									// 代替モデルになっていた場合に対応を正規のモデルに戻すために一度テーブルから消去
+									model_names_.erase(name1);
+								}
+								// ※ ここまで
 								// ステージデータをキャッシュ
 								if (name.find("stage:") == 0) {
 									CreateModelCache(model_path_str, pt_json);
@@ -181,7 +188,6 @@ void ResourceManager::BuildModelFileTree()
 	} catch (const filesystem_error& ex) {
 		Logger::Error(_T("%s"), unicode::ToTString(ex.what()));
 	}
-
 }
 
 int LoadFile(const TCHAR *FilePath, void **FileImageAddr, int *FileSize)
@@ -239,10 +245,10 @@ int FileReadFunc(const TCHAR *FilePath, void **FileImageAddr, int *FileSize, voi
 
 	bool load_motion = false;
 	if (funcdata.motions_it != funcdata.motions.end() &&
-			filepath.string().find_last_of("L.vmd") != std::string::npos) {
+		filepath.string().find_last_of("L.vmd") != std::string::npos) {
 
-		filepath = funcdata.motions_it->second;
-		load_motion = true;
+			filepath = funcdata.motions_it->second;
+			load_motion = true;
 	}
 
 	Logger::Debug(_T("Request %s"), unicode::ToTString(filepath.wstring()));
@@ -315,10 +321,12 @@ void ResourceManager::CreateModelCache(std::string filepath, const ptree& info)
 	auto funcdata = std::make_shared<ReadFuncData>(info);
 
 	std::shared_ptr<char> fileimage;
-    int filesize;
+	int filesize;
 
-    LoadFile(unicode::ToTString(filepath).c_str(), &fileimage, &filesize );
+
+	LoadFile(unicode::ToTString(filepath).c_str(), &fileimage, &filesize );
 	auto cache_filename = GetCacheFilename(info, fileimage, filesize);
+
 
 	if (!boost::filesystem::exists(cache_filename)) {
 		int handle = MV1LoadModelFromMem(fileimage.get(), filesize, FileReadFunc, FileReleaseFunc, &(*funcdata));
@@ -343,8 +351,11 @@ void ResourceManager::RequestModelFromName(const tstring& name)
 bool ResourceManager::IsCachedModelName(const tstring& name)
 {
 	auto name_it = model_names_.find(name);
-    if (name_it != model_names_.end()) {
-		return model_handles_.find(unicode::ToTString(name_it->second)) != model_handles_.end();
+	if (name_it != model_names_.end()) {
+		// ※ model_handles_ が利用されておらず常にfalseを返すようなので model_names_ のみの確認に修正
+		return true;
+		// return model_handles_.find(unicode::ToTString(name_it->second)) != model_handles_.end();
+		// ※ ここまで
 	} else {
 		return false;
 	}
@@ -414,7 +425,7 @@ float ResourceManager::model_edge_size_ = 1.0f;
 
 ModelHandle ResourceManager::LoadModelFromName(const tstring& name)
 {
- 	auto fullpath = ptree::path_type(unicode::ToString(NameToFullPath(name)), ':');
+	auto fullpath = ptree::path_type(unicode::ToString(NameToFullPath(name)), ':');
 	ptree p = model_name_tree_.get_child(fullpath, ptree());
 
 	ptree info = p.get_child("_info_", ptree());
@@ -426,19 +437,19 @@ ModelHandle ResourceManager::LoadModelFromName(const tstring& name)
 		info = p.get_child("_info_", ptree());
 		filepath = unicode::ToTString(info.get<std::string>("modelpath", ""));
 	}
-    if (filepath.size() > 0) {
-        auto it = shared_model_data_.find(unicode::ToTString(filepath));
-        if (it != shared_model_data_.end()) {
-            return ModelHandle(it->second);
-        }else{
+	if (filepath.size() > 0) {
+		auto it = shared_model_data_.find(unicode::ToTString(filepath));
+		if (it != shared_model_data_.end()) {
+			return ModelHandle(it->second);
+		}else{
 			auto funcdata = std::make_shared<ReadFuncData>(info);
 			set_motions_ = funcdata->set_motions;
 
 			std::shared_ptr<char> FileImage;
-            int FileSize;
+			int FileSize;
 
-            LoadFile(unicode::ToTString(filepath).c_str(), &FileImage, &FileSize );
-			
+			LoadFile(unicode::ToTString(filepath).c_str(), &FileImage, &FileSize );
+
 			// キャッシュ読み込み
 			// モーションなしのモデルでないと上手くいかない
 			auto cache_filename = GetCacheFilename(info, FileImage, FileSize);
@@ -461,14 +472,14 @@ ModelHandle ResourceManager::LoadModelFromName(const tstring& name)
 			SharedModelDataPtr shared_data = 
 				std::make_shared<SharedModelData>(handle, std::make_shared<ptree>(info));
 
-            shared_model_data_[unicode::ToTString(filepath)] = shared_data;
+			shared_model_data_[unicode::ToTString(filepath)] = shared_data;
 
-            Logger::Debug(_T("Model %d"), handle);
-            return ModelHandle(shared_data);
+			Logger::Debug(_T("Model %d"), handle);
+			return ModelHandle(shared_data);
 		}
-    } else {
-        return ModelHandle();
-    }
+	} else {
+		return ModelHandle();
+	}
 }
 
 void ResourceManager::ClearModelHandle()
@@ -515,57 +526,57 @@ void ResourceManager::SetModelEdgeSize(int handle)
 
 tstring ResourceManager::NameToFullPath(const tstring& name)
 {
-    if (model_name_tree_.empty()) {
-        BuildModelFileTree();
-    }
+	if (model_name_tree_.empty()) {
+		BuildModelFileTree();
+	}
 
-    tstring fullpath;
-    ptree info;
+	tstring fullpath;
+	ptree info;
 
-    auto name_it = model_names_.find(name);
-    if (name_it != model_names_.end()) {
-        fullpath = name_it->second;
+	auto name_it = model_names_.find(name);
+	if (name_it != model_names_.end()) {
+		fullpath = name_it->second;
 
-    } else {
-        ptree p;
-        auto path = ptree::path_type(unicode::ToString(name), ':');
+	} else {
+		ptree p;
+		auto path = ptree::path_type(unicode::ToString(name), ':');
 
-        p = model_name_tree_.get_child(path, ptree());
+		p = model_name_tree_.get_child(path, ptree());
 
-        // ルートで探索を打ち切る
-        while (1) {
-            if (p.empty()) {
-                Logger::Debug(_T("EMPTY %s"), unicode::ToTString(path.dump()));
-                // 親ノードを検索
+		// ルートで探索を打ち切る
+		while (1) {
+			if (p.empty()) {
+				Logger::Debug(_T("EMPTY %s"), unicode::ToTString(path.dump()));
+				// 親ノードを検索
 				if (!path.single()) {
 					return _T("");
 					break;
 				}
-                std::string path_str = path.dump();
-                size_t separator_pos = path_str.find_last_of(':');
-                assert(separator_pos != std::string::npos);
+				std::string path_str = path.dump();
+				size_t separator_pos = path_str.find_last_of(':');
+				assert(separator_pos != std::string::npos);
 
-                path = ptree::path_type(path_str.substr(0, separator_pos), ':');
-                p = model_name_tree_.get_child(path, ptree());
-            } else {
-                info = p.get_child("_info_", ptree());
-                if (info.empty()) {
-                    Logger::Debug(_T("CHILD_FOUND"));
-                    // データがない場合は最初の子ノードへ移動
+				path = ptree::path_type(path_str.substr(0, separator_pos), ':');
+				p = model_name_tree_.get_child(path, ptree());
+			} else {
+				info = p.get_child("_info_", ptree());
+				if (info.empty()) {
+					Logger::Debug(_T("CHILD_FOUND"));
+					// データがない場合は最初の子ノードへ移動
 					path /= ptree::path_type(p.front().first, ':');
-                    p = p.get_child(ptree::path_type(p.front().first, ':'), ptree());
-                } else {
-                    Logger::Debug(_T("FOUND"));
-                    break;
-                }
-            }
+					p = p.get_child(ptree::path_type(p.front().first, ':'), ptree());
+				} else {
+					Logger::Debug(_T("FOUND"));
+					break;
+				}
+			}
 
-        }
-		
-        Logger::Debug(_T("ModelName to fullpath %s -> %s"), name, unicode::ToTString(path.dump()));
+		}
+
+		Logger::Debug(_T("ModelName to fullpath %s -> %s"), name, unicode::ToTString(path.dump()));
 		fullpath = unicode::ToTString(path.dump());
 		model_names_[name] = fullpath;
-    }
+	}
 
 	return fullpath;
 }
@@ -597,23 +608,23 @@ std::unordered_map<std::string, std::string>& ResourceManager::set_motions()
 }
 
 ImageHandle::ImageHandle() :
-                handle_(-1)
+handle_(-1)
 {
 
 }
 
 ImageHandle::ImageHandle(int handle) :
-        handle_(handle)
+handle_(handle)
 {
 }
 
 ImageHandle::operator int() const
 {
-    return handle_;
+	return handle_;
 }
 
 SharedModelData::SharedModelData(int base_handle, const PtreePtr& property) :
-	base_handle_(base_handle),
+base_handle_(base_handle),
 	property_(property)
 {
 
@@ -641,7 +652,7 @@ SharedModelData::~SharedModelData()
 }
 
 ModelHandle::ModelHandle(const SharedModelDataPtr& shared_data) :
-	shared_data_(shared_data),
+shared_data_(shared_data),
 	handle_(shared_data->DuplicateHandle())
 {
 
@@ -669,5 +680,5 @@ const ptree& ModelHandle::property() const
 
 std::string ModelHandle::name() const
 {
-    return property().get<std::string>("name", "");
+	return property().get<std::string>("name", "");
 }
