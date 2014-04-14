@@ -57,7 +57,8 @@ public:
     void ResetPosition(const std::shared_ptr<VECTOR>& init_position);
     void RescuePosition();
 
-	void LoadModel(const tstring& name);
+//	void LoadModel(const tstring& name);
+    void LoadModel(const tstring& name,const bool async = false); // ※　非同期読み込みの指定ができるように修正
     void SetModel(const ModelHandle& model);
 	void PlayMotion(const tstring& name,bool isloop);
 	void FieldPlayer::ResetMotion();
@@ -71,6 +72,7 @@ public:
     void LinkToCamera(float* roty);
     void UnlinkToCamera();
     void UpdateInput(InputManager* input);
+	ModelHandle loading_model_handle_; // ※非同期読み込みを復活させるため追加
 
 private:
     void Move();

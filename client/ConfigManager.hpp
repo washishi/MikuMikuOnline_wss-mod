@@ -75,8 +75,15 @@ class ConfigManager
 	private:
 		int show_nametag_,
 			show_modelname_,
+			modelload_mode_, // ※ モデルのロード方法を変更できるように追加
 			gamepad_type_,
 			gamepad_enable_, // ※ ゲームパッド有効をウインドウアクティブ時のみにもできる様に追加
+			// ※ ここから  ゲームパッドのボタンを変更できるように追加
+			gamepad_jump_,
+			gamepad_speed_,
+			gamepad_warp_,
+			gamepad_sshot_,
+			// ※ ここまで
 			camera_direction_,
 			walk_change_type_;
 
@@ -85,6 +92,10 @@ class ConfigManager
 		void set_show_nametag(int value);
 		int show_modelname() const;
 		void set_show_modelname(int value);
+		// ※ ここから モデルのロード方法を変更できるように追加
+		int modelload_mode() const;
+		void set_modelload_mode(int value);
+		// ※ ここまで
 		int walk_change_type() const;
 		void set_walk_change_type(int value);
 
@@ -95,7 +106,18 @@ class ConfigManager
 		int gamepad_enable() const;
 		void set_gamepad_enable(int value);
 		// ※ ここまで
-	
+
+		// ※ ここから ゲームパッドのボタンを変更できるように追加
+		int gamepad_jump() const;
+		void set_gamepad_jump(int value);
+		int gamepad_speed() const;
+		void set_gamepad_speed(int value);
+		int gamepad_warp() const;
+		void set_gamepad_warp(int value);
+		int gamepad_sshot() const;
+		void set_gamepad_sshot(int value);
+		// ※ ここまで
+
 		int camera_direction() const;
 		void set_camera_direction(int value);
 

@@ -51,197 +51,207 @@ void Player::Update()
     }
 }
 
-void Player::Draw()
+//void Player::Draw()
+void Player::Draw(bool loading)
 {
-    VECTOR pos = {pos_.x, pos_.y + 22, pos_.z};
-    auto screen_pos = ConvWorldPosToScreenPos(pos);
+	VECTOR pos = {pos_.x, pos_.y + 22, pos_.z};
+	auto screen_pos = ConvWorldPosToScreenPos(pos);
 
-    // 画面内に映っているかチェック
-    if (screen_pos.z > 0.0f && screen_pos.z < 1.0f) {
+	// 画面内に映っているかチェック
+	if (screen_pos.z > 0.0f && screen_pos.z < 1.0f) {
 
-        balloon_root_point_.x = (screen_pos.x / 2) * 2;
-        balloon_root_point_.y = (screen_pos.y / 2) * 2 - 16;
-        balloon_root_point_current_.x += (balloon_root_point_.x - balloon_root_point_current_.x) / 4;
-        balloon_root_point_current_.y += (balloon_root_point_.y - balloon_root_point_current_.y) / 4;
+		balloon_root_point_.x = (screen_pos.x / 2) * 2;
+		balloon_root_point_.y = (screen_pos.y / 2) * 2 - 16;
+		balloon_root_point_current_.x += (balloon_root_point_.x - balloon_root_point_current_.x) / 4;
+		balloon_root_point_current_.y += (balloon_root_point_.y - balloon_root_point_current_.y) / 4;
 
-//        if (std::abs(balloon_root_point_.x - balloon_root_point_current_.x) <= 2)
-//            balloon_root_point_current_.x = balloon_root_point_.x;
-//        if (std::abs(balloon_root_point_.y - balloon_root_point_current_.y) <= 2)
-//            balloon_root_point_current_.y = balloon_root_point_.y;
+		//        if (std::abs(balloon_root_point_.x - balloon_root_point_current_.x) <= 2)
+		//            balloon_root_point_current_.x = balloon_root_point_.x;
+		//        if (std::abs(balloon_root_point_.y - balloon_root_point_current_.y) <= 2)
+		//            balloon_root_point_current_.y = balloon_root_point_.y;
 
-        auto name = unicode::ToTString(name_);
-        int text_width = GetDrawStringWidthToHandle(name.data(), name.size(), font_handle_);
+		auto name = unicode::ToTString(name_);
+		int text_width = GetDrawStringWidthToHandle(name.data(), name.size(), font_handle_);
 
-        name_tip_rect_.width = text_width + NAME_TIP_MARGIN_SIZE * 2;
-        name_tip_rect_.height = ResourceManager::default_font_size() + NAME_TIP_MARGIN_SIZE * 2;
-        name_tip_rect_.x = balloon_root_point_.x - text_width / 2 - NAME_TIP_MARGIN_SIZE;
-        name_tip_rect_.y = balloon_root_point_.y - name_tip_rect_.height;
+		name_tip_rect_.width = text_width + NAME_TIP_MARGIN_SIZE * 2;
+		name_tip_rect_.height = ResourceManager::default_font_size() + NAME_TIP_MARGIN_SIZE * 2;
+		name_tip_rect_.x = balloon_root_point_.x - text_width / 2 - NAME_TIP_MARGIN_SIZE;
+		name_tip_rect_.y = balloon_root_point_.y - name_tip_rect_.height;
 
-        if (ballon_content_) {
+		if (ballon_content_) {
 
-            auto content_ptr = ballon_content_;
+			auto content_ptr = ballon_content_;
 
-            Rect balloon_rect(
-                balloon_root_point_current_.x + BALLOON_OFFSET_X - BALLOON_BASE_BLOCK_SIZE / 2,
-                balloon_root_point_current_.y - content_ptr->absolute_height() - NAME_TIP_MARGIN_SIZE * 2 - BALLOON_BASE_BLOCK_SIZE / 2,
-                std::max(content_ptr->absolute_width(), BALLOON_MIN_WIDTH + 0) + BALLOON_BASE_BLOCK_SIZE,
-                content_ptr->absolute_height() + BALLOON_BASE_BLOCK_SIZE
-            );
+			Rect balloon_rect(
+				balloon_root_point_current_.x + BALLOON_OFFSET_X - BALLOON_BASE_BLOCK_SIZE / 2,
+				balloon_root_point_current_.y - content_ptr->absolute_height() - NAME_TIP_MARGIN_SIZE * 2 - BALLOON_BASE_BLOCK_SIZE / 2,
+				std::max(content_ptr->absolute_width(), BALLOON_MIN_WIDTH + 0) + BALLOON_BASE_BLOCK_SIZE,
+				content_ptr->absolute_height() + BALLOON_BASE_BLOCK_SIZE
+				);
 
-            content_ptr->set_top(balloon_root_point_current_.y - content_ptr->absolute_height() - NAME_TIP_MARGIN_SIZE * 2);
-            content_ptr->set_left(balloon_root_point_current_.x + BALLOON_OFFSET_X);
+			content_ptr->set_top(balloon_root_point_current_.y - content_ptr->absolute_height() - NAME_TIP_MARGIN_SIZE * 2);
+			content_ptr->set_left(balloon_root_point_current_.x + BALLOON_OFFSET_X);
 
-            name_tip_rect_.y = balloon_root_point_.y - name_tip_rect_.height - content_ptr->absolute_height() - NAME_TIP_MARGIN_SIZE * 2;
-            name_tip_rect_.x = balloon_root_point_.x - text_width / 2 + BALLOON_OFFSET_X;
+			name_tip_rect_.y = balloon_root_point_.y - name_tip_rect_.height - content_ptr->absolute_height() - NAME_TIP_MARGIN_SIZE * 2;
+			name_tip_rect_.x = balloon_root_point_.x - text_width / 2 + BALLOON_OFFSET_X;
 
-            DrawGraph(balloon_rect.x, balloon_rect.y,
-                    *balloon_base_image_handle_[0], TRUE);
-            DrawGraph(
-                    balloon_rect.x + balloon_rect.width - BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.y, *balloon_base_image_handle_[2], TRUE);
-            DrawGraph(balloon_rect.x,
-                    balloon_rect.y + balloon_rect.height - BALLOON_BASE_BLOCK_SIZE,
-                    *balloon_base_image_handle_[3], TRUE);
-            DrawGraph(
-                    balloon_rect.x + balloon_rect.width - BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.y + balloon_rect.height - BALLOON_BASE_BLOCK_SIZE,
-                    *balloon_base_image_handle_[5], TRUE);
+			DrawGraph(balloon_rect.x, balloon_rect.y,
+				*balloon_base_image_handle_[0], TRUE);
+			DrawGraph(
+				balloon_rect.x + balloon_rect.width - BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.y, *balloon_base_image_handle_[2], TRUE);
+			DrawGraph(balloon_rect.x,
+				balloon_rect.y + balloon_rect.height - BALLOON_BASE_BLOCK_SIZE,
+				*balloon_base_image_handle_[3], TRUE);
+			DrawGraph(
+				balloon_rect.x + balloon_rect.width - BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.y + balloon_rect.height - BALLOON_BASE_BLOCK_SIZE,
+				*balloon_base_image_handle_[5], TRUE);
 
-            DrawGraph(
-                    balloon_root_point_current_.x - BALLOON_BASE_BLOCK_SIZE / 2,
-                    balloon_rect.y + balloon_rect.height - BALLOON_BASE_BLOCK_SIZE,
-                    *balloon_base_image_handle_[4], TRUE);
+			DrawGraph(
+				balloon_root_point_current_.x - BALLOON_BASE_BLOCK_SIZE / 2,
+				balloon_rect.y + balloon_rect.height - BALLOON_BASE_BLOCK_SIZE,
+				*balloon_base_image_handle_[4], TRUE);
 
-            DrawGraph(
-                    balloon_root_point_current_.x - BALLOON_BASE_BLOCK_SIZE / 2,
-                    balloon_rect.y + balloon_rect.height,
-                    *balloon_base_image_handle_[7], TRUE);
+			DrawGraph(
+				balloon_root_point_current_.x - BALLOON_BASE_BLOCK_SIZE / 2,
+				balloon_rect.y + balloon_rect.height,
+				*balloon_base_image_handle_[7], TRUE);
 
-            DrawRectExtendGraphF(
-                    balloon_rect.x + BALLOON_BASE_BLOCK_SIZE, balloon_rect.y,
-                    balloon_rect.x + balloon_rect.width
-                            - BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.y + BALLOON_BASE_BLOCK_SIZE, 0, 0, 1,
-                    BALLOON_BASE_BLOCK_SIZE, *balloon_base_image_handle_[2], TRUE);
+			DrawRectExtendGraphF(
+				balloon_rect.x + BALLOON_BASE_BLOCK_SIZE, balloon_rect.y,
+				balloon_rect.x + balloon_rect.width
+				- BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.y + BALLOON_BASE_BLOCK_SIZE, 0, 0, 1,
+				BALLOON_BASE_BLOCK_SIZE, *balloon_base_image_handle_[2], TRUE);
 
-            DrawRectExtendGraphF(
-                    balloon_rect.x + BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.y + balloon_rect.height
-                            - BALLOON_BASE_BLOCK_SIZE,
-                            balloon_root_point_current_.x - BALLOON_BASE_BLOCK_SIZE / 2,
-                    balloon_rect.y + balloon_rect.height, 0, 0, 1,
-                    BALLOON_BASE_BLOCK_SIZE, *balloon_base_image_handle_[5], TRUE);
+			DrawRectExtendGraphF(
+				balloon_rect.x + BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.y + balloon_rect.height
+				- BALLOON_BASE_BLOCK_SIZE,
+				balloon_root_point_current_.x - BALLOON_BASE_BLOCK_SIZE / 2,
+				balloon_rect.y + balloon_rect.height, 0, 0, 1,
+				BALLOON_BASE_BLOCK_SIZE, *balloon_base_image_handle_[5], TRUE);
 
-            DrawRectExtendGraphF(
-                    balloon_root_point_current_.x - BALLOON_BASE_BLOCK_SIZE / 2 + BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.y + balloon_rect.height
-                            - BALLOON_BASE_BLOCK_SIZE,
-                            balloon_rect.x + balloon_rect.width
-                                                        - BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.y + balloon_rect.height, 0, 0, 1,
-                    BALLOON_BASE_BLOCK_SIZE, *balloon_base_image_handle_[5], TRUE);
+			DrawRectExtendGraphF(
+				balloon_root_point_current_.x - BALLOON_BASE_BLOCK_SIZE / 2 + BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.y + balloon_rect.height
+				- BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.x + balloon_rect.width
+				- BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.y + balloon_rect.height, 0, 0, 1,
+				BALLOON_BASE_BLOCK_SIZE, *balloon_base_image_handle_[5], TRUE);
 
-            DrawRectExtendGraphF(balloon_rect.x,
-                    balloon_rect.y + BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.x + BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.y + balloon_rect.height
-                            - BALLOON_BASE_BLOCK_SIZE, 0, 0,
-                    BALLOON_BASE_BLOCK_SIZE, 1, *balloon_base_image_handle_[3], TRUE);
+			DrawRectExtendGraphF(balloon_rect.x,
+				balloon_rect.y + BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.x + BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.y + balloon_rect.height
+				- BALLOON_BASE_BLOCK_SIZE, 0, 0,
+				BALLOON_BASE_BLOCK_SIZE, 1, *balloon_base_image_handle_[3], TRUE);
 
-            DrawRectExtendGraphF(
-                    balloon_rect.x + balloon_rect.width
-                            - BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.y + BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.x + balloon_rect.width,
-                    balloon_rect.y + balloon_rect.height
-                            - BALLOON_BASE_BLOCK_SIZE, 0, 0,
-                    BALLOON_BASE_BLOCK_SIZE, 1, *balloon_base_image_handle_[5], TRUE);
+			DrawRectExtendGraphF(
+				balloon_rect.x + balloon_rect.width
+				- BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.y + BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.x + balloon_rect.width,
+				balloon_rect.y + balloon_rect.height
+				- BALLOON_BASE_BLOCK_SIZE, 0, 0,
+				BALLOON_BASE_BLOCK_SIZE, 1, *balloon_base_image_handle_[5], TRUE);
 
-            DrawRectExtendGraphF(
-                    balloon_rect.x + BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.y + BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.x + balloon_rect.width
-                            - BALLOON_BASE_BLOCK_SIZE,
-                    balloon_rect.y + balloon_rect.height
-                            - BALLOON_BASE_BLOCK_SIZE, 0, 0, 1, 1,
-                    *balloon_base_image_handle_[5], TRUE);
+			DrawRectExtendGraphF(
+				balloon_rect.x + BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.y + BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.x + balloon_rect.width
+				- BALLOON_BASE_BLOCK_SIZE,
+				balloon_rect.y + balloon_rect.height
+				- BALLOON_BASE_BLOCK_SIZE, 0, 0, 1, 1,
+				*balloon_base_image_handle_[5], TRUE);
 
-            content_ptr->Draw();
-        }
+			content_ptr->Draw();
+		}
 
-        name_tip_rect_current_.x += (name_tip_rect_.x - name_tip_rect_current_.x) / 4;
-        name_tip_rect_current_.y += (name_tip_rect_.y - name_tip_rect_current_.y) / 4;
-        name_tip_rect_current_.width += (name_tip_rect_.width - name_tip_rect_current_.width) / 4;
-        name_tip_rect_current_.height += (name_tip_rect_.height - name_tip_rect_current_.height) / 4;
+		name_tip_rect_current_.x += (name_tip_rect_.x - name_tip_rect_current_.x) / 4;
+		name_tip_rect_current_.y += (name_tip_rect_.y - name_tip_rect_current_.y) / 4;
+		name_tip_rect_current_.width += (name_tip_rect_.width - name_tip_rect_current_.width) / 4;
+		name_tip_rect_current_.height += (name_tip_rect_.height - name_tip_rect_current_.height) / 4;
 
-        Rect name_tip_rect(
-            name_tip_rect_current_.x,
-            name_tip_rect_current_.y,
-            name_tip_rect_current_.width,
-            name_tip_rect_current_.height
-        );
+		Rect name_tip_rect(
+			name_tip_rect_current_.x,
+			name_tip_rect_current_.y,
+			name_tip_rect_current_.width,
+			name_tip_rect_current_.height
+			);
 
-        DrawGraph(name_tip_rect.x, name_tip_rect.y, *name_tip_image_handle_[0],
-                TRUE);
-        DrawGraph(
-                name_tip_rect.x + name_tip_rect.width
-                        - NAME_TIP_BASE_BLOCK_SIZE, name_tip_rect.y,
-                *name_tip_image_handle_[1], TRUE);
-        DrawGraph(name_tip_rect.x,
-                name_tip_rect.y + name_tip_rect.height
-                        - NAME_TIP_BASE_BLOCK_SIZE, *name_tip_image_handle_[2],
-                TRUE);
-        DrawGraph(
-                name_tip_rect.x + name_tip_rect.width
-                        - NAME_TIP_BASE_BLOCK_SIZE,
-                name_tip_rect.y + name_tip_rect.height
-                        - NAME_TIP_BASE_BLOCK_SIZE, *name_tip_image_handle_[3],
-                TRUE);
+		DrawGraph(name_tip_rect.x, name_tip_rect.y, *name_tip_image_handle_[0],
+			TRUE);
+		DrawGraph(
+			name_tip_rect.x + name_tip_rect.width
+			- NAME_TIP_BASE_BLOCK_SIZE, name_tip_rect.y,
+			*name_tip_image_handle_[1], TRUE);
+		DrawGraph(name_tip_rect.x,
+			name_tip_rect.y + name_tip_rect.height
+			- NAME_TIP_BASE_BLOCK_SIZE, *name_tip_image_handle_[2],
+			TRUE);
+		DrawGraph(
+			name_tip_rect.x + name_tip_rect.width
+			- NAME_TIP_BASE_BLOCK_SIZE,
+			name_tip_rect.y + name_tip_rect.height
+			- NAME_TIP_BASE_BLOCK_SIZE, *name_tip_image_handle_[3],
+			TRUE);
 
-        DrawRectExtendGraphF(
-                name_tip_rect.x + NAME_TIP_BASE_BLOCK_SIZE, name_tip_rect.y,
-                name_tip_rect.x + name_tip_rect.width
-                        - NAME_TIP_BASE_BLOCK_SIZE,
-                name_tip_rect.y + NAME_TIP_BASE_BLOCK_SIZE, 0, 0, 1,
-                NAME_TIP_BASE_BLOCK_SIZE, *name_tip_image_handle_[1], TRUE);
+		DrawRectExtendGraphF(
+			name_tip_rect.x + NAME_TIP_BASE_BLOCK_SIZE, name_tip_rect.y,
+			name_tip_rect.x + name_tip_rect.width
+			- NAME_TIP_BASE_BLOCK_SIZE,
+			name_tip_rect.y + NAME_TIP_BASE_BLOCK_SIZE, 0, 0, 1,
+			NAME_TIP_BASE_BLOCK_SIZE, *name_tip_image_handle_[1], TRUE);
 
-        DrawRectExtendGraphF(
-                name_tip_rect.x + NAME_TIP_BASE_BLOCK_SIZE,
-                name_tip_rect.y + name_tip_rect.height
-                        - NAME_TIP_BASE_BLOCK_SIZE,
-                name_tip_rect.x + name_tip_rect.width
-                        - NAME_TIP_BASE_BLOCK_SIZE,
-                name_tip_rect.y + name_tip_rect.height, 0, 0, 1,
-                NAME_TIP_BASE_BLOCK_SIZE, *name_tip_image_handle_[3], TRUE);
+		DrawRectExtendGraphF(
+			name_tip_rect.x + NAME_TIP_BASE_BLOCK_SIZE,
+			name_tip_rect.y + name_tip_rect.height
+			- NAME_TIP_BASE_BLOCK_SIZE,
+			name_tip_rect.x + name_tip_rect.width
+			- NAME_TIP_BASE_BLOCK_SIZE,
+			name_tip_rect.y + name_tip_rect.height, 0, 0, 1,
+			NAME_TIP_BASE_BLOCK_SIZE, *name_tip_image_handle_[3], TRUE);
 
-        DrawRectExtendGraphF(name_tip_rect.x,
-                name_tip_rect.y + NAME_TIP_BASE_BLOCK_SIZE,
-                name_tip_rect.x + NAME_TIP_BASE_BLOCK_SIZE,
-                name_tip_rect.y + name_tip_rect.height
-                        - NAME_TIP_BASE_BLOCK_SIZE, 0, 0,
-                NAME_TIP_BASE_BLOCK_SIZE, 1, *name_tip_image_handle_[2], TRUE);
+		DrawRectExtendGraphF(name_tip_rect.x,
+			name_tip_rect.y + NAME_TIP_BASE_BLOCK_SIZE,
+			name_tip_rect.x + NAME_TIP_BASE_BLOCK_SIZE,
+			name_tip_rect.y + name_tip_rect.height
+			- NAME_TIP_BASE_BLOCK_SIZE, 0, 0,
+			NAME_TIP_BASE_BLOCK_SIZE, 1, *name_tip_image_handle_[2], TRUE);
 
-        DrawRectExtendGraphF(
-                name_tip_rect.x + name_tip_rect.width
-                        - NAME_TIP_BASE_BLOCK_SIZE,
-                name_tip_rect.y + NAME_TIP_BASE_BLOCK_SIZE,
-                name_tip_rect.x + name_tip_rect.width,
-                name_tip_rect.y + name_tip_rect.height
-                        - NAME_TIP_BASE_BLOCK_SIZE, 0, 0,
-                NAME_TIP_BASE_BLOCK_SIZE, 1, *name_tip_image_handle_[3], TRUE);
+		DrawRectExtendGraphF(
+			name_tip_rect.x + name_tip_rect.width
+			- NAME_TIP_BASE_BLOCK_SIZE,
+			name_tip_rect.y + NAME_TIP_BASE_BLOCK_SIZE,
+			name_tip_rect.x + name_tip_rect.width,
+			name_tip_rect.y + name_tip_rect.height
+			- NAME_TIP_BASE_BLOCK_SIZE, 0, 0,
+			NAME_TIP_BASE_BLOCK_SIZE, 1, *name_tip_image_handle_[3], TRUE);
 
-        DrawRectExtendGraphF(
-                name_tip_rect.x + NAME_TIP_BASE_BLOCK_SIZE,
-                name_tip_rect.y + NAME_TIP_BASE_BLOCK_SIZE,
-                name_tip_rect.x + name_tip_rect.width
-                        - NAME_TIP_BASE_BLOCK_SIZE,
-                name_tip_rect.y + name_tip_rect.height
-                        - NAME_TIP_BASE_BLOCK_SIZE, 0, 0, 1, 1,
-                *name_tip_image_handle_[3], TRUE);
+		DrawRectExtendGraphF(
+			name_tip_rect.x + NAME_TIP_BASE_BLOCK_SIZE,
+			name_tip_rect.y + NAME_TIP_BASE_BLOCK_SIZE,
+			name_tip_rect.x + name_tip_rect.width
+			- NAME_TIP_BASE_BLOCK_SIZE,
+			name_tip_rect.y + name_tip_rect.height
+			- NAME_TIP_BASE_BLOCK_SIZE, 0, 0, 1, 1,
+			*name_tip_image_handle_[3], TRUE);
 
-        DrawStringToHandle(name_tip_rect.x + NAME_TIP_MARGIN_SIZE, name_tip_rect.y + NAME_TIP_MARGIN_SIZE,
-            unicode::ToTString(name).c_str(), GetColor(255, 255, 255), font_handle_);
-    }
+// ※ ここから  モデルロード中は名前表示を黄色にする
+//      DrawStringToHandle(name_tip_rect.x + NAME_TIP_MARGIN_SIZE, name_tip_rect.y + NAME_TIP_MARGIN_SIZE,
+//          unicode::ToTString(name).c_str(), GetColor(255, 255, 255), font_handle_);
+		if (loading){
+			DrawStringToHandle(name_tip_rect.x + NAME_TIP_MARGIN_SIZE, name_tip_rect.y + NAME_TIP_MARGIN_SIZE,
+				unicode::ToTString(name).c_str(), GetColor(255, 255, 0), font_handle_);
+		} else {
+			DrawStringToHandle(name_tip_rect.x + NAME_TIP_MARGIN_SIZE, name_tip_rect.y + NAME_TIP_MARGIN_SIZE,
+				unicode::ToTString(name).c_str(), GetColor(255, 255, 255), font_handle_);
+		}
+// ※ ここまで
+	}
 }
 
 Handle<Object> Player::GetJSObject()

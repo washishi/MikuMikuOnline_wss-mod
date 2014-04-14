@@ -32,7 +32,7 @@ class Player : public std::enable_shared_from_this<Player> {
         ~Player();
 
         void Update();
-        void Draw();
+        void Draw(bool loading);
 
     public:
         static PlayerPtr GetPointerFromObj(Handle<Object>);

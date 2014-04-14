@@ -107,7 +107,8 @@ class ResourceManager {
         static void BuildModelFileTree();
         static void CacheBakedModel();
 
-        static ModelHandle LoadModelFromName(const tstring&);
+//      static ModelHandle LoadModelFromName(const tstring&);
+		static ModelHandle LoadModelFromName(const tstring&, bool async = false); // ※ 非同期読み込みを復活させるため修正
         static void ClearModelHandle();
 
 		static std::string GetCacheFilename(const ptree& info, const std::shared_ptr<char>& fileimage, int filesize);
@@ -177,16 +178,21 @@ typedef std::shared_ptr<ptree> PtreePtr;
 
 class SharedModelData {
 	public:
-		SharedModelData(int base_handle, const PtreePtr& property);
+//		SharedModelData(int base_handle, const PtreePtr& property);
+		SharedModelData(int base_handle, const ReadFuncDataPtr& funcdata, const PtreePtr& property, bool async_load = false); // ※非同期読み込みを行えるよう修正
 		~SharedModelData();
 
 		const ptree& property() const;
 		int DuplicateHandle();
-
+		operator bool() const;     // ※非同期読み込みを行えるよう修正
+		ReadFuncDataPtr funcdata_; // ※非同期読み込みを行えるよう修正
+		bool async_load_;          // ※非同期読み込みを行えるよう修正
 	private:
 		int base_handle_;
 		std::list<int> handles_;
 		PtreePtr property_;
+
+
 };
 
 class ModelHandle {
@@ -197,11 +203,14 @@ class ModelHandle {
 	    int handle() const;
         const ptree& property() const;
         std::string name() const;
-
+		bool CheckLoaded(); // ※ 非同期読み込みを復活させるために追加
 	private:
 		SharedModelDataPtr shared_data_;
 		int handle_;
-
+		// ※ ここから  非同期読み込みを復活させるために追加
+		//	ReadFuncDataPtr funcdata_;
+		//	bool async_load_;
+		// ※ ここまで
 	public:
 		void *operator new(size_t size)
 		{

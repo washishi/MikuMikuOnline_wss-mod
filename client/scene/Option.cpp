@@ -48,7 +48,7 @@ void Option::Begin()
 	tabs_.push_back(std::make_shared<StatusTab>(manager_accessor_));
 	tabs_.push_back(std::make_shared<DisplayTab>(manager_accessor_));
 	tabs_.push_back(std::make_shared<InputTab>(manager_accessor_));
-	// tabs_.push_back(std::make_shared<OtherTab>(manager_accessor_));
+	tabs_.push_back(std::make_shared<OtherTab>(manager_accessor_)); // ※ その他タブを有効化
 }
 
 void Option::Update()
@@ -419,7 +419,104 @@ InputTab::InputTab(const ManagerAccessorPtr& manager_accessor) :
 		manager_accessor_));
 		// ※ ここまで
 
-	items_.push_back(std::make_shared<RadioButtonItem>(
+		// ※ ここから ゲームパッドのボタンを変更できるように追加
+		items_.push_back(std::make_shared<RadioButtonItem>(
+		_LT("option.input.gamepad_jump"),
+		_LT("option.input.gamepad_jump_json"),
+		std::make_shared<RadioButtonItemGetter>(
+		[manager_accessor]() -> int{
+			auto config_manager = 
+				manager_accessor->config_manager().lock();
+			return config_manager->gamepad_jump();
+		}),
+		std::make_shared<RadioButtonItemSetter>(
+		[manager_accessor](int value){
+			if (auto config_manager = 
+				manager_accessor->config_manager().lock()) {
+				InputManager::SetGamepadJump(value);
+				config_manager->set_gamepad_jump(value);
+			}
+		}),
+		manager_accessor_));
+
+		items_.push_back(std::make_shared<RadioButtonItem>(
+		_LT("option.input.gamepad_speed"),
+		_LT("option.input.gamepad_speed_json"),
+		std::make_shared<RadioButtonItemGetter>(
+		[manager_accessor]() -> int{
+			auto config_manager = 
+				manager_accessor->config_manager().lock();
+			return config_manager->gamepad_speed();
+		}),
+		std::make_shared<RadioButtonItemSetter>(
+		[manager_accessor](int value){
+			if (auto config_manager = 
+				manager_accessor->config_manager().lock()) {
+				InputManager::SetGamepadSpeed(value);
+				config_manager->set_gamepad_speed(value);
+			}
+		}),
+		manager_accessor_));
+
+		items_.push_back(std::make_shared<RadioButtonItem>(
+		_LT("option.input.gamepad_warp"),
+		_LT("option.input.gamepad_warp_json"),
+		std::make_shared<RadioButtonItemGetter>(
+		[manager_accessor]() -> int{
+			auto config_manager = 
+				manager_accessor->config_manager().lock();
+			return config_manager->gamepad_warp();
+		}),
+		std::make_shared<RadioButtonItemSetter>(
+		[manager_accessor](int value){
+			if (auto config_manager = 
+				manager_accessor->config_manager().lock()) {
+				InputManager::SetGamepadWarp(value);
+				config_manager->set_gamepad_warp(value);
+			}
+		}),
+		manager_accessor_));
+
+		items_.push_back(std::make_shared<RadioButtonItem>(
+		_LT("option.input.gamepad_sshot"),
+		_LT("option.input.gamepad_sshot_json"),
+		std::make_shared<RadioButtonItemGetter>(
+		[manager_accessor]() -> int{
+			auto config_manager = 
+				manager_accessor->config_manager().lock();
+			return config_manager->gamepad_sshot();
+		}),
+		std::make_shared<RadioButtonItemSetter>(
+		[manager_accessor](int value){
+			if (auto config_manager = 
+				manager_accessor->config_manager().lock()) {
+				InputManager::SetGamepadSShot(value);
+				config_manager->set_gamepad_sshot(value);
+			}
+		}),
+		manager_accessor_));
+		// ※ ここまで
+		// ※ ここから 移動速度変更タイプを設定で変更できるように追加
+		items_.push_back(std::make_shared<RadioButtonItem>(
+		_LT("option.input.walk_change_type"),
+		_LT("option.input.walk_change_type_json"),
+		std::make_shared<RadioButtonItemGetter>(
+		[manager_accessor]() -> int{
+			auto config_manager = 
+				manager_accessor->config_manager().lock();
+			return config_manager->walk_change_type();
+		}),
+		std::make_shared<RadioButtonItemSetter>(
+		[manager_accessor](int value){
+			if (auto config_manager = 
+				manager_accessor->config_manager().lock()) {
+				InputManager::SetGamepadSShot(value);
+				config_manager->set_walk_change_type(value);
+			}
+		}),
+		manager_accessor_));
+		// ※ ここまで
+		items_.push_back(std::make_shared<RadioButtonItem>(
 		_LT("option.input.camera_direction"),
 		_LT("option.input.camera_direction_json"),
 		std::make_shared<RadioButtonItemGetter>(
@@ -461,6 +558,26 @@ OtherTab::OtherTab(const ManagerAccessorPtr& manager_accessor) :
 	//		}
 	//	}),
 	//	manager_accessor_));
+	
+	// ※ ここから  キャラクターの読み込み方法を変更できるように追加
+	items_.push_back(std::make_shared<RadioButtonItem>(
+		_LT("option.others.modelload_mode"),
+		_LT("option.others.modelload_mode_json"),
+		std::make_shared<RadioButtonItemGetter>(
+		[manager_accessor]() -> int{
+			auto config_manager = 
+				manager_accessor->config_manager().lock();
+			return config_manager->modelload_mode();
+		}),
+		std::make_shared<RadioButtonItemSetter>(
+		[manager_accessor](int value){
+			if (auto config_manager = 
+				manager_accessor->config_manager().lock()) {
+				return config_manager->set_modelload_mode(value);
+			}
+		}),
+		manager_accessor_));
+	// ※ ここまで
 }
 
 OptionItemBase::OptionItemBase(const ManagerAccessorPtr& manager_accessor) :
@@ -554,8 +671,12 @@ RadioButtonItem::RadioButtonItem(const tstring& name,
 		setter_(setter),
 		selecting_index_(0)
 {
-    selecting_bg_image_handle_ = ResourceManager::LoadCachedDivGraph<3>(
-            _T("system/images/gui/gui_option_selecting_bg.png"), 3, 1, 16, 24);
+// ※ ここから  ボタンの文字数が少ないと正常に表示できないので修正(イメージ3分割→4分割)
+//  selecting_bg_image_handle_ = ResourceManager::LoadCachedDivGraph<3>(
+//            _T("system/images/gui/gui_option_selecting_bg.png"), 3, 1, 16, 24);　
+    selecting_bg_image_handle_ = ResourceManager::LoadCachedDivGraph<4>(
+            _T("system/images/gui/gui_option_selecting_bg.png"), 4, 1, 12, 24);
+// ※ ここまで
 
 	ptree item_array;
 	read_json(std::stringstream(unicode::ToString(items)), item_array);
@@ -590,7 +711,14 @@ void RadioButtonItem::ProcessInput(InputManager* input)
 		if (item.hover && input->GetMouseLeftCount() == 1) {
 			(*setter_)(item.value);
 		}
+// ※ ここから  オプション画面でコントローラのボタンを押した際に該当のボタンがわかるように修正
+//     (明確な識別方法がないのでオプション選択数が13あるものがコントローラのボタン選択として処理)
 
+		if (!item.hover) {
+			int botton_mask = ( item.value  == 0 ? 0 : 0x08 << item.value);
+			item.hover = (items_.size() == 13 && input->GetGamepadCount(botton_mask) > 0);
+		}
+// ※ ここまで
 		item_left += item.width + 20;
 		index++;
 	}
@@ -616,13 +744,17 @@ void RadioButtonItem::Draw()
 				SetDrawBlendMode(DX_BLENDMODE_SUB, 40);
 			}
 		}
-
 		DrawGraph(left - 8, base_rect_.y - 4, *selecting_bg_image_handle_[0], TRUE);
-		DrawRectExtendGraphF(left - 8 + 16, base_rect_.y - 4,
-								right - 16 + 8, base_rect_.y + 20,
+// ※ ボタンの文字数が少ないと正常に表示できないので修正(イメージ分割数を3→4に変更)
+//		DrawRectExtendGraphF(left - 8 + 16, base_rect_.y - 4,
+//								right - 16 + 8, base_rect_.y + 20,
+//								0, 0, 1, 24, *selecting_bg_image_handle_[2], TRUE);
+//		DrawGraph(right - 16 + 8, base_rect_.y - 4, *selecting_bg_image_handle_[2], TRUE);
+		DrawRectExtendGraphF(left - 8 + 12, base_rect_.y - 4,
+								right - 12 + 8, base_rect_.y + 20,
 								0, 0, 1, 24, *selecting_bg_image_handle_[2], TRUE);
-		DrawGraph(right - 16 + 8, base_rect_.y - 4, *selecting_bg_image_handle_[2], TRUE);
-
+		DrawGraph(right - 16 + 12, base_rect_.y - 4, *selecting_bg_image_handle_[3], TRUE);
+// ※ ここまで
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 4);
 
 		DrawStringToHandle(left, base_rect_.y,

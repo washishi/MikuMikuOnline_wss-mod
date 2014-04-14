@@ -3,6 +3,7 @@
 //
 
 #include <fstream>
+#include <iostream> // ※ ファイルの非同期読み込みを行うために追加
 #include <boost/filesystem.hpp>
 #include <boost/crc.hpp>
 #include "ResourceManager.hpp"
@@ -170,7 +171,9 @@ void ResourceManager::BuildModelFileTree()
 								}
 								// ※ ここまで
 								// ステージデータをキャッシュ
-								if (name.find("stage:") == 0) {
+								// if (name.find("stage:") == 0) {
+								// ※ スカイドームもキャッシュ対象に追加
+								if (name.find("stage:") == 0 || name.find("skydome:") == 0 ) {
 									CreateModelCache(model_path_str, pt_json);
 								}
 							}
@@ -194,6 +197,7 @@ int LoadFile(const TCHAR *FilePath, void **FileImageAddr, int *FileSize)
 {
 	Logger::Debug(_T("Load %s"), FilePath);
 	tstring path(FilePath);
+
 	std::ifstream ifs(path.c_str(), std::ios::binary);
 
 	if (!ifs) {
@@ -208,8 +212,8 @@ int LoadFile(const TCHAR *FilePath, void **FileImageAddr, int *FileSize)
 	auto buffer = reinterpret_cast<char*>(tlsf_new(ResourceManager::memory_pool(), *FileSize));
 	ifs.read(buffer, *FileSize);
 	*FileImageAddr = buffer;
-
-	return 0;
+	
+    return 0;
 }
 
 int LoadFile(const TCHAR *FilePath, std::shared_ptr<char>* FileImage, int *FileSize)
@@ -245,10 +249,11 @@ int FileReadFunc(const TCHAR *FilePath, void **FileImageAddr, int *FileSize, voi
 
 	bool load_motion = false;
 	if (funcdata.motions_it != funcdata.motions.end() &&
-		filepath.string().find_last_of("L.vmd") != std::string::npos) {
+	//	filepath.string().find_last_of("L.vmd") != std::string::npos) { // ※ 条件がおかしいので修正
+	filepath.string().rfind("L.vmd") != std::string::npos) {
 
-			filepath = funcdata.motions_it->second;
-			load_motion = true;
+		filepath = funcdata.motions_it->second;
+		load_motion = true;
 	}
 
 	Logger::Debug(_T("Request %s"), unicode::ToTString(filepath.wstring()));
@@ -296,7 +301,7 @@ void SetMotionNames(int handle, const ReadFuncData& funcdata)
 
 std::string ResourceManager::GetCacheFilename(const ptree& info, const std::shared_ptr<char>& fileimage, int filesize)
 {
-	boost::crc_32_type crc;
+    boost::crc_32_type crc;
 	crc.process_block(static_cast<void*>(fileimage.get()),
 		static_cast<void*>(fileimage.get() + filesize));
 
@@ -322,13 +327,24 @@ void ResourceManager::CreateModelCache(std::string filepath, const ptree& info)
 
 	std::shared_ptr<char> fileimage;
 	int filesize;
+// ※ ここから  キャッシュファイルのされたファイル名の生成元を
+//              モデルファイルの内容 から モデルファイル名(パス付き)と更新日に変更
 
-
-	LoadFile(unicode::ToTString(filepath).c_str(), &fileimage, &filesize );
-	auto cache_filename = GetCacheFilename(info, fileimage, filesize);
-
-
+//
+//	LoadFile(unicode::ToTString(filepath).c_str(), &fileimage, &filesize );
+//	auto cache_filename = GetCacheFilename(info, fileimage, filesize);
+//	if (!boost::filesystem::exists(cache_filename)) {
+	auto time = boost::filesystem::last_write_time(unicode::ToTString(filepath));
+	auto keystring = filepath + to_simple_string(boost::posix_time::from_time_t(time));
+	filesize = strlen(keystring.c_str()) + 1;
+    char *nstring = new char[filesize];
+    strcpy_s(nstring, filesize, keystring.c_str());
+	fileimage = (std::shared_ptr<char>)nstring;
+    auto cache_filename = GetCacheFilename(info, fileimage, filesize);
 	if (!boost::filesystem::exists(cache_filename)) {
+		fileimage.reset();
+		LoadFile(unicode::ToTString(filepath).c_str(), &fileimage, &filesize);
+// ※ ここまで
 		int handle = MV1LoadModelFromMem(fileimage.get(), filesize, FileReadFunc, FileReleaseFunc, &(*funcdata));
 
 		if (!boost::filesystem::exists("./cache")) {
@@ -338,6 +354,7 @@ void ResourceManager::CreateModelCache(std::string filepath, const ptree& info)
 //		MV1SaveModelToMV1File(handle, unicode::ToTString(cache_filename).c_str()) ; // ※ 座標精度を変更(MODクライアント互換)
 		MV1SaveModelToMV1File(handle, unicode::ToTString(cache_filename).c_str(),MV1_SAVETYPE_NORMAL,-1,1,0,0,0,0);
 		MV1DeleteModel(handle);
+		boost::filesystem::last_write_time(unicode::ToTString(cache_filename),time);
 	}
 }
 
@@ -352,10 +369,9 @@ bool ResourceManager::IsCachedModelName(const tstring& name)
 {
 	auto name_it = model_names_.find(name);
 	if (name_it != model_names_.end()) {
-		// ※ model_handles_ が利用されておらず常にfalseを返すようなので model_names_ のみの確認に修正
-		return true;
+		// ※ model_handles_ を調べないように変更
 		// return model_handles_.find(unicode::ToTString(name_it->second)) != model_handles_.end();
-		// ※ ここまで
+		return true;
 	} else {
 		return false;
 	}
@@ -423,7 +439,8 @@ ReadFuncData::ReadFuncData(const ptree& info)
 std::unordered_map<std::string, std::string> ResourceManager::set_motions_ = std::unordered_map<std::string, std::string>();
 float ResourceManager::model_edge_size_ = 1.0f;
 
-ModelHandle ResourceManager::LoadModelFromName(const tstring& name)
+// ModelHandle ResourceManager::LoadModelFromName(const tstring& name)
+ModelHandle ResourceManager::LoadModelFromName(const tstring& name, bool async) // ※ 非同期読み込みを復活させるため修正
 {
 	auto fullpath = ptree::path_type(unicode::ToString(NameToFullPath(name)), ':');
 	ptree p = model_name_tree_.get_child(fullpath, ptree());
@@ -448,29 +465,60 @@ ModelHandle ResourceManager::LoadModelFromName(const tstring& name)
 			std::shared_ptr<char> FileImage;
 			int FileSize;
 
-			LoadFile(unicode::ToTString(filepath).c_str(), &FileImage, &FileSize );
+// ※ ここから ステージかスカイドームの場合はキャッシュを探しキャッシュ済みの場合は元のモデルファイルを読まないように修正
+//			LoadFile(unicode::ToTString(filepath).c_str(), &FileImage, &FileSize );
+//			// キャッシュ読み込み
+//			// モーションなしのモデルでないと上手くいかない
+//			auto cache_filename = GetCacheFilename(info, FileImage, FileSize);
+//			if (boost::filesystem::exists(cache_filename)) {
+			std::string cache_filename;
+			if (name.find(L"stage:")== 0||name.find(L"skydome:")== 0) {
+				async = false; // ステージ、スカイドームは必ず同期読み込みにする
+				auto time = boost::posix_time::from_time_t( boost::filesystem::last_write_time(unicode::ToTString(filepath).c_str()));
+                auto keystring = unicode::ToString(filepath) + to_simple_string(time);
+				FileSize = strlen(keystring.c_str()) + 1;
+				char *nstring = new char[FileSize];
+				strcpy_s(nstring, FileSize, keystring.c_str());
+				FileImage = (std::shared_ptr<char>)nstring;
+				cache_filename = GetCacheFilename(info, FileImage, FileSize);
+			}
+			if ((!cache_filename.empty()) &&  boost::filesystem::exists(cache_filename)) {
+// ※ ここまで
 
-			// キャッシュ読み込み
-			// モーションなしのモデルでないと上手くいかない
-			auto cache_filename = GetCacheFilename(info, FileImage, FileSize);
-			if (boost::filesystem::exists(cache_filename)) {
 				FileImage.reset();
 				LoadFile(unicode::ToTString(cache_filename).c_str(), &FileImage, &FileSize);
 			}
-
+// ※ ここから キャッシュがない場合はモデルファイル読み込み
+			else {
+				FileImage.reset();
+				LoadFile(unicode::ToTString(filepath).c_str(), &FileImage, &FileSize );
+			}
+// ※ ここまで
+// ※ ここから  非同期読み込みを復活させるため修正
+			if (async) {
+				SetUseASyncLoadFlag(TRUE);
+			}
+// ※ ここまで
 			int handle = MV1LoadModelFromMem( FileImage.get(), FileSize, FileReadFunc, FileReleaseFunc, &(*funcdata));
 
 			auto material_num = MV1GetMaterialNum(handle);
 			for(int i = 0; i < material_num; ++i){
 				MV1SetMaterialType(handle,i,DX_MATERIAL_TYPE_TOON_2);
 			}
-
-			SetMotionNames(handle, *funcdata);
-
-			// CreateModelCache(handle, info, FileImage, FileSize);
+// ※ ここから  非同期読み込みを復活させるため修正
+			// SetMotionNames(handle, *funcdata);
+			// // CreateModelCache(handle, info, FileImage, FileSize);
+			// SharedModelDataPtr shared_data = 
+			//	std::make_shared<SharedModelData>(handle, std::make_shared<ptree>(info));
+			if (async) {
+				SetUseASyncLoadFlag(FALSE);
+			} else {
+				SetMotionNames(handle, *funcdata);
+			}
 
 			SharedModelDataPtr shared_data = 
-				std::make_shared<SharedModelData>(handle, std::make_shared<ptree>(info));
+				std::make_shared<SharedModelData>(handle,funcdata, std::make_shared<ptree>(info),async);
+// ※ ここまで
 
 			shared_model_data_[unicode::ToTString(filepath)] = shared_data;
 
@@ -623,9 +671,13 @@ ImageHandle::operator int() const
 	return handle_;
 }
 
-SharedModelData::SharedModelData(int base_handle, const PtreePtr& property) :
+//SharedModelData::SharedModelData(int base_handle, const PtreePtr& property) :
+SharedModelData::SharedModelData(int base_handle, const ReadFuncDataPtr& funcdata, const PtreePtr& property, bool async_load) : // ※ 非同期読み込み対応のため修正
 base_handle_(base_handle),
-	property_(property)
+//	property_(property)  // ※ 非同期読み込み対応のため修正
+funcdata_(funcdata),     // ※ 非同期読み込み対応のため修正
+property_(property),     // ※ 非同期読み込み対応のため修正
+async_load_(async_load)  // ※ 非同期読み込み対応のため修正
 {
 
 }
@@ -638,9 +690,13 @@ const ptree& SharedModelData::property() const
 int SharedModelData::DuplicateHandle()
 {
 	int handle = MV1DuplicateModel(base_handle_);
-	assert(handle != -1);
-	handles_.push_back(handle);
-	return handle;
+    if ( handle != -1){
+    //assert(handle != -1);
+    	handles_.push_back(handle);
+	    return handle;
+    } else {
+        return base_handle_;
+    }
 }
 
 SharedModelData::~SharedModelData()
@@ -650,6 +706,23 @@ SharedModelData::~SharedModelData()
 	}
 	MV1DeleteModel(base_handle_);
 }
+
+// ※ ここから  　非同期読み込みを復活させるために追加
+bool ModelHandle::CheckLoaded()
+{
+	if (!shared_data_->async_load_) {
+		return true;
+	} else if (shared_data_->async_load_ && CheckHandleASyncLoad(handle_) == FALSE) {
+        handle_ = MV1DuplicateModel(handle_);
+		SetMotionNames(handle_, *shared_data_->funcdata_);
+		shared_data_->async_load_ = false;
+		return true;
+	} else {
+		return false;
+	}
+}
+// ※ ここまで
+
 
 ModelHandle::ModelHandle(const SharedModelDataPtr& shared_data) :
 shared_data_(shared_data),

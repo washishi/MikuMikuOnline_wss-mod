@@ -24,6 +24,7 @@
 #include "GenerateJSON.hpp"
 #include "Music.hpp"
 #include "3d/PlayerCharacter.hpp"  // ※ 他プレイヤーのモーションを変更できるようにするために追加(MODクライアント互換)
+#include "ConfigManager.hpp"       // ※ キャラクタ読み込み方法の設定を参照するために追加
 
 //#pragma comment(lib,"libctemplate.lib")
 
@@ -442,16 +443,38 @@ Handle<Value> Card::Function_Account_updateModelName(const Arguments& args)
 
     if (args.Length() >= 1 && args[0]->IsString()) {
         auto name = std::string(*String::Utf8Value(args[0]->ToString()));
-        if (auto world_manager = self->manager_accessor_->world_manager().lock()) {
-            world_manager->myself()->LoadModel(unicode::ToTString(name));
-			world_manager->myself()->ResetMotion();
-        }
+// ※ 非同期読み込みを可能するのと同じキャラへの変更を無効にするため修正
+//      if (auto world_manager = self->manager_accessor_->world_manager().lock()) {
+//          world_manager->myself()->LoadModel(unicode::ToTString(name));
+//			world_manager->myself()->ResetMotion();
+//      }
+//      auto account_manager = self->manager_accessor_->account_manager().lock();
+//      auto command_manager = self->manager_accessor_->command_manager().lock();
+//      account_manager->set_model_name(name);
+//      command_manager->Write(network::ServerUpdateAccountProperty(MODEL_NAME, name));
         auto account_manager = self->manager_accessor_->account_manager().lock();
-        auto command_manager = self->manager_accessor_->command_manager().lock();
-        account_manager->set_model_name(name);
-        command_manager->Write(network::ServerUpdateAccountProperty(MODEL_NAME, name));
-    }
+        if (account_manager->model_name()!= name) {
+            if (auto world_manager = self->manager_accessor_->world_manager().lock()) {
 
+                auto command_manager = self->manager_accessor_->command_manager().lock();
+                command_manager->Write(network::ServerUpdateAccountProperty(MODEL_NAME, name));
+
+                auto config_manager =  self->manager_accessor_->config_manager().lock();
+                if (config_manager->modelload_mode()){
+                    account_manager->set_model_name(name);
+                    world_manager->myself()->LoadModel(unicode::ToTString(name),true);
+                } else {
+                    world_manager->myself()->ResetMotion();
+                    world_manager->myself()->LoadModel(unicode::ToTString(name));
+                    account_manager->set_model_name(name);
+                    auto player_manager = self->manager_accessor_->player_manager().lock();
+                    player_manager->GetMyself()->set_current_model_name(name);
+                }
+		        // world_manager->myself()->ResetMotion();
+            }
+        }
+// ※ ここまで
+    }
     return Undefined();
 }
 

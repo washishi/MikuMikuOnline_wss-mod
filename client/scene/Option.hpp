@@ -187,7 +187,8 @@ class RadioButtonItem : public OptionItemBase {
 		RadioButtonItemGetterPtr getter_;
 		RadioButtonItemSetterPtr setter_;
 
-		std::array<ImageHandlePtr,3> selecting_bg_image_handle_;
+//		std::array<ImageHandlePtr,3> selecting_bg_image_handle_; // ※ボタンの文字が少ないと正常に表示できないので修正
+		std::array<ImageHandlePtr,4> selecting_bg_image_handle_; // イメージ３分割→４分割に変更
 };
 
 

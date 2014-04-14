@@ -26,7 +26,7 @@ Model.onReload = function() {
 						text: model_name.substring(5),
 						bgcolor: ((even_line = !even_line) ? "#EEAFEECC" : "#FFFFFFCC"),
 						onclick: function() {
-							Player.stopMotion();
+//							Player.stopMotion(); // モーションを停止しないようにコメント
 							Account.updateModelName(model_name)
 						}
 					})

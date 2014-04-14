@@ -198,10 +198,22 @@ void FieldPlayer::RescuePosition()
 	current_stat_.vel.y = 0;
 }
 
-void FieldPlayer::LoadModel(const tstring& name)
+void FieldPlayer::LoadModel(const tstring& name,const bool async)
 {
-	SetModel(ResourceManager::LoadModelFromName(name));
-	ResourceManager::SetModelEdgeSize(model_handle_.handle());
+// ※ ここから  モデルの読み込みを非同期にもできるよう修正
+//	SetModel(ResourceManager::LoadModelFromName(name));
+// 	ResourceManager::SetModelEdgeSize(model_handle_.handle());
+//  自キャラ読み込み　初回は必ず同期読込する
+    if (!loading_model_handle_){
+	    if (model_handle_ && async){
+            loading_model_handle_ = ResourceManager::LoadModelFromName(name, true);
+        }else {
+	        SetModel(ResourceManager::LoadModelFromName(name));
+            ResourceManager::SetModelEdgeSize(model_handle_.handle());
+        }
+    }
+// ※ ここまで
+
 }
 
 void FieldPlayer::SetModel(const ModelHandle& model)
@@ -231,7 +243,13 @@ void FieldPlayer::SetModel(const ModelHandle& model)
 
 void FieldPlayer::Update()
 {
-
+// ※ ここから  非同期読み込みを復活させるため追加
+	if (loading_model_handle_ && loading_model_handle_.CheckLoaded()) {
+		SetModel(loading_model_handle_);
+       	ResourceManager::SetModelEdgeSize(loading_model_handle_);
+		loading_model_handle_ = ModelHandle();
+	}
+// ※ ここまで
 	// 落ちた時に強制復帰
 	if (prev_stat_.pos.y < (*stage_)->min_height()) {
 		RescuePosition();
@@ -539,6 +557,7 @@ void FieldPlayer::InputFromUser()
 	case 0:
 		// おしっぱ
 		if (input.GetKeyCount(InputManager::KEYBIND_CHANGE_SPEED) > 0 ||
+			input.GetGamepadCount(InputManager::PADBIND_SPEED) > 0 || // ※ ゲームパッド対応にするため追加
 			input.GetKeyCount(InputManager::KEYBIND_CHANGE_SPEED2) > 0)
 		{
 			current_stat_.is_walking = true;
@@ -549,6 +568,7 @@ void FieldPlayer::InputFromUser()
 	case 1:
 		// 切り替え
 		if (input.GetKeyCount(InputManager::KEYBIND_CHANGE_SPEED) == 1 ||
+			input.GetGamepadCount(InputManager::PADBIND_SPEED) == 1 || // ※ ゲームパッド対応にするため追加
 			input.GetKeyCount(InputManager::KEYBIND_CHANGE_SPEED2) == 1)
 		{
 			current_stat_.is_walking = !prev_stat_.is_walking;
