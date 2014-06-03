@@ -45,8 +45,8 @@ void CommandManager::FetchCommand(const network::Command& command)
 	CardManagerPtr card_manager = manager_accessor_->card_manager().lock();
 	PlayerManagerPtr player_manager = manager_accessor_->player_manager().lock();
 	AccountManagerPtr account_manager = manager_accessor_->account_manager().lock();
-
-	Logger::Debug(_T("Receive: 0x%08x %d byte"), header, command.body().size());
+// ※ デバッグ出力が多いのでコメント
+//	Logger::Debug(_T("Receive: 0x%08x %d byte"), header, command.body().size());
 
 	switch (header) {
 	using namespace network::header;
@@ -179,7 +179,7 @@ void CommandManager::FetchCommand(const network::Command& command)
 			PlayerPosition pos;
 			uint32_t user_id;
 			network::Utils::Deserialize(command.body(), &user_id, &pos.x, &pos.y, &pos.z, &pos.theta, &pos.vy);
-
+//          Logger::Info(_T("Receive Pos %d %f %f"), user_id,pos.theta,pos.vy);
 			player_manager->UpdatePlayerPosition(user_id, pos);
 		}
 	}

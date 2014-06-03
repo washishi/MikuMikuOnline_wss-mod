@@ -157,12 +157,24 @@ void PlayerManager::Update()
         const VECTOR& pos = char_data_providers_[charmgr_->my_character_id()]->position();
         const float theta = char_data_providers_[charmgr_->my_character_id()]->theta();
         const float vy = char_data_providers_[charmgr_->my_character_id()]->vy();
+        char vy_char = std::max(std::min(vy, static_cast<float>(SCHAR_MAX)), static_cast<float>(SCHAR_MIN));
 
-		char vy_char = std::max(std::min(vy, static_cast<float>(SCHAR_MAX)), static_cast<float>(SCHAR_MIN));
+// ※ ここから  キャラの向きを反映させるために修正
+        const float PI = 3.1415926535897932384626433832795f;
+        // 8ビットINTの範囲で角度θが出来るだけ近い値となる値のテーブル(32方向)
+        const int degtbl[] = {245,107,214,32,139,246,64,215,234,96,247,21,172,235,53,204,223,129,236,10,161,224,86,193,212,118,225,43,150,213,75,182,0};
+        float theta_ = fmod(theta , (PI * 2.0f ));
+        if ( theta_ < 0 ) theta_ = (PI * 2.0f) + theta_;
+        int idx = theta_ / PI * 16;
+        float theta2 = degtbl[idx];
+        // Logger::Debug(_T("vychar %d"), (int)vy_char);
         if (auto command_manager = manager_accessor_->command_manager().lock()) {
-             command_manager->Write(network::ServerUpdatePlayerPosition(pos.x, pos.y, pos.z, theta, vy_char));
+//          command_manager->Write(network::ServerUpdatePlayerPosition(pos.x, pos.y, pos.z, theta, vy_char));
+            command_manager->Write(network::ServerUpdatePlayerPosition(pos.x, pos.y, pos.z, theta2, vy_char));
         }
-        // Logger::Debug("PlayerPos %f %f %f", pos.x, pos.y, pos.z);
+// ※ ここまで
+        //Logger::Debug(_T("PlayerPos %f %f %f"), pos.x, pos.y, pos.z);
+        //Logger::Debug(_T("PlayerPos %f %f %d"), theta, theta_, theta2);
     }
     count++;
     auto config_manager= manager_accessor_->config_manager().lock(); // ※ 設定(同期/非同期)を参照するために追加
@@ -494,14 +506,23 @@ std::vector<PlayerPtr> PlayerManager::GetAll()
     return players;
 }
 
+// ※ ここから  キャラクターの向きを反映させるために修正
+//void PlayerManager::UpdatePlayerPosition(unsigned int user_id, const PlayerPosition& pos)
+//{
+//    if (char_data_providers_.find(user_id) != char_data_providers_.end()) {
+//        char_data_providers_[user_id]->set_target_position(VGet(pos.x, pos.y, pos.z));
+//        char_data_providers_[user_id]->set_vy(pos.vy);
+//    }
+//}
 void PlayerManager::UpdatePlayerPosition(unsigned int user_id, const PlayerPosition& pos)
 {
     if (char_data_providers_.find(user_id) != char_data_providers_.end()) {
         char_data_providers_[user_id]->set_target_position(VGet(pos.x, pos.y, pos.z));
-		char_data_providers_[user_id]->set_vy(pos.vy);
-		char_data_providers_[user_id]->set_theta(pos.theta); // ※
+        char_data_providers_[user_id]->set_vy(pos.vy);
+		char_data_providers_[user_id]->set_theta(pos.theta);
     }
 }
+// ※ ここまで
 
 std::shared_ptr<CharacterManager> PlayerManager::charmgr() const
 {

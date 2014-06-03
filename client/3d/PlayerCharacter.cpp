@@ -156,7 +156,21 @@ public:
 		static auto time_now = 0.0f;
 		prev_target_pos_ = current_target_pos_;
         const auto current_target_pos = data_provider_.target_position();
-		const auto current_target_vec_y_ = data_provider_.vy();
+        const auto current_target_vec_y_ = data_provider_.vy();
+
+// ※ ここから  キャラクターの向きを反映するため追加
+        // 8ビットINTの範囲で角度θが出来るだけ近い値となる値のテーブル(32方向)
+        const std::array<uint8_t,32> degtbl = {245,107,214,32,139,246,64,215,234,96,247,21,172,235,53,204,223,129,236,10,161,224,86,193,212,118,225,43,150,213,75,182};
+        const auto current_terget_rot_y_ = data_provider_.theta();
+        bool rot_flag_ = false;
+        BOOST_FOREACH(const auto& it, degtbl) {
+		if (it == (uint8_t)current_terget_rot_y_) {
+            rot_flag_ = true;
+            break;
+		}
+	}
+// ※ ここまで
+
         // if (current_target_pos.y == 0) return;
 		if(current_target_pos != prev_target_pos_ )
 		{
@@ -167,8 +181,9 @@ public:
 
         current_target_pos_ = current_target_pos;
         current_pos_ = MV1GetPosition(model_handle_);
-
+        current_rot_ = MV1GetRotationXYZ(model_handle_);
         const auto distance_to_target = VSize(current_target_pos_ - current_pos_);
+        //Logger::Debug(_T("Rot_Y(move) %f %f %f"), current_rot_.y, current_terget_rot_y_,abs(current_rot_.y - current_terget_rot_y_));
 
         if (distance_to_target < 200) {
 
@@ -305,14 +320,18 @@ public:
 				}
 
                 data_provider_.set_position(moved_pos);
+
+                if (rot_flag_){
+                   current_rot_ = VGet(0, current_terget_rot_y_, 0);
+                }
 				if(distance_to_target > 2.0)
 				{
 					data_provider_.set_theta(current_rot_.y);
 				}
-
+                // current_rot_ = VGet(0, current_terget_rot_y_ , 0); //
                 MV1SetPosition(model_handle_, moved_pos);
 				MV1SetRotationXYZ(model_handle_, current_rot_);
-
+                // Logger::Debug(_T("Rot_Y(move) %f %f %f"), current_rot_.y, current_terget_rot_y_,abs(current_rot_.y - current_terget_rot_y_));
 				if (current_speed_ * timer_->DeltaSec() > 0.205f)
 				{
 					current_motion_ = motion.run_;
@@ -322,6 +341,11 @@ public:
 					current_motion_ = motion.walk_;
 				}
 			}else{
+    //              Logger::Debug(_T("Rot_Y(stop) %f %f"), current_rot_.y, current_terget_rot_y_);
+                    if (rot_flag_){
+                      current_rot_ = VGet(0, current_terget_rot_y_ , 0);
+                      MV1SetRotationXYZ(model_handle_, current_rot_);
+                    }
                 current_motion_ = motion.stand_;
             }
 

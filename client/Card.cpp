@@ -467,8 +467,6 @@ Handle<Value> Card::Function_Account_updateModelName(const Arguments& args)
                     world_manager->myself()->ResetMotion();
                     world_manager->myself()->LoadModel(unicode::ToTString(name));
                     account_manager->set_model_name(name);
-                    auto player_manager = self->manager_accessor_->player_manager().lock();
-                    player_manager->GetMyself()->set_current_model_name(name);
                 }
 		        // world_manager->myself()->ResetMotion();
             }
