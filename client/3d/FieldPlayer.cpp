@@ -244,12 +244,17 @@ void FieldPlayer::SetModel(const ModelHandle& model)
 void FieldPlayer::Update()
 {
 // ※ ここから  非同期読み込みを復活させるため追加
-	if (loading_model_handle_ && loading_model_handle_.CheckLoaded()) {
-		SetModel(loading_model_handle_);
-       	ResourceManager::SetModelEdgeSize(loading_model_handle_);
-        current_stat_.motion = 0;
-		loading_model_handle_ = ModelHandle();
-	}
+    if (loading_model_handle_) {
+        if (loading_model_handle_.CheckLoaded() == TRUE) {
+            SetModel(loading_model_handle_);
+            ResourceManager::SetModelEdgeSize(loading_model_handle_);
+            current_stat_.motion = 0;
+            loading_model_handle_ = ModelHandle();
+        } else if (loading_model_handle_.CheckLoaded() == -1) {
+            // 読み込み失敗時
+            loading_model_handle_ = ModelHandle();
+        }
+    }
 
 // ※ ここまで
 	// 落ちた時に強制復帰

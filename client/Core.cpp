@@ -103,7 +103,7 @@ int Core::SetUpDxLib()
 
     if( DxLib_Init() == -1 )
         return -1;
-
+    SetSysCommandOffFlag( TRUE ) ; // Å¶ F10ÉLÅ[Ç™îΩâûÇ∑ÇÈÇΩÇﬂí«â¡
     SetDrawScreen(DX_SCREEN_BACK);
     SetDragFileValidFlag(TRUE);
     DragFileInfoClear();

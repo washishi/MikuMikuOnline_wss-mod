@@ -203,7 +203,7 @@ class ModelHandle {
 	    int handle() const;
         const ptree& property() const;
         std::string name() const;
-		bool CheckLoaded(); // ※ 非同期読み込みを復活させるために追加
+		int CheckLoaded(); // ※ 非同期読み込みを復活させるために追加
 	private:
 		SharedModelDataPtr shared_data_;
 		int handle_;

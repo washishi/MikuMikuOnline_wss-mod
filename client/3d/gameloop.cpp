@@ -17,6 +17,11 @@
 #include "../../common/Logger.hpp"
 
 
+const float  camera_min_fov = 10.0f;
+const float  camera_max_fov = 60.0f;
+static float camera_fov=60.0f; // ※ 視野角を変更できるようにするため追加
+
+
 int KeyChecker::Check()
 {
     std::array<char, 256> key_state;
@@ -71,6 +76,7 @@ int GameLoop::ProcessInput(InputManager* input)
 {
     MoveCamera(input);
     myself_->UpdateInput(input);
+
     return 0;
 }
 
@@ -155,6 +161,7 @@ void GameLoop::FixCameraPosition()
 	} else {
 		wallcamera_cnt = 0;
 	}
+    
 	if(VSize(camera_pos - target_pos) <= model_coll_size)
 	{
 		camera_pos = target_pos + VScale(camera_pos - target_pos,(model_coll_size)/(VSize(camera_pos - target_pos) <= 0 ? 0.000001f : VSize(camera_pos - target_pos)));
@@ -216,8 +223,8 @@ void GameLoop::MoveCamera(InputManager* input)
 		// ジャンプ時のみカメラ回転速度 x 3/5 y 2/5
 		if(myself_->current_stat().acc.y != 0)
 		{
-			camera.theta += diff_x * 0.003f;
-			camera.phi += diff_y * 0.0005f;
+       	    camera.theta += diff_x * 0.003f;
+		    camera.phi += diff_y * 0.0005f;
 		}else{
 			camera.theta += diff_x * 0.005f;
 			camera.phi += diff_y * 0.005f;
@@ -263,31 +270,66 @@ void GameLoop::MoveCamera(InputManager* input)
         }
     }
 
+// ※ ここから  カメラが自キャラに衝突後は視野角を変更するように修正
+    const auto target_pos = myself_->current_stat().pos +
+        VGet(0, myself_->model_height() * camera.target_height + 0.2f, 0) * stage_->map_scale();
+	auto camera_pos = target_pos +
+		VGet(cos(camera.phi) * sin(camera.theta),
+			sin(camera.phi >= TORADIAN(180.0f) ? camera.phi + TORADIAN(90.0f) : camera.phi ),
+			cos(camera.phi) * cos(camera.theta)) * (camera.radius * stage_->map_scale());	
+  	auto model_coll_size = (myself_->model_height() * camera.target_height + 0.25f) * stage_->map_scale();
+
     int wheel = input->GetMouseWheel();
     if (wheel > 0) {
         if (camera.radius > CAMERA_MIN_RADIUS) {
             camera.radius -= 0.5f;
             camera_default_stat.radius = camera.radius;
+        } else {
+            if (camera_fov > camera_min_fov ){
+                camera_fov -= 1.0f;
+                SetupCamera_Perspective(DX_PI_F * camera_fov / 180.0f);
+            }
         }
     } else if (wheel < 0) {
-        if (camera.radius < CAMERA_MAX_RADIUS) {
-            camera.radius += 0.5f;
-            camera_default_stat.radius = camera.radius;
+        if (camera_fov < camera_max_fov){
+            camera_fov += 1.0f;
+            SetupCamera_Perspective(DX_PI_F * camera_fov / 180.0f);
+        } else {
+            if (camera.radius < CAMERA_MAX_RADIUS) {
+                camera.radius += 0.5f;
+                camera_default_stat.radius = camera.radius;
+            }
         }
     }
 
     float pad_rz = static_cast<float>(input->GetGamepadManagedAnalogRy());
     if (pad_rz > 0) {
-        if (camera.radius > CAMERA_MIN_RADIUS) {
-            camera.radius -= 0.5f * pad_rz;
-            camera_default_stat.radius = camera.radius;
+        camera.radius -= 0.5f * pad_rz;
+        if (camera.radius < CAMERA_MIN_RADIUS) {
+            camera.radius = CAMERA_MIN_RADIUS;
+            camera_fov -= 1.0f * pad_rz;
+            if (camera_fov < camera_min_fov){
+                camera_fov=camera_min_fov;
+            }
+            SetupCamera_Perspective(DX_PI_F * camera_fov / 180.0f);
         }
+        camera_default_stat.radius = camera.radius;
     } else if (pad_rz < 0) {
-        if (camera.radius < CAMERA_MAX_RADIUS) {
+        camera_fov -= 1.0f * pad_rz;
+        if (camera_fov > camera_max_fov){
+            camera_fov = camera_max_fov;
             camera.radius -= 0.5f * pad_rz;
+            if (camera.radius > CAMERA_MAX_RADIUS) {
+                camera.radius = CAMERA_MAX_RADIUS;
+            }
             camera_default_stat.radius = camera.radius;
         }
+        SetupCamera_Perspective(DX_PI_F * camera_fov / 180.0f);
     }
+    // Logger::Debug(_T("camera.radius col %f %f"), camera.radius,model_coll_size);
+
+// ※ ここまで
+
 }
 
 void LightStatus::Init()

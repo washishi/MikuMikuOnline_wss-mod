@@ -142,7 +142,6 @@ void ResourceManager::BuildModelFileTree()
 						path model_path;
 						for (auto it = directory_iterator(*it_dir); it != directory_iterator(); ++it) {
 							auto extension = it->path().extension().string();
-
 							if (extension == ".mv1" || extension == ".x"
 								|| extension == ".pmd" || extension == ".pmx") {
 									model_path = it->path();
@@ -708,17 +707,20 @@ SharedModelData::~SharedModelData()
 }
 
 // ※ ここから  　非同期読み込みを復活させるために追加
-bool ModelHandle::CheckLoaded()
+int ModelHandle::CheckLoaded()
 {
 	if (!shared_data_->async_load_) {
-		return true;
+		return TRUE;
 	} else if (shared_data_->async_load_ && CheckHandleASyncLoad(handle_) == FALSE) {
         handle_ = MV1DuplicateModel(handle_);
 		SetMotionNames(handle_, *shared_data_->funcdata_);
 		shared_data_->async_load_ = false;
-		return true;
-	} else {
-		return false;
+		return TRUE;
+    } else if (shared_data_->async_load_ && CheckHandleASyncLoad(handle_) == -1) {
+        // 非同期読み込み中にエラーになった場合
+        return -1;
+    } else {
+		return FALSE;
 	}
 }
 // ※ ここまで

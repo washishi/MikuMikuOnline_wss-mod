@@ -162,7 +162,7 @@ void PlayerManager::Update()
 // ※ ここから  キャラの向きを反映させるために修正
         const float PI = 3.1415926535897932384626433832795f;
         // 8ビットINTの範囲で角度θが出来るだけ近い値となる値のテーブル(32方向)
-        const int degtbl[] = {245,107,214,32,139,246,64,215,234,96,247,21,172,235,53,204,223,129,236,10,161,224,86,193,212,118,225,43,150,213,75,182,0};
+        const int degtbl[] = {245,107,214,32,139,246,64,215,234,96,247,21,172,235,53,204,223,129,236,10,161,224,86,193,212,118,225,43,150,213,75,182,245};
         float theta_ = fmod(theta , (PI * 2.0f ));
         if ( theta_ < 0 ) theta_ = (PI * 2.0f) + theta_;
         int idx = theta_ / PI * 16;
@@ -232,16 +232,18 @@ void PlayerManager::Update()
 				AddCharacter<PlayerCharacter>(player->id(), unicode::ToTString(player->model_name()));
 
 				player->set_current_model_name(player->model_name());
-//            } else {
+//           } else {
 //                if (!model.empty() && !player->current_model_name().empty() && player->current_model_name() != model) {
-//                    AddCharacter<PlayerCharacter>(player->id(), unicode::ToTString(player->model_name()));
-                // モデル非同期読み込み開始
-                // モデル読み込み完了確認
+                    // モデル非同期読み込み開始
+//                    if (ResourceManager::IsCachedModelName(unicode::ToTString(player->model_name())) == false){
+//                      AddCharacter<PlayerCharacter>(player->id(), unicode::ToTString(player->model_name()));
+//                    }
+                    // モデル読み込み完了確認
                 // 読み込み完了
                 //   旧モデル解放
                 //   player->set_current_model_name(player->model_name());
 //                }
-         }
+            }
         }
 
         if (player->login()) {
@@ -543,31 +545,30 @@ std::map<unsigned int, std::unique_ptr<CharacterDataProvider>>& PlayerManager::c
 template <typename CharacterType>
 void PlayerManager::AddCharacter(unsigned int user_id, const tstring& model_name)
 {
-  auto world_manager = manager_accessor_->world_manager().lock();
-  std::unique_ptr<CharacterDataProvider> cdp_ptr(new CharacterDataProvider());
-  auto& cdp = *cdp_ptr;
-  char_data_providers_[user_id] = move(cdp_ptr);
-  cdp.set_id(user_id);
-  cdp.set_model(ResourceManager::LoadModelFromName(model_name));
-  ResourceManager::SetModelEdgeSize(cdp.model().handle());
-  auto character = std::make_shared<CharacterType>(cdp, stage_ptr_holder_, timer_);
-  charmgr_->Add(user_id, character);
+    auto world_manager = manager_accessor_->world_manager().lock();
+    std::unique_ptr<CharacterDataProvider> cdp_ptr(new CharacterDataProvider());
+    auto& cdp = *cdp_ptr;
+    char_data_providers_[user_id] = move(cdp_ptr);
+    cdp.set_id(user_id);
+    cdp.set_model(ResourceManager::LoadModelFromName(model_name));
+    ResourceManager::SetModelEdgeSize(cdp.model().handle());
+    auto character = std::make_shared<CharacterType>(cdp, stage_ptr_holder_, timer_);
+    charmgr_->Add(user_id, character);
 
-//    auto world_manager = manager_accessor_->world_manager().lock();
-//    auto config_manager= manager_accessor_->config_manager().lock();
-//
-//    std::unique_ptr<CharacterDataProvider> cdp_ptr(new CharacterDataProvider());
-//    auto& cdp = *cdp_ptr;
-//    char_data_providers_[user_id] = move(cdp_ptr);
-//    cdp.set_id(user_id);
-//    cdp.set_model(ResourceManager::LoadModelFromName(model_name,false));
-// //   auto model=ResourceManager::LoadModelFromName(model_name,config_manager->modelload_mode());
-// //   if (model.CheckLoaded() ){
-////      cdp.set_model(model);
-//	    ResourceManager::SetModelEdgeSize(cdp.model().handle());
-//        auto character = std::make_shared<CharacterType>(cdp, stage_ptr_holder_, timer_);
-//        charmgr_->Add(user_id, character);
-// //   }
+    //auto world_manager = manager_accessor_->world_manager().lock();
+    //auto config_manager= manager_accessor_->config_manager().lock();
+    //std::unique_ptr<CharacterDataProvider> cdp_ptr(new CharacterDataProvider());
+    //auto& cdp = *cdp_ptr;
+    //char_data_providers_[user_id] = move(cdp_ptr);
+    //cdp.set_id(user_id);
+    ////cdp.set_model(ResourceManager::LoadModelFromName(model_name,false));
+    //auto model=ResourceManager::LoadModelFromName(model_name,config_manager->modelload_mode());
+    //if (model.CheckLoaded() ){
+    //    cdp.set_model(model);
+    //    ResourceManager::SetModelEdgeSize(cdp.model().handle());
+    //    auto character = std::make_shared<CharacterType>(cdp, stage_ptr_holder_, timer_);
+    //    charmgr_->Add(user_id, character);
+    //}
 }
 
 void PlayerManager::RemoveCharacter(unsigned int user_id)
