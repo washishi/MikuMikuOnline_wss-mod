@@ -528,11 +528,13 @@ void FieldPlayer::InputFromUser()
 			++move_dir;
 		}
 	} else {
-		if (input.GetKeyCount(InputManager::KEYBIND_FORWARD) > 0)
+		//if (input.GetKeyCount(InputManager::KEYBIND_FORWARD) > 0)
+		if ((input.GetKeyCount(InputManager::KEYBIND_FORWARD) > 0 && GetActiveFlag() != 0)) // ※ 非アクティブ時はキーは効かない様に修正
 		{
 			++move_dir;
 		}
-		if (input.GetKeyCount(InputManager::KEYBIND_BACK) > 0)
+		//if (input.GetKeyCount(InputManager::KEYBIND_BACK) > 0)
+		if ((input.GetKeyCount(InputManager::KEYBIND_BACK) > 0 && GetActiveFlag() != 0)) // ※ 非アクティブ時はキーは効かない様に修正
 		{
 			--move_dir;
 		}
@@ -618,11 +620,13 @@ void FieldPlayer::InputFromUser()
     }
 
     int rot_dir = 0;
-    if (input.GetKeyCount(InputManager::KEYBIND_RIGHT_TRUN) > 0)
+    //if (input.GetKeyCount(InputManager::KEYBIND_RIGHT_TRUN) > 0)
+    if (input.GetKeyCount(InputManager::KEYBIND_RIGHT_TRUN) > 0 && GetActiveFlag() != 0)// ※ 非アクティブ時はキーは効かない様に修正
     {
         ++rot_dir;
     }
-    if (input.GetKeyCount(InputManager::KEYBIND_LEFT_TURN) > 0)
+    //if (input.GetKeyCount(InputManager::KEYBIND_LEFT_TURN) > 0)
+    if (input.GetKeyCount(InputManager::KEYBIND_LEFT_TURN) > 0 && GetActiveFlag() != 0)// ※ 非アクティブ時はキーは効かない様に修正
     {
         --rot_dir;
     }
@@ -646,7 +650,8 @@ void FieldPlayer::InputFromUser()
     }
 
     if (current_stat_.acc.y == 0 &&
-		(input.GetKeyCount(InputManager::KEYBIND_JUMP) > 0 ||
+//		(input.GetKeyCount(InputManager::KEYBIND_JUMP) > 0 ||
+		((input.GetKeyCount(InputManager::KEYBIND_JUMP) > 0 && GetActiveFlag() != 0)|| // ※ 非アクティブ時はキーは効かない様に修正
                     input.GetGamepadCount(InputManager::PADBIND_JUMP) > 0))
     {
 			any_move_ = true;
@@ -655,16 +660,28 @@ void FieldPlayer::InputFromUser()
 	}
 
 	std::string motion_num = "";
-	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_00) > 0)motion_num = "0";
-	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_01) > 0 && motion_num.empty())motion_num = "1";
-	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_02) > 0 && motion_num.empty())motion_num = "2";
-	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_03) > 0 && motion_num.empty())motion_num = "3";
-	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_04) > 0 && motion_num.empty())motion_num = "4";
-	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_05) > 0 && motion_num.empty())motion_num = "5";
-	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_06) > 0 && motion_num.empty())motion_num = "6";
-	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_07) > 0 && motion_num.empty())motion_num = "7";
-	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_08) > 0 && motion_num.empty())motion_num = "8";
-	if (input.GetKeyCount(InputManager::KEYBIND_MOTION_09) > 0 && motion_num.empty())motion_num = "9";
+// ※ ここから 非アクティブ時はキーは効かない様に修正
+	//if (input.GetKeyCount(InputManager::KEYBIND_MOTION_00) > 0)motion_num = "0";
+	//if (input.GetKeyCount(InputManager::KEYBIND_MOTION_01) > 0 && motion_num.empty())motion_num = "1";
+	//if (input.GetKeyCount(InputManager::KEYBIND_MOTION_02) > 0 && motion_num.empty())motion_num = "2";
+	//if (input.GetKeyCount(InputManager::KEYBIND_MOTION_03) > 0 && motion_num.empty())motion_num = "3";
+	//if (input.GetKeyCount(InputManager::KEYBIND_MOTION_04) > 0 && motion_num.empty())motion_num = "4";
+	//if (input.GetKeyCount(InputManager::KEYBIND_MOTION_05) > 0 && motion_num.empty())motion_num = "5";
+	//if (input.GetKeyCount(InputManager::KEYBIND_MOTION_06) > 0 && motion_num.empty())motion_num = "6";
+	//if (input.GetKeyCount(InputManager::KEYBIND_MOTION_07) > 0 && motion_num.empty())motion_num = "7";
+	//if (input.GetKeyCount(InputManager::KEYBIND_MOTION_08) > 0 && motion_num.empty())motion_num = "8";
+	//if (input.GetKeyCount(InputManager::KEYBIND_MOTION_09) > 0 && motion_num.empty())motion_num = "9";
+   	if ((input.GetKeyCount(InputManager::KEYBIND_MOTION_00) > 0 && GetActiveFlag() != 0))motion_num = "0";
+	if ((input.GetKeyCount(InputManager::KEYBIND_MOTION_01) > 0 && GetActiveFlag() != 0) && motion_num.empty())motion_num = "1";
+	if ((input.GetKeyCount(InputManager::KEYBIND_MOTION_02) > 0 && GetActiveFlag() != 0) && motion_num.empty())motion_num = "2";
+	if ((input.GetKeyCount(InputManager::KEYBIND_MOTION_03) > 0 && GetActiveFlag() != 0) && motion_num.empty())motion_num = "3";
+	if ((input.GetKeyCount(InputManager::KEYBIND_MOTION_04) > 0 && GetActiveFlag() != 0) && motion_num.empty())motion_num = "4";
+	if ((input.GetKeyCount(InputManager::KEYBIND_MOTION_05) > 0 && GetActiveFlag() != 0) && motion_num.empty())motion_num = "5";
+	if ((input.GetKeyCount(InputManager::KEYBIND_MOTION_06) > 0 && GetActiveFlag() != 0) && motion_num.empty())motion_num = "6";
+	if ((input.GetKeyCount(InputManager::KEYBIND_MOTION_07) > 0 && GetActiveFlag() != 0) && motion_num.empty())motion_num = "7";
+	if ((input.GetKeyCount(InputManager::KEYBIND_MOTION_08) > 0 && GetActiveFlag() != 0) && motion_num.empty())motion_num = "8";
+	if ((input.GetKeyCount(InputManager::KEYBIND_MOTION_09) > 0 && GetActiveFlag() != 0) && motion_num.empty())motion_num = "9";
+// ※ ここまで
 	if (!motion_num.empty()){
 		auto type = ResourceManager::set_motions().find(allocated_motion_[motion_num]);
 		if( type != ResourceManager::set_motions().end() )

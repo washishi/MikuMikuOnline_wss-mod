@@ -111,7 +111,7 @@ void MainLoop::ProcessInput(InputManager* input)
 
 // ※ ここから  ゲームパッド対応にするため修正
 //	if(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) == 1)
-	if(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) == 1 ||
+	if((input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) == 1 && GetActiveFlag() != 0)||  // ※ 非アクティブ時はキーは効かない様に修正
 		input->GetGamepadCount(InputManager::PADBIND_SCREEN_SHOT) == 1)
 // ※ ここまで
 	{
@@ -127,7 +127,7 @@ void MainLoop::ProcessInput(InputManager* input)
 			auto distance = VSize(warp_point.position - VGet(pos.x, pos.y, pos.z));
 // ※ ここから  ゲームパッド対応にするため修正
 //			if (distance < 50 && input->GetKeyCount(KEY_INPUT_M) == 1) {
-			if (distance < 50 && (input->GetKeyCount(KEY_INPUT_M) == 1 ||
+			if (distance < 50 && ((input->GetKeyCount(KEY_INPUT_M) == 1 && GetActiveFlag() != 0)||  // ※ 非アクティブ時はキーは効かない様に修正
 				input->GetGamepadCount(InputManager::PADBIND_WARP) == 1)) {
 
 				// 同一チャンネルの場合は移動するだけ
