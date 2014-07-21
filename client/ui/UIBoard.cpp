@@ -168,14 +168,16 @@ void UIBoard::UpdateDrag(InputManager* input, bool resizeable)
             && input->GetMouseY() <= absolute_y() + absolute_height());
 
     // アクティブ
-    if (hover && input->GetMouseLeftCount() == 1) {
+//  if (hover && input->GetMouseLeftCount() == 1) {
+    if (hover && input->GetMouseLeftCount() == 1 && GetActiveFlag() != 0) { // ※ 非アクティブ時はマウスが効かないように修正
         Focus();
     }
 
     //Logger::Log("%d, %d, %d", hover, input->GetMouseLeftCount(), drag_resize_offset_rect_.x);
 
     // ドラッグ処理
-    if (input->GetMouseLeft()) {
+//  if (input->GetMouseLeft()) {
+    if (input->GetMouseLeft() && GetActiveFlag() != 0 ) { // ※ 非アクティブ時はマウスが効かないように修正
         if (input->GetMouseLeftCount() == 1) {
             if (drag_offset_rect_.x < 0 && hover
                     && !corner_hover) {

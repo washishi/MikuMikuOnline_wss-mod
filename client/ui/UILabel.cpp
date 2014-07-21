@@ -254,6 +254,7 @@ void UILabel::UpdatePosition()
             line_num++;
             substr_list_.push_back(text_cursor);
             substr_list_.push_back(text_cursor + 1);
+            line_width = 0; // ※ メッセージに改行が含まれる際に後の行の折り返しがおかしくなるため追加
         } else if (line_width + *it > absolute_width()) {
             line_width = *it;
             line_num++;
