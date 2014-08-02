@@ -186,7 +186,8 @@ void UILabel::ProcessInput(InputManager* input)
 	bool hover = (absolute_x()<= input->GetMouseX() && input->GetMouseX() <= absolute_x()+ absolute_width()
             && absolute_y() <= input->GetMouseY() && input->GetMouseY() <= absolute_y() + absolute_height());
 
-	if (input->GetMouseLeftCount() == 1 && hover) {  
+//	if (input->GetMouseLeftCount() == 1 && hover) { // ※ 非アクティブ時はマウスが効かないように修正
+	if (input->GetMouseLeftCount() == 1 && hover && GetActiveFlag() != 0) {  
 		if (!on_click_.IsEmpty() && on_click_->IsFunction()) {
 			on_click_.As<Function>()->CallAsFunction(Context::GetCurrent()->Global(), 0, nullptr);
 		}else if(!on_click_function_._Empty()) {
@@ -194,12 +195,14 @@ void UILabel::ProcessInput(InputManager* input)
 			parent_c_->set_visible(false);
 			input->CancelMouseLeft();
 		}
-	}else if(hover && !hover_flag_){
+//	}else if(hover && !hover_flag_){ // ※ 非アクティブ時はマウスが効かないように修正
+	}else if(hover && !hover_flag_ && GetActiveFlag() != 0){
 		if(!on_hover_function_._Empty()) {
 			on_hover_function_(this);
 			hover_flag_ = true;
 		}
-	}else if(!hover && hover_flag_){
+//	}else if(!hover && hover_flag_){ // ※ 非アクティブ時はマウスが効かないように修正
+	}else if(!hover && hover_flag_ && GetActiveFlag() != 0){
 		if(!on_out_function_._Empty()) {
 			on_out_function_(this);
 			hover_flag_ = false;

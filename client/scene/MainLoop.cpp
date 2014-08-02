@@ -182,7 +182,8 @@ void MainLoop::Draw()
         info_json += (boost::format("\"id\":\"%d\",") % id).str();
         info_json += (boost::format("\"time\":\"%s\"") % time_string).str();
         info_json += "}";
-		_stprintf( tmp_str , _T("{\"type\":\"chat\",\"body\":\"スクリーンショットを保存しました:ss%03d.png\"}") , snapshot_number_ );
+//		_stprintf( tmp_str , _T("{\"type\":\"chat\",\"body\":\"スクリーンショットを保存しました:ss%03d.png\"}") , snapshot_number_ );
+        _stprintf( tmp_str , _T("{\"private\":[%d,%d],\"body\":\"スクリーンショットを保存しました:ss%03d.png\"}") , id,id,snapshot_number_ );
 		card_manager_->OnReceiveJSON(info_json, unicode::ToString(tmp_str));
 		// ※ ここまで
 		snapshot_number_++;

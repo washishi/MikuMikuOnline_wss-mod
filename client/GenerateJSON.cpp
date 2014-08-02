@@ -1,4 +1,5 @@
 #include "GenerateJSON.hpp"
+#include "../common/unicode.hpp"
 
 namespace
 {
@@ -321,17 +322,46 @@ JsonGen::JsonGen()
 					}
 
 					// JSONの構築
-					prejson = _T("{\n\t\"name\": \"char:");
+// ※ここから モデル名が64バイトを超える場合は先頭から64バイト以内のみにする
+// 					prejson = _T("{\n\t\"name\": \"char:");
+//					size_t tmp_w_s_m = ADFUNC_DXconvAnsiToWide(0,0,pmd_model_name_);
+//					TCHAR *tmp_w_m = new TCHAR[tmp_w_s_m + 1];
+//					ADFUNC_DXconvAnsiToWide(tmp_w_s_m,tmp_w_m,pmd_model_name_);
+//					prejson += tmp_w_m;
+//					prejson += _T(":");
+//					//size_t tmp_w_s_a = ADFUNC_DXconvAnsiToWide(0,0,pmd_author_name_);
+//					//TCHAR *tmp_w_a = new TCHAR[tmp_w_s_a + 1];
+//					//ADFUNC_DXconvAnsiToWide(tmp_w_s_a,tmp_w_a,pmd_author_name_);
+//					prejson += pmd_author_name_;
+//					prejson += _T("式\",\n\t\"character\":\n\t\t{\n\t\t\t\"height\":");
+
+					prejson = _T("{\n\t\"name\": \"");
+					std::wstring premodelname = _T("char:");
 					size_t tmp_w_s_m = ADFUNC_DXconvAnsiToWide(0,0,pmd_model_name_);
 					TCHAR *tmp_w_m = new TCHAR[tmp_w_s_m + 1];
 					ADFUNC_DXconvAnsiToWide(tmp_w_s_m,tmp_w_m,pmd_model_name_);
-					prejson += tmp_w_m;
-					prejson += _T(":");
+					premodelname += tmp_w_m;
+					premodelname += _T(":");
 					//size_t tmp_w_s_a = ADFUNC_DXconvAnsiToWide(0,0,pmd_author_name_);
 					//TCHAR *tmp_w_a = new TCHAR[tmp_w_s_a + 1];
 					//ADFUNC_DXconvAnsiToWide(tmp_w_s_a,tmp_w_a,pmd_author_name_);
-					prejson += pmd_author_name_;
-					prejson += _T("式\",\n\t\"character\":\n\t\t{\n\t\t\t\"height\":");
+					premodelname += pmd_author_name_;
+					premodelname += _T("式");
+
+                    auto a = unicode::ToString(premodelname);
+                    if (a.size() > 64) {
+                        for (int i=20;i<=premodelname.size();i++){
+                            a = unicode::ToString(premodelname.substr(0,i));
+                            if (a.size() > 64){
+                                premodelname = premodelname.substr(0,i-1);
+                                break;
+                            }
+                        }
+                    }
+
+					prejson += premodelname;
+					prejson += _T("\",\n\t\"character\":\n\t\t{\n\t\t\t\"height\":");
+// ※ ここまで
 					TCHAR tmp_f[32];
 					_ftot_s(tmp_f,32,floor(prePos.y*2)/10.0f,2);
 					prejson += tmp_f;

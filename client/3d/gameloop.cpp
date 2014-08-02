@@ -624,10 +624,12 @@ void LightStatus::SetGrobalAmbientColorMatchToTime()
 		mooning_glow_seconds + end_offset >= now_seconds ){
 			int ColorCoefficient =  now_seconds - (mooning_glow_seconds - start_offset);
 			if(0 <= ColorCoefficient && ColorCoefficient <= start_offset ) {
-				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("夕方")],(static_cast<float>(ColorCoefficient) / static_cast<float>(start_offset)) * 255.0f);
+//				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("夕方")],(static_cast<float>(ColorCoefficient) / static_cast<float>(start_offset)) * 255.0f);
+				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),1,(static_cast<float>(ColorCoefficient) / static_cast<float>(start_offset)) * 255.0f);
 			}
 			if(start_offset < ColorCoefficient && ColorCoefficient <= start_offset + end_offset ) {
-				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("昼")],(static_cast<float>(ColorCoefficient - start_offset) / static_cast<float>(end_offset)) * 255.0f);
+//				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("昼")],(static_cast<float>(ColorCoefficient - start_offset) / static_cast<float>(end_offset)) * 255.0f);
+				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),2,(static_cast<float>(ColorCoefficient - start_offset) / static_cast<float>(end_offset)) * 255.0f);
 			}
 			auto r = 0.9f/2.55f * sin(0.001f * (ColorCoefficient - 1000) / 2.0f);
 			r = (r <= 0 ? 0 : r) + ((2201 - ColorCoefficient)/2200.f < 0 ? 0 : ((2201 - ColorCoefficient)/2200.f)*0.603f);
@@ -642,10 +644,12 @@ void LightStatus::SetGrobalAmbientColorMatchToTime()
 		sunset_seconds + end_offset >= now_seconds ){
 			int ColorCoefficient =  now_seconds - (sunset_seconds - start_offset);
 			if(0 <= ColorCoefficient && ColorCoefficient <= start_offset ) {
-				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("昼")],(static_cast<float>(start_offset - ColorCoefficient) / static_cast<float>(start_offset)) * 255.0f);
+//				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("昼")],(static_cast<float>(start_offset - ColorCoefficient) / static_cast<float>(start_offset)) * 255.0f);
+				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),1,(static_cast<float>(start_offset - ColorCoefficient) / static_cast<float>(start_offset)) * 255.0f);
 			}
 			if(start_offset < ColorCoefficient && ColorCoefficient <= start_offset + end_offset ) {
-				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("夕方")],(static_cast<float>(end_offset - ( ColorCoefficient - start_offset ) ) / static_cast<float>(end_offset)) * 255.0f);
+//				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("夕方")],(static_cast<float>(end_offset - ( ColorCoefficient - start_offset ) ) / static_cast<float>(end_offset)) * 255.0f);
+				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),2,(static_cast<float>(end_offset - ( ColorCoefficient - start_offset ) ) / static_cast<float>(end_offset)) * 255.0f);
 			}
 			auto r = 1.2f/2.55f * sin(0.001f * (ColorCoefficient) / 1.8f);
 			r = (r <= 0 ? 0 : r) + ((2201 - ColorCoefficient)/2200.f < 0 ? 0 : ((2201 - ColorCoefficient)/2200.f)*0.603f);
@@ -659,16 +663,21 @@ void LightStatus::SetGrobalAmbientColorMatchToTime()
 	}else if(sunset_seconds + end_offset < now_seconds ||
 		mooning_glow_seconds - start_offset > now_seconds ){
 			if ( night_flag_ ) {
-				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("昼")],0);
-				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("夕方")],0);
+//				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("昼")],0);
+//				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("夕方")],0);
+   				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),1,0);
+				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),2,0);
+
 				night_flag_ = false;
 			}
 			SetLightDifColor(GetColorF(0,0,0,0));
 			SetLightSpcColor(GetColorF(0,0,0,0));
 	}else{
 			if ( noon_flag_ ) {
-				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("昼")],255);
-				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("夕方")],255);
+//				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("昼")],255);
+//				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),material_index_of_name_[_T("夕方")],255);
+				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),1,255);
+				MV1SetMaterialDrawBlendParam(stage_->skymap_handle().handle(),2,255);
 				noon_flag_ = false;
 			}
 			SetLightDifColor(GetColorF(0.603f,0.603f,0.603f,0));
