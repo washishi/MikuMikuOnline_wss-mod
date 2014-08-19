@@ -1,4 +1,4 @@
-//
+ï»¿//
 // MainLoop.cpp
 //
 
@@ -21,7 +21,7 @@
 #include <shlwapi.h>
 #include "ServerChange.hpp"
 #include "../Music.hpp"
-#include "../common/unicode.hpp" // ¦ ƒXƒNƒŠ[ƒ“ƒVƒ‡ƒbƒgÌæ‚ÉƒƒbƒZ[ƒW‚ğo‚·‚½‚ß‚É’Ç‰Á
+#include "../common/unicode.hpp" // â€» ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚·ãƒ§ãƒƒãƒˆæ¡å–æ™‚ã«ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’å‡ºã™ãŸã‚ã«è¿½åŠ 
 
 namespace scene {
 MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :
@@ -109,11 +109,11 @@ void MainLoop::ProcessInput(InputManager* input)
     card_manager_->ProcessInput(input);
     world_manager_->ProcessInput(input);
 
-// ¦ ‚±‚±‚©‚ç  ƒQ[ƒ€ƒpƒbƒh‘Î‰‚É‚·‚é‚½‚ßC³
+// â€» ã“ã“ã‹ã‚‰  ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰å¯¾å¿œã«ã™ã‚‹ãŸã‚ä¿®æ­£
 //	if(input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) == 1)
-	if((input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) == 1 && GetActiveFlag() != 0)||  // ¦ ”ñƒAƒNƒeƒBƒu‚ÍƒL[‚ÍŒø‚©‚È‚¢—l‚ÉC³
+	if((input->GetKeyCount(InputManager::KEYBIND_SCREEN_SHOT) == 1 && GetActiveFlag() != 0)||  // â€» éã‚¢ã‚¯ãƒ†ã‚£ãƒ–æ™‚ã¯ã‚­ãƒ¼ã¯åŠ¹ã‹ãªã„æ§˜ã«ä¿®æ­£
 		input->GetGamepadCount(InputManager::PADBIND_SCREEN_SHOT) == 1)
-// ¦ ‚±‚±‚Ü‚Å
+// â€» ã“ã“ã¾ã§
 	{
 		snapshot_ = true;
 	}
@@ -125,12 +125,12 @@ void MainLoop::ProcessInput(InputManager* input)
 			const auto& pos = player_manager_->GetMyself()->position();
 
 			auto distance = VSize(warp_point.position - VGet(pos.x, pos.y, pos.z));
-// ¦ ‚±‚±‚©‚ç  ƒQ[ƒ€ƒpƒbƒh‘Î‰‚É‚·‚é‚½‚ßC³
+// â€» ã“ã“ã‹ã‚‰  ã‚²ãƒ¼ãƒ ãƒ‘ãƒƒãƒ‰å¯¾å¿œã«ã™ã‚‹ãŸã‚ä¿®æ­£
 //			if (distance < 50 && input->GetKeyCount(KEY_INPUT_M) == 1) {
-			if (distance < 50 && ((input->GetKeyCount(KEY_INPUT_M) == 1 && GetActiveFlag() != 0)||  // ¦ ”ñƒAƒNƒeƒBƒu‚ÍƒL[‚ÍŒø‚©‚È‚¢—l‚ÉC³
+			if (distance < 50 && ((input->GetKeyCount(KEY_INPUT_M) == 1 && GetActiveFlag() != 0)||  // â€» éã‚¢ã‚¯ãƒ†ã‚£ãƒ–æ™‚ã¯ã‚­ãƒ¼ã¯åŠ¹ã‹ãªã„æ§˜ã«ä¿®æ­£
 				input->GetGamepadCount(InputManager::PADBIND_WARP) == 1)) {
 
-				// “¯ˆêƒ`ƒƒƒ“ƒlƒ‹‚Ìê‡‚ÍˆÚ“®‚·‚é‚¾‚¯
+				// åŒä¸€ãƒãƒ£ãƒ³ãƒãƒ«ã®å ´åˆã¯ç§»å‹•ã™ã‚‹ã ã‘
 				if (player_manager_->GetMyself()->channel() == warp_point.channel) {
 					if (warp_point.destination) {
 						world_manager_->myself()->ResetPosition(warp_point.destination);
@@ -173,7 +173,7 @@ void MainLoop::Draw()
 			}
 		}
 		SaveDrawScreenToPNG( 0, 0, config_manager_->screen_width(), config_manager_->screen_height(),tmp_str);
-		// ¦ ƒXƒNƒŠƒ“ƒVƒ‡ƒbƒgÌæ‚É‹[—ƒƒbƒZ[ƒW‚ªo‚é‚æ‚¤‚ÉC³@‚±‚±‚©‚ç
+		// â€» ã‚¹ã‚¯ãƒªãƒ³ã‚·ãƒ§ãƒƒãƒˆæ¡å–æ™‚ã«æ“¬ä¼¼ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãŒå‡ºã‚‹ã‚ˆã†ã«ä¿®æ­£ã€€ã“ã“ã‹ã‚‰
 		boost::posix_time::ptime now = boost::posix_time::second_clock::universal_time();
         auto time_string = to_iso_extended_string(now);
         std::string info_json;
@@ -182,10 +182,10 @@ void MainLoop::Draw()
         info_json += (boost::format("\"id\":\"%d\",") % id).str();
         info_json += (boost::format("\"time\":\"%s\"") % time_string).str();
         info_json += "}";
-//		_stprintf( tmp_str , _T("{\"type\":\"chat\",\"body\":\"ƒXƒNƒŠ[ƒ“ƒVƒ‡ƒbƒg‚ğ•Û‘¶‚µ‚Ü‚µ‚½:ss%03d.png\"}") , snapshot_number_ );
-        _stprintf( tmp_str , _T("{\"private\":[%d,%d],\"body\":\"ƒXƒNƒŠ[ƒ“ƒVƒ‡ƒbƒg‚ğ•Û‘¶‚µ‚Ü‚µ‚½:ss%03d.png\"}") , id,id,snapshot_number_ );
+//		_stprintf( tmp_str , _T("{\"type\":\"chat\",\"body\":\"ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚·ãƒ§ãƒƒãƒˆã‚’ä¿å­˜ã—ã¾ã—ãŸ:ss%03d.png\"}") , snapshot_number_ );
+        _stprintf( tmp_str , _T("{\"private\":[%d,%d],\"body\":\"ã‚¹ã‚¯ãƒªãƒ¼ãƒ³ã‚·ãƒ§ãƒƒãƒˆã‚’ä¿å­˜ã—ã¾ã—ãŸ:ss%03d.png\"}") , id,id,snapshot_number_ );
 		card_manager_->OnReceiveJSON(info_json, unicode::ToString(tmp_str));
-		// ¦ ‚±‚±‚Ü‚Å
+		// â€» ã“ã“ã¾ã§
 		snapshot_number_++;
 		snapshot_ = false;
 	}
@@ -205,9 +205,9 @@ void MainLoop::Draw()
 
 				UILabel label_;
 				label_.set_width(160);
-				auto text = _T("y") + unicode::ToTString(warp_point.name) + _T("z");
+				auto text = _T("ã€") + unicode::ToTString(warp_point.name) + _T("ã€‘");
 				if (distance < 50) {
-					text += _T("\n‚lƒL[‚Å“]‘—‚µ‚Ü‚·");
+					text += _T("\nï¼­ã‚­ãƒ¼ã§è»¢é€ã—ã¾ã™");
 					label_.set_bgcolor(UIBase::Color(255,0,0,150));
 				} else {
 					label_.set_bgcolor(UIBase::Color(0,0,0,150));
@@ -228,7 +228,7 @@ void MainLoop::Draw()
 		SetDrawBlendMode(DX_BLENDMODE_MUL, 120);
 		DrawBox(0,0,config_manager_->screen_width(),config_manager_->screen_height(),GetColor(0,0,0),1);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-		auto str = unicode::ToTString(_T("ƒT[ƒo[‚Æ‚ÌÚ‘±‚ªØ’f‚³‚ê‚Ü‚µ‚½"));
+		auto str = unicode::ToTString(_T("ã‚µãƒ¼ãƒãƒ¼ã¨ã®æ¥ç¶šãŒåˆ‡æ–­ã•ã‚Œã¾ã—ãŸ"));
 		auto width = GetDrawStringWidthToHandle(str.c_str(),str.length(),ResourceManager::default_font_handle());
 		DrawStringToHandle(
 			config_manager_->screen_width() / 2 - width,

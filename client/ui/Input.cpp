@@ -60,7 +60,8 @@ void Input::Init()
 		UILabel label;
 		label.set_parent_c(shd_right_click_list_);
 		label.set_input_adaptor(this);
-		label.set_text(unicode::ToTString(unicode::sjis2utf8("切り取り")));
+//		label.set_text(unicode::ToTString(unicode::sjis2utf8("切り取り")));
+		label.set_text(L"切り取り");
 		label.set_width(120);
 		label.set_top(12);
 		label.set_left(0);
@@ -97,7 +98,8 @@ void Input::Init()
 		UILabel label;
 		label.set_parent_c(shd_right_click_list_);
 		label.set_input_adaptor(this);
-		label.set_text(unicode::ToTString(unicode::sjis2utf8("コピー")));
+//		label.set_text(unicode::ToTString(unicode::sjis2utf8("コピー")));
+		label.set_text(L"コピー");
 		label.set_width(120);
 		label.set_top(12);
 		label.set_left(0);
@@ -124,7 +126,8 @@ void Input::Init()
 		UILabel label;
 		label.set_parent_c(shd_right_click_list_);
 		label.set_input_adaptor(this);
-		label.set_text(unicode::ToTString(unicode::sjis2utf8("貼り付け")));
+//		label.set_text(unicode::ToTString(unicode::sjis2utf8("貼り付け")));
+		label.set_text(L"貼り付け");
 		label.set_width(120);
 		label.set_top(12);
 		label.set_left(0);

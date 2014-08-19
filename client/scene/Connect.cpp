@@ -1,4 +1,4 @@
-//
+ï»¿//
 // Connect.cpp
 //
 
@@ -82,19 +82,19 @@ void Connect::Update()
 
 	switch (command_manager_->status()) {
 	case CommandManager::STATUS_ERROR:
-		message_.set_text(_T("ƒGƒ‰[FÚ‘±‚ÉŽ¸”s‚µ‚Ü‚µ‚½"));
+		message_.set_text(_T("ã‚¨ãƒ©ãƒ¼ï¼šæŽ¥ç¶šã«å¤±æ•—ã—ã¾ã—ãŸ"));
 		command_manager_->set_client(ClientUniqPtr());
 		break;
 	case CommandManager::STATUS_ERROR_CROWDED:
-		message_.set_text(_T("ƒGƒ‰[Fl”‚ª‘½‚·‚¬‚Ü‚·"));
+		message_.set_text(_T("ã‚¨ãƒ©ãƒ¼ï¼šäººæ•°ãŒå¤šã™ãŽã¾ã™"));
 		command_manager_->set_client(ClientUniqPtr());
 		break;
 	case CommandManager::STATUS_ERROR_VERSION:
-		message_.set_text(_T("ƒGƒ‰[FƒT[ƒo[‚ÆƒNƒ‰ƒCƒAƒ“ƒg‚Ìƒo[ƒWƒ‡ƒ“‚ª‘Î‰ž‚µ‚Ä‚¢‚Ü‚¹‚ñ"));
+		message_.set_text(_T("ã‚¨ãƒ©ãƒ¼ï¼šã‚µãƒ¼ãƒãƒ¼ã¨ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆã®ãƒãƒ¼ã‚¸ãƒ§ãƒ³ãŒå¯¾å¿œã—ã¦ã„ã¾ã›ã‚“"));
 		command_manager_->set_client(ClientUniqPtr());
 		break;
 	case CommandManager::STATUS_ERROR_NOSTAGE:
-		message_.set_text(_T("ƒGƒ‰[F•K—v‚ÈƒXƒe[ƒWƒf[ƒ^‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ"));
+		message_.set_text(_T("ã‚¨ãƒ©ãƒ¼ï¼šå¿…è¦ãªã‚¹ãƒ†ãƒ¼ã‚¸ãƒ‡ãƒ¼ã‚¿ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“"));
 		command_manager_->set_client(ClientUniqPtr());
 		break;
 	}

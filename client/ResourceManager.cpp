@@ -149,14 +149,35 @@ void ResourceManager::BuildModelFileTree()
 							}
 						}
 
+// ※ ここから zip展開時のskydomeのテキスチャーファイル名文字化けの救済(他国語OS対応)
+						// 英語
+						if (exists(it_dir->path() / "\xc9\x2d\xef\x3d.bmp" )) {
+							rename (it_dir->path() / "\xc9\x2d\xef\x3d.bmp" ,it_dir->path() / L"青空.bmp");
+						}
+						if (exists(it_dir->path() / "\xf9\x5b\xf4\xb7.bmp" )) {
+							rename (it_dir->path() / "\xf9\x5b\xf4\xb7.bmp" ,it_dir->path() / L"夕日.bmp");
+						}
+						if (exists(it_dir->path() / "\xfb\x50\xee\xc4\xe9\xa6\xfb\x54.bmp" )) {
+							rename (it_dir->path() / "\xfb\x50\xee\xc4\xe9\xa6\xfb\x54.bmp" ,it_dir->path() / L"満月の夜.bmp");
+						}
+// ※ ここまで
+
 						if (!model_path.empty()) {
 							ptree pt_json;
-							read_json(json_path.string(), pt_json);
+// ※ ここから ファイル名にwstringを使いたかったのでストリームによる読み込みに変更(他国語OS対応)
+//							read_json(json_path.string(), pt_json);
+							std::ifstream json_stream(json_path.wstring(),std::ios::binary);
+							read_json(json_stream,pt_json);
+// ※ ここまで
 							MergePtree(&pt_json, GetDefaultInfoJSON());
 
 							std::string name = pt_json.get<std::string>("name", "");
-							auto model_path_str = unicode::sjis2utf8(model_path.string());
 
+// ※ ここから model_path.string()で日本語が?になるので変更(他国語OS対応)
+//							auto model_path_str = unicode::sjis2utf8(model_path.string());
+							auto model_path_wstr = unicode::ToWString(model_path.native());
+							auto model_path_str = unicode::ToString(model_path_wstr);
+// ※ ここまで
 							pt_json.put<std::string>("modelpath", model_path_str);
 							if (!name.empty()) {
 								model_name_list_.push_back(name);

@@ -1,4 +1,4 @@
-//
+Ôªø//
 // MiniMap.cpp
 //
 
@@ -37,14 +37,14 @@ void MiniMap::UpdateDrag(InputManager* input, bool resizeable)
             && absolute_y() + absolute_height() - 18 <= input->GetMouseY()
             && input->GetMouseY() <= absolute_y() + absolute_height());
 
-    // ÉAÉNÉeÉBÉu
+    // „Ç¢„ÇØ„ÉÜ„Ç£„Éñ
     if (hover && input->GetMouseLeftCount() == 1) {
         Focus();
     }
 
     //Logger::Log("%d, %d, %d", hover, input->GetMouseLeftCount(), drag_resize_offset_rect_.x);
 
-    // ÉhÉâÉbÉOèàóù
+    // „Éâ„É©„ÉÉ„Ç∞Âá¶ÁêÜ
     if (input->GetMouseLeft()) {
         if (input->GetMouseLeftCount() == 1) {
             if (drag_offset_rect_.x < 0 && hover
@@ -161,7 +161,7 @@ void MiniMap::Draw()
 		DrawBox( x, y, x + thickness, y + height, Color, TRUE);
 		DrawBox( x + width - thickness, y, x + width, y + height, Color, TRUE);
 		DrawBox( x, y + height - thickness, x + width, y + height, Color, TRUE);
-	};// thicknessÇ≈é¶ÇµÇΩëæÇ≥Ç≈âèÇÃÇ›ÇÃéläpå`Çï`âÊ
+	};// thickness„ÅßÁ§∫„Åó„ÅüÂ§™„Åï„ÅßÁ∏Å„ÅÆ„Åø„ÅÆÂõõËßíÂΩ¢„ÇíÊèèÁîª
 
 	DrawOfOnlyEdge(x + 12, y + 12, width - 24, height - 24 - 16, GetColor(133,211,192),2);
 
@@ -190,16 +190,16 @@ void MiniMap::DrawPosAndCalc()
 	for(it; it != providers.end(); ++it)
 	{
 		if(it->first == player_manager->charmgr()->my_character_id())continue;
-		// Å¶ é©ï™Ç∆àŸÇ»ÇÈÉ`ÉÉÉìÉlÉãÇÕï`âÊÇµÇ»Ç¢ÇÊÇ§Ç…ïœçX
+		// ‚Äª Ëá™ÂàÜ„Å®Áï∞„Å™„Çã„ÉÅ„É£„É≥„Éç„É´„ÅØÊèèÁîª„Åó„Å™„ÅÑ„Çà„ÅÜ„Å´Â§âÊõ¥
 		if (player_manager->GetMyself()->channel() != player_manager->GetFromId(it->first)->channel()) {
-			continue; // É`ÉÉÉìÉlÉãÇ™àŸÇ»ÇÈÇÃÇ≈ï`âÊÇµÇ»Ç¢
+			continue; // „ÉÅ„É£„É≥„Éç„É´„ÅåÁï∞„Å™„Çã„ÅÆ„ÅßÊèèÁîª„Åó„Å™„ÅÑ
 		}
-		// Å¶ Ç±Ç±Ç‹Ç≈
+		// ‚Äª „Åì„Åì„Åæ„Åß
 		direction = VSub(it->second->position(),myself_pos);
 		direction.y = 0;
 		theta = atan2( -direction.x, -direction.z);
 		tmp_pos_x = ( sin(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager->stage()->map_scale()) )/ 3.0f + absolute_x() + absolute_width()/2;
-		tmp_pos_z = ( cos(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager->stage()->map_scale()) )/ 3.0f + absolute_y() + absolute_height()/2; // yç¿ïWâªÇ∑ÇÈ
+		tmp_pos_z = ( cos(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager->stage()->map_scale()) )/ 3.0f + absolute_y() + absolute_height()/2; // yÂ∫ßÊ®ôÂåñ„Åô„Çã
 		if(tmp_pos_x < absolute_x() + 12)tmp_pos_x = absolute_x() + 12;
 		if(tmp_pos_x > absolute_x() + absolute_width() - 12)tmp_pos_x = absolute_x() + absolute_width() - 12;
 		if(tmp_pos_z < absolute_y() + 12)tmp_pos_z = absolute_y() + 12;
@@ -213,7 +213,7 @@ void MiniMap::DrawPosAndCalc()
 		direction.y = 0;
 		theta = atan2( -direction.x, -direction.z);
 		tmp_pos_x = ( sin(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager->stage()->map_scale()) )/ 3.0f + absolute_x() + absolute_width()/2;
-		tmp_pos_z = ( cos(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager->stage()->map_scale()) )/ 3.0f + absolute_y() + absolute_height()/2; // yç¿ïWâªÇ∑ÇÈ
+		tmp_pos_z = ( cos(mtheta + TORADIAN(180.0f) - theta) * VSize(direction) * ( 1.0f / world_manager->stage()->map_scale()) )/ 3.0f + absolute_y() + absolute_height()/2; // yÂ∫ßÊ®ôÂåñ„Åô„Çã
 		if(tmp_pos_x < absolute_x() + 12)tmp_pos_x = absolute_x() + 12;
 		if(tmp_pos_x > absolute_x() + absolute_width() - 12)tmp_pos_x = absolute_x() + absolute_width() - 12;
 		if(tmp_pos_z < absolute_y() + 12)tmp_pos_z = absolute_y() + 12;
@@ -221,7 +221,7 @@ void MiniMap::DrawPosAndCalc()
 		DrawCircle( tmp_pos_x, tmp_pos_z, 3, GetColor(255,255,255),TRUE);
 	}
 	}
-	// ç≈å„Ç…é©ï™ÇÃà íuÇï`âÊÅyíÜâõå≈íËÅz
+	// ÊúÄÂæå„Å´Ëá™ÂàÜ„ÅÆ‰ΩçÁΩÆ„ÇíÊèèÁîª„Äê‰∏≠Â§ÆÂõ∫ÂÆö„Äë
 	DrawCircle( absolute_x() + absolute_width()/2, absolute_y() + absolute_height()/2, 2, GetColor(206,52,95));
 
 	prev_myself_pos_on_map_ = player_manager->char_data_providers()[player_manager->charmgr()->my_character_id()]->position();
@@ -229,10 +229,10 @@ void MiniMap::DrawPosAndCalc()
 	tstring login_num;
 	int color;
 	if (command_manager->status() == CommandManager::STATUS_ERROR) {
-		login_num = _T("ÉIÉtÉâÉCÉì");
+		login_num = _T("„Ç™„Éï„É©„Ç§„É≥");
 		color = GetColor(255,163,167);
 	} else {
-		login_num = (tformat(_T("ÉçÉOÉCÉìêlêî: %d")) % player_manager->GetAll().size()).str();
+		login_num = (tformat(_T("„É≠„Ç∞„Ç§„É≥‰∫∫Êï∞: %d")) % player_manager->GetAll().size()).str();
 		color = GetColor(133,211,192);
 	}
 	DrawBox(absolute_x() + 12,absolute_y() + absolute_height() - 24,absolute_x() + absolute_width() - 12,absolute_y() + absolute_height() - 6,color,TRUE);

@@ -14,9 +14,11 @@ namespace unicode {
 
     std::string sjis2utf8(const std::string& in) {
 
-        int wchar_size = ::MultiByteToWideChar(CP_ACP,0,in.data(),in.size(),nullptr,0);
+      int wchar_size = ::MultiByteToWideChar(CP_ACP,0,in.data(),in.size(),nullptr,0);
+//        int wchar_size = ::MultiByteToWideChar(932,0,in.data(),in.size(),nullptr,0);
 		auto wchar_buf = new wchar_t [wchar_size];
-        ::MultiByteToWideChar(CP_ACP,0,in.data(),in.size(),wchar_buf,wchar_size);
+      ::MultiByteToWideChar(CP_ACP,0,in.data(),in.size(),wchar_buf,wchar_size);
+//        ::MultiByteToWideChar(932,0,in.data(),in.size(),wchar_buf,wchar_size);
 
         int utf8_size = ::WideCharToMultiByte(CP_UTF8,0,wchar_buf,wchar_size,nullptr,0,nullptr,nullptr);
 		auto utf8_buf = new char[utf8_size];
@@ -35,9 +37,11 @@ namespace unicode {
 		auto wchar_buf = new wchar_t[wchar_size];
         ::MultiByteToWideChar(CP_UTF8,0,in.data(),in.size(),wchar_buf,wchar_size);
 
-        int sjis_size = ::WideCharToMultiByte(CP_ACP,0,wchar_buf,wchar_size,nullptr,0,nullptr,nullptr);
+      int sjis_size = ::WideCharToMultiByte(CP_ACP,0,wchar_buf,wchar_size,nullptr,0,nullptr,nullptr);
+//        int sjis_size = ::WideCharToMultiByte(932,0,wchar_buf,wchar_size,nullptr,0,nullptr,nullptr);
         auto sjis_buf = new char[sjis_size];
-        ::WideCharToMultiByte(CP_ACP,0,wchar_buf,wchar_size,sjis_buf,sjis_size,nullptr,nullptr);
+      ::WideCharToMultiByte(CP_ACP,0,wchar_buf,wchar_size,sjis_buf,sjis_size,nullptr,nullptr);
+//        ::WideCharToMultiByte(932,0,wchar_buf,wchar_size,sjis_buf,sjis_size,nullptr,nullptr);
 
 		auto out = std::string(sjis_buf, sjis_size);
 		delete[] wchar_buf;
