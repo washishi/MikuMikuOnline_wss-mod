@@ -160,6 +160,23 @@ void ResourceManager::BuildModelFileTree()
 						if (exists(it_dir->path() / "\xfb\x50\xee\xc4\xe9\xa6\xfb\x54.bmp" )) {
 							rename (it_dir->path() / "\xfb\x50\xee\xc4\xe9\xa6\xfb\x54.bmp" ,it_dir->path() / L"満月の夜.bmp");
 						}
+						// ポルトガル語(夕日については英語と同じ)
+						if (exists(it_dir->path() / "\xc9\x2d\xef\xbe.bmp" )) {
+							rename (it_dir->path() / "\xc9\x2d\xef\xbe.bmp" ,it_dir->path() / L"青空.bmp");
+						}
+						if (exists(it_dir->path() / "\xfb\xd7\xee\xc4\xe9\xa6\xfb\xda.bmp" )) {
+							rename (it_dir->path() / "\xfb\xd7\xee\xc4\xe9\xa6\xfb\xda.bmp" ,it_dir->path() / L"満月の夜.bmp");
+						}
+						// ロシア語
+						if (exists(it_dir->path() / "\xd0\x54\xcb\xba.bmp" )) {
+							rename (it_dir->path() / "\xd0\x54\xcb\xba.bmp" ,it_dir->path() / L"青空.bmp");
+						}
+						if (exists(it_dir->path() / "\xd7\x5b\xd3\xb7.bmp" )) {
+							rename (it_dir->path() / "\xd7\x5b\xd3\xb7.bmp" ,it_dir->path() / L"夕日.bmp");
+						}
+						if (exists(it_dir->path() / "\xd6\xde\xcc\xce\xc2\xa6\xd6\xf9.bmp" )) {
+							rename (it_dir->path() / "\xd6\xde\xcc\xce\xc2\xa6\xd6\xf9.bmp" ,it_dir->path() / L"満月の夜.bmp");
+						}
 // ※ ここまで
 
 						if (!model_path.empty()) {

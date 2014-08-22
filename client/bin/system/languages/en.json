@@ -34,28 +34,15 @@
 					"name":					"Input",
 					"gamepad_type":			"Gamepad type",
 					"gamepad_type_json":	"{\"Type1\":0,\"Type2\":1,\"Type3\":2}",
-					"gamepad_enable":		"  Gamepad Enable",
-					"gamepad_enable_json":	"{\"Always\":0,\"Only Window is Active\":1}",
-					"gamepad_jump":			"  Botton [Jump(Space)]",
-					"gamepad_jump_json":	"{\"Disable\":0,\"1\":1,\"2\":2,\"3\":3,\"4\":4,\"5\":5,\"6\":6,\"7\":7,\"8\":8,\"9\":9,\"10\":10,\"11\":11,\"12\":12}",
-					"gamepad_speed":		"  Botton [Speed(Shift)]",
-					"gamepad_speed_json":	"{\"Disable\":0,\"1\":1,\"2\":2,\"3\":3,\"4\":4,\"5\":5,\"6\":6,\"7\":7,\"8\":8,\"9\":9,\"10\":10,\"11\":11,\"12\":12}",
-					"gamepad_warp":			"  Botton[Warp(M)]",
-					"gamepad_warp_json":	"{\"Disable\":0,\"1\":1,\"2\":2,\"3\":3,\"4\":4,\"5\":5,\"6\":6,\"7\":7,\"8\":8,\"9\":9,\"10\":10,\"11\":11,\"12\":12}",
-					"gamepad_sshot":		"  Botton[ScreenShot(P)]",
-					"gamepad_sshot_json":	"{\"Disable\":0,\"1\":1,\"2\":2,\"3\":3,\"4\":4,\"5\":5,\"6\":6,\"7\":7,\"8\":8,\"9\":9,\"10\":10,\"11\":11,\"12\":12}",
-					"walk_change_type":		"SpeedChange",
-					"walk_change_type_json":	"{\"Normal:Run/Push:Walk\":0,\"Run/Walk Toggle\":1}",
+					"gamepad_enable":			"Gamepad Enable",
+					"gamepad_enable_json":	"{\"Always\":0,\"Only Window Active\":1}",
 					"camera_direction":		"Camera direction",
 					"camera_direction_json":"{\"Always behind\":0,\"Independent\":1}"
 				},
 				
 			"others":
 				{
-					"name":					"Others",
-					"modelload_mode":		"ModelLoad",
-					"modelload_mode_json":	"{\"Sync\":0,\"Async\":1}"
-
+					"name":					"Others"
 				}
 		}
 }
