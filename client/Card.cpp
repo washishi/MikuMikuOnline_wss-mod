@@ -64,7 +64,7 @@ Card::Card(
     using namespace v8;
 
 	icon_base_handle_  = ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_base.png"));
-	icon_base_close_handle_  = ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_base_close.png"));
+//	icon_base_close_handle_  = ResourceManager::LoadCachedGraph(_T("system/images/gui/gui_icon_base_close.png")); // 使われておらずファイルも存在しないのでコメント
 
     // 入力ウィンドウのセットアップ
     inputbox.enable_ = true;

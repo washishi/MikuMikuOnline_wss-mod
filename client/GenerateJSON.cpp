@@ -1,5 +1,6 @@
 ﻿#include "GenerateJSON.hpp"
 #include "../common/unicode.hpp"
+#include <sys/stat.h>
 
 namespace
 {
@@ -165,7 +166,8 @@ _error:
 		return RemoveDirectory( lpPathName );
 	}
 
-	int Trim(char *s) {
+//	int Trim(char *s) {
+	int Trim(char *s,unsigned int size) {
     int i;
     int count = 0;
 
@@ -186,7 +188,8 @@ _error:
     /* 先頭から順に空白でない位置を探す */
     i = 0;
     while ( s[i] != '\0' && s[i] == ' ' ) i++;
-    strcpy(s, &s[i]);
+//  strcpy(s, &s[i]);
+    strcpy_s(s,size, &s[i]);
 
     return i + count;
 	}
@@ -281,23 +284,25 @@ JsonGen::JsonGen()
 // ※ ここから  pmx対応のため追加
 					if (pmd_paths[i].substr(pmd_paths[i].size()-4,4) == L".pmx") {
 						// PMX
-						int fd = _topen(pmd_paths[i].c_str(),O_RDONLY);
+//						int fd = _topen(pmd_paths[i].c_str(),O_RDONLY);
+						int fd;
+						_tsopen_s(&fd,pmd_paths[i].c_str(),_O_BINARY|_O_RDONLY,_SH_DENYWR,_S_IREAD|_S_IWRITE);
 						char readbuf[1024];
-						read(fd,readbuf,9);
+						_read(fd,readbuf,9);
 						// ヘッダー確認
 						if( readbuf[ 0 ] != 'P' || readbuf[ 1 ] != 'M' || readbuf[ 2 ] != 'X' || readbuf[ 3 ] != ' ' ) {
-							close(fd);
+							_close(fd);
 							continue;
 						}
 						// Ver2.0 かを確認
 						if( readbuf[ 4 ] != 0x00 || readbuf[ 5 ] != 0x00 || readbuf[ 6 ] != 0x00 || readbuf[ 7 ] != 0x40 ) {
-							close(fd);
+							_close(fd);
 							continue;
 						}
 
 						// 追加情報のサイズを取得し読み込み
 						auto AddHeadDataSize = readbuf[ 8 ] ;
-						read(fd,readbuf,8);
+						_read(fd,readbuf,8);
 						if (AddHeadDataSize > 8) {
 							// 追加情報が8バイトより大きい場合は残りをスキップ
 							_lseek(fd,AddHeadDataSize - 8,SEEK_CUR);
@@ -306,12 +311,12 @@ JsonGen::JsonGen()
 
 						// モデル情報読み込み
 						DWORD size;
-						read(fd,(char *) &size,4);  // テキストデータ サイズ取得
+						_read(fd,(char *) &size,4);  // テキストデータ サイズ取得
 						if (size <= 1024) {
-							read(fd,readbuf,size); // 文字列情報を読み込み
+							_read(fd,readbuf,size); // 文字列情報を読み込み
 						} else {
 							// 1024バイトより大きい場合は1024バイト読み込んで残りはスキップ
-							read(fd,readbuf,1024); // 文字列情報を読み込み
+							_read(fd,readbuf,1024); // 文字列情報を読み込み
 							_lseek(fd,size - 1024,SEEK_CUR);
 							size=1024;
 						}
@@ -319,7 +324,7 @@ JsonGen::JsonGen()
 						pmx_model_name_ = L"";
 						switch (EncodeType) {
 						case 0: // UTF16
-							for (int idx=0;idx<size;idx+=2) {
+							for (int idx=0;idx<(int)size;idx+=2) {
 								pmx_model_name_ +=  (unsigned char)readbuf[idx] + ((unsigned char)readbuf[idx+1]<<8);
 							}
 							break;
@@ -333,25 +338,25 @@ JsonGen::JsonGen()
 							break;
 						}
 						// モデル名(英)をスキップ
-						read(fd,(char *) &size,4);  // テキストデータ サイズ取得
+						_read(fd,(char *) &size,4);  // テキストデータ サイズ取得
 						_lseek(fd,size,SEEK_CUR);
 
 						// コメント取得
-						read(fd,(char *) &size,4);  // テキストデータ サイズ取得
+						_read(fd,(char *) &size,4);  // テキストデータ サイズ取得
 						if (size <= 1024) {
-							read(fd,readbuf,size); // 文字列情報を読み込み
+							_read(fd,readbuf,size); // 文字列情報を読み込み
 						} else {
 							// 1024バイトより大きい場合は1024バイト読み込んで残りはスキップ
-							read(fd,readbuf,1024); // 文字列情報を読み込み
+							_read(fd,readbuf,1024); // 文字列情報を読み込み
 							_lseek(fd,size - 1024,SEEK_CUR);
 							size=1024;
 						}
-						close(fd);
+						_close(fd);
 
 						std::wstring pmx_model_comment = L"";
 						switch (EncodeType) {
 						case 0: // UTF16
-							for (int idx=0;idx<size;idx+=2) {
+							for (int idx=0;idx<(int)size;idx+=2) {
 								pmx_model_comment +=  (unsigned char)readbuf[idx] + ((unsigned char)readbuf[idx+1]<<8);
 							}
 							break;
@@ -385,13 +390,16 @@ JsonGen::JsonGen()
 // ※ ここまで
 						// PMD
 						char pmd_info[PMDINFO_SIZE+1];
-						int fd = _topen(pmd_paths[i].c_str(),O_RDONLY);
-						read(fd,pmd_info,PMDINFO_SIZE);
-						close(fd);
+//						int fd = _topen(pmd_paths[i].c_str(),O_RDONLY);
+						int fd;
+						_tsopen_s(&fd,pmd_paths[i].c_str(),_O_BINARY|_O_RDONLY,_SH_DENYWR,_S_IREAD|_S_IWRITE);
+						_read(fd,pmd_info,PMDINFO_SIZE);
+						_close(fd);
 
 						// モデル名取得
 						strcpy_s(pmd_model_name_,pmd_info+7);
-						Trim(pmd_model_name_);
+//						Trim(pmd_model_name_);
+						Trim(pmd_model_name_,sizeof(pmd_model_name_));
 						unsigned int cnt = 0x1b;
 						size_t info_size = ADFUNC_DXconvAnsiToWide(0,0,pmd_info+cnt);
 						TCHAR *pmd_info_t = new TCHAR[info_size + 1];
@@ -469,7 +477,7 @@ JsonGen::JsonGen()
 // ※ここから モデル名が64バイトを超える場合は先頭から64バイト以内のみにする
 					auto premodelname_ = unicode::ToString(premodelname);
                     if (premodelname_.size() > 64) {
-                        for (int i=20;i<=premodelname.size();i++){
+                        for (int i=20;i<=(int)premodelname.size();i++){
                             premodelname_ = unicode::ToString(premodelname.substr(0,i));
                             if (premodelname_.size() > 64){
                                 premodelname = premodelname.substr(0,i-1);
@@ -482,6 +490,11 @@ JsonGen::JsonGen()
 // ※ ここまで
 					TCHAR tmp_f[32];
 					_ftot_s(tmp_f,32,floor(prePos.y*2)/10.0f,2);
+// ※ ここから height が　0.00の場合は1.60にする
+					if (_tcscmp(tmp_f,_T("0.00"))==0){
+						lstrcpy(tmp_f, _T("1.60"));
+					}
+// ※ ここまで
 					prejson += tmp_f;
 					prejson += _T(",\n\t\t\t\"motions\":\n\t\t\t\t{\n\t\t\t\t\t\"stand\":\"basic_stand.vmd\",\n\t\t\t\t\t\"walk\": \t\"basic_walk.vmd\",\n\t\t\t\t\t\"run\":\t\"basic_run.vmd\"\n\t\t\t\t}\n\t\t}\n}");
 					TCHAR tmp_dir[MAX_PATH_L];
@@ -571,8 +584,22 @@ JsonGen::JsonGen()
 						CopyFile(tmp_src,tmp_cpy,TRUE);
 					}while(FindNextFile(hTxtFind, &win32fd_txt));
 					FindClose(hTxtFind);
+// ※ ここから モーションファイル(*.vmd)がある場合はコピーする
+					_tcscpy_s(tmp_txt_f,tcsTmpDir);
+					_tcscat_s(tmp_txt_f,_T("*.vmd"));
+					hTxtFind = FindFirstFile(tmp_txt_f,&win32fd_txt);
+					do{
+						_tcscpy_s(tmp_src,tcsTmpDir);
+						_tcscat_s(tmp_src,win32fd_txt.cFileName);
+						_tcscpy_s(tmp_cpy,tmp_dir);
+						_tcscat_s(tmp_cpy,win32fd_txt.cFileName);
+						CopyFile(tmp_src,tmp_cpy,TRUE);
+					}while(FindNextFile(hTxtFind, &win32fd_txt));
+					FindClose(hTxtFind);
+// ※ ここまで
 					TCHAR tmp_type[128] = {0};
-					_tsplitpath(pmd_paths[i].c_str(),NULL,NULL,tmp_cpy,tmp_type);
+//					_tsplitpath(pmd_paths[i].c_str(),NULL,NULL,tmp_cpy,tmp_type);
+					_tsplitpath_s(pmd_paths[i].c_str(),NULL,0,NULL,0,tmp_cpy,sizeof(tmp_cpy)/sizeof(tmp_cpy[0]),tmp_type,sizeof(tmp_type)/sizeof(tmp_type[0]));
 					_tcscat_s(tmp_cpy,tmp_type);
 					_tcscpy_s(tmp_type,tmp_dir);
 					_tcscat_s(tmp_type,tmp_cpy);
