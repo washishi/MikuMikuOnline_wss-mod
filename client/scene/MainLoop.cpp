@@ -21,7 +21,7 @@
 #include <shlwapi.h>
 #include "ServerChange.hpp"
 #include "../Music.hpp"
-#include "../common/unicode.hpp" // ※ スクリーンショット採取時にメッセージを出すために追加
+#include "../../common/unicode.hpp" // ※ スクリーンショット採取時にメッセージを出すために追加
 
 namespace scene {
 MainLoop::MainLoop(const ManagerAccessorPtr& manager_accessor) :

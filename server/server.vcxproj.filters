@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\common">
+      <UniqueIdentifier>{a87415b3-427c-43b3-be15-06dce859f4af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\common">
+      <UniqueIdentifier>{e5c1b299-da5e-4f5f-8535-f42327b36b89}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\common\network">
+      <UniqueIdentifier>{c4ad775f-1e75-4694-af6f-3dff3874c9e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\common\network">
+      <UniqueIdentifier>{ad8aa500-7d54-4d1e-9170-f92fc1cf9f95}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\common\network\lz4">
+      <UniqueIdentifier>{14e298e5-d523-49f7-9510-6fd355cde3bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\common\network\lz4">
+      <UniqueIdentifier>{08763c8c-11cd-433a-bf31-2beffb363a59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\common\database">
+      <UniqueIdentifier>{73422b89-5496-4715-9fb8-4e20a366c9b1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\server">
+      <UniqueIdentifier>{ff669395-daa2-4a67-b5ad-a0603762775e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\server">
+      <UniqueIdentifier>{0bdfe735-f07c-4e5e-8d33-0e63aa1a7cf0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\unicode.cpp">
+      <Filter>ソース ファイル\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\network\Utils.cpp">
+      <Filter>ソース ファイル\common\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\network\Signature.cpp">
+      <Filter>ソース ファイル\common\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\network\Session.cpp">
+      <Filter>ソース ファイル\common\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\network\Encrypter.cpp">
+      <Filter>ソース ファイル\common\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\network\Command.cpp">
+      <Filter>ソース ファイル\common\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\network\lz4\lz4.c">
+      <Filter>ソース ファイル\common\network\lz4</Filter>
+    </ClCompile>
+    <ClCompile Include="Account.cpp">
+      <Filter>ソース ファイル\server</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ソース ファイル\server</Filter>
+    </ClCompile>
+    <ClCompile Include="Channel.cpp">
+      <Filter>ソース ファイル\server</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
+      <Filter>ソース ファイル\server</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル\server</Filter>
+    </ClCompile>
+    <ClCompile Include="Server.cpp">
+      <Filter>ソース ファイル\server</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\FormatString.hpp">
+      <Filter>ヘッダー ファイル\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\Logger.hpp">
+      <Filter>ヘッダー ファイル\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\unicode.hpp">
+      <Filter>ヘッダー ファイル\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\Utils.hpp">
+      <Filter>ヘッダー ファイル\common\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\Signature.hpp">
+      <Filter>ヘッダー ファイル\common\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\Session.hpp">
+      <Filter>ヘッダー ファイル\common\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\Encrypter.hpp">
+      <Filter>ヘッダー ファイル\common\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\CommandHeader.hpp">
+      <Filter>ヘッダー ファイル\common\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\Command.hpp">
+      <Filter>ヘッダー ファイル\common\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\lz4\lz4.h">
+      <Filter>ヘッダー ファイル\common\network\lz4</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\database\AccountProperty.hpp">
+      <Filter>ヘッダー ファイル\common\database</Filter>
+    </ClInclude>
+    <ClInclude Include="Account.hpp">
+      <Filter>ヘッダー ファイル\server</Filter>
+    </ClInclude>
+    <ClInclude Include="version.hpp">
+      <Filter>ヘッダー ファイル\server</Filter>
+    </ClInclude>
+    <ClInclude Include="buildversion.hpp">
+      <Filter>ヘッダー ファイル\server</Filter>
+    </ClInclude>
+    <ClInclude Include="Channel.hpp">
+      <Filter>ヘッダー ファイル\server</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.hpp">
+      <Filter>ヘッダー ファイル\server</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.hpp">
+      <Filter>ヘッダー ファイル\server</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerSigHandler.hpp">
+      <Filter>ヘッダー ファイル\server</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>ヘッダー ファイル\server</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

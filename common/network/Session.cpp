@@ -47,7 +47,7 @@ namespace network {
         write_byte_sum_ += msg.size();
         UpdateWriteByteAverage();
 
-		Logger::Debug(_T("%d byte/s"), GetWriteByteAverage());
+		// Logger::Debug(_T("%d byte/s"), GetWriteByteAverage()); ※ 
 
         io_service_tcp_.post(boost::bind(&Session::DoWriteTCP, this, msg, shared_from_this()));
     }

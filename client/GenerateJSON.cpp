@@ -513,7 +513,6 @@ JsonGen::JsonGen()
 						_tcscat_s(tmp_dir,pmx_author_name_.c_str());
 						_tcscat_s(tmp_dir,_T("式"));
 						_tcscat_s(tmp_dir,_T("/"));
-						_tcscat_s(tmp_dir,pmx_model_name_.c_str());
 					} else if (pmd_paths[i].substr(pmd_paths[i].size()-4,4) == L".pmd") { 
 // ※ ここまで
 						_tcscat_s(tmp_dir,pmd_author_name_);
@@ -528,8 +527,11 @@ JsonGen::JsonGen()
 						_tcscat_s(tmp_dir,_T("/"));
 // ※ ここから pmx対応のため追加
 //						_tcscat_s(tmp_dir,tmp_w_m); // スコープ外になったので pmx_model_name_ に代入してそちらを利用
-						_tcscat_s(tmp_dir,pmx_model_name_.c_str());
 					}
+					while (pmx_model_name_.rfind('.')==pmx_model_name_.length()-1){ // フォルダ名の最後が'.'になる場合は削る
+						pmx_model_name_.erase(pmx_model_name_.length()-1,1);
+					}
+					_tcscat_s(tmp_dir,pmx_model_name_.c_str());
 					_tcscat_s(tmp_dir,_T("/"));
 					_wmkdir(tmp_dir);
 //					delete [] tmp_w_m;  // スコープ外になったのでスコープ内で開放してここはコメント化

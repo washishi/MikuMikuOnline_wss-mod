@@ -12,7 +12,7 @@
 #include "BasicMotion.hpp"
 #include "PMDLoader.hpp"
 #include "Stage.hpp"
-#include "PlayerManager.hpp" // ※ 追加
+#include "../PlayerManager.hpp" // ※ 追加
 #include "../ConfigManager.hpp"
 #include "../../common/Logger.hpp"
 

@@ -1,0 +1,479 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ソース ファイル\client">
+      <UniqueIdentifier>{257dce20-e8fd-4cf4-b43f-45a0e86227a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\client">
+      <UniqueIdentifier>{2af5d91a-12b3-45d0-9f06-5a045fb2db21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="リソース ファイル\client">
+      <UniqueIdentifier>{582e457a-73a0-4cd7-b89d-903f640af7b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\client\ui">
+      <UniqueIdentifier>{d3e97d0e-e1dc-4e58-95f7-2daee2259e9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\client\3d">
+      <UniqueIdentifier>{b86da17f-4005-4603-a5e4-f2335186bfcb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\client\scene">
+      <UniqueIdentifier>{d9eec816-7cd1-4b37-82ec-69f900e3abc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\client\3d">
+      <UniqueIdentifier>{b2535f12-946e-4e15-a71e-a367eacad16c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\client\scene">
+      <UniqueIdentifier>{c882f1de-ec41-4c01-84d6-ba7497892001}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\client\ui">
+      <UniqueIdentifier>{480f0f5c-e177-49dd-b56d-4bb5d535686e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\common">
+      <UniqueIdentifier>{0df6526a-c7e3-420d-b92c-f89023344265}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\common\network">
+      <UniqueIdentifier>{553b00b2-ff42-406c-a528-ea2a786603cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\common\network\lz4">
+      <UniqueIdentifier>{85db7656-871a-43d4-9e8c-cd577a8b62e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\common">
+      <UniqueIdentifier>{ab22a695-6400-409e-a4e7-b401ae23088d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\common\network">
+      <UniqueIdentifier>{55213397-e8ed-4b22-8a31-f72cdf259d7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\common\network\lz4">
+      <UniqueIdentifier>{f3453260-90ed-4e1c-9ff7-86fb4998f78d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\common\database">
+      <UniqueIdentifier>{62e34683-9cf9-43f1-91a5-d6244d98d6e2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resourse.rc">
+      <Filter>リソース ファイル\client</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\unicode.cpp">
+      <Filter>ソース ファイル\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\network\Utils.cpp">
+      <Filter>ソース ファイル\common\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\network\Signature.cpp">
+      <Filter>ソース ファイル\common\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\network\Session.cpp">
+      <Filter>ソース ファイル\common\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\network\Encrypter.cpp">
+      <Filter>ソース ファイル\common\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\network\Command.cpp">
+      <Filter>ソース ファイル\common\network</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\network\lz4\lz4.c">
+      <Filter>ソース ファイル\common\network\lz4</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\InputBox.cpp">
+      <Filter>ソース ファイル\client\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIBase.cpp">
+      <Filter>ソース ファイル\client\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIBoard.cpp">
+      <Filter>ソース ファイル\client\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIButton.cpp">
+      <Filter>ソース ファイル\client\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UICustom.cpp">
+      <Filter>ソース ファイル\client\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIGroup.cpp">
+      <Filter>ソース ファイル\client\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UILabel.cpp">
+      <Filter>ソース ファイル\client\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UIList.cpp">
+      <Filter>ソース ファイル\client\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\UISuper.cpp">
+      <Filter>ソース ファイル\client\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\Base.cpp">
+      <Filter>ソース ファイル\client\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\ChannelChange.cpp">
+      <Filter>ソース ファイル\client\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\Connect.cpp">
+      <Filter>ソース ファイル\client\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\Dashboard.cpp">
+      <Filter>ソース ファイル\client\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\Init.cpp">
+      <Filter>ソース ファイル\client\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\MainLoop.cpp">
+      <Filter>ソース ファイル\client\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\Option.cpp">
+      <Filter>ソース ファイル\client\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\ServerChange.cpp">
+      <Filter>ソース ファイル\client\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="scene\Title.cpp">
+      <Filter>ソース ファイル\client\scene</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\CharacterManager.cpp">
+      <Filter>ソース ファイル\client\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\FieldPlayer.cpp">
+      <Filter>ソース ファイル\client\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\gameloop.cpp">
+      <Filter>ソース ファイル\client\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\MotionPlayer.cpp">
+      <Filter>ソース ファイル\client\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\PlayerCharacter.cpp">
+      <Filter>ソース ファイル\client\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\PMDLoader.cpp">
+      <Filter>ソース ファイル\client\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\Stage.cpp">
+      <Filter>ソース ファイル\client\3d</Filter>
+    </ClCompile>
+    <ClCompile Include="AccountManager.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="Card.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="CardManager.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="Client.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandManager.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigManager.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="Core.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="InputManager.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="Language.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="Lobby.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="ManagerAccessor.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="MiniMap.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="Music.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayerManager.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptEnvironment.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerLauncher.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="SocketServerManager.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowManager.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="WorldManager.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="ui\Input.cpp">
+      <Filter>ソース ファイル\client\ui</Filter>
+    </ClCompile>
+    <ClCompile Include="GenerateJSON.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="tlsf.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>ソース ファイル\client</Filter>
+    </ClCompile>
+    <ClCompile Include="3d\Timer.cpp">
+      <Filter>ソース ファイル\client\scene</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\common\FormatString.hpp">
+      <Filter>ヘッダー ファイル\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\Logger.hpp">
+      <Filter>ヘッダー ファイル\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\unicode.hpp">
+      <Filter>ヘッダー ファイル\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\Utils.hpp">
+      <Filter>ヘッダー ファイル\common\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\Signature.hpp">
+      <Filter>ヘッダー ファイル\common\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\Session.hpp">
+      <Filter>ヘッダー ファイル\common\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\Encrypter.hpp">
+      <Filter>ヘッダー ファイル\common\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\CommandHeader.hpp">
+      <Filter>ヘッダー ファイル\common\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\Command.hpp">
+      <Filter>ヘッダー ファイル\common\network</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\network\lz4\lz4.h">
+      <Filter>ヘッダー ファイル\common\network\lz4</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\database\AccountProperty.hpp">
+      <Filter>ヘッダー ファイル\common\database</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\Base.hpp">
+      <Filter>ヘッダー ファイル\client\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\ChannelChange.hpp">
+      <Filter>ヘッダー ファイル\client\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\Connect.hpp">
+      <Filter>ヘッダー ファイル\client\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\Dashboard.hpp">
+      <Filter>ヘッダー ファイル\client\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\Include.hpp">
+      <Filter>ヘッダー ファイル\client\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\Init.hpp">
+      <Filter>ヘッダー ファイル\client\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\MainLoop.hpp">
+      <Filter>ヘッダー ファイル\client\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\Option.hpp">
+      <Filter>ヘッダー ファイル\client\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\ServerChange.hpp">
+      <Filter>ヘッダー ファイル\client\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene\Title.hpp">
+      <Filter>ヘッダー ファイル\client\scene</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\include.hpp">
+      <Filter>ヘッダー ファイル\client\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\Input.hpp">
+      <Filter>ヘッダー ファイル\client\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\InputBox.hpp">
+      <Filter>ヘッダー ファイル\client\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIBase.hpp">
+      <Filter>ヘッダー ファイル\client\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIBoard.hpp">
+      <Filter>ヘッダー ファイル\client\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIButton.hpp">
+      <Filter>ヘッダー ファイル\client\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UICustom.hpp">
+      <Filter>ヘッダー ファイル\client\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIGroup.hpp">
+      <Filter>ヘッダー ファイル\client\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UILabel.hpp">
+      <Filter>ヘッダー ファイル\client\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UIList.hpp">
+      <Filter>ヘッダー ファイル\client\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="ui\UISuper.hpp">
+      <Filter>ヘッダー ファイル\client\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\BasicMotion.hpp">
+      <Filter>ヘッダー ファイル\client\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\Character.hpp">
+      <Filter>ヘッダー ファイル\client\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\CharacterDataProvider.hpp">
+      <Filter>ヘッダー ファイル\client\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\CharacterManager.hpp">
+      <Filter>ヘッダー ファイル\client\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\dx_vector.hpp">
+      <Filter>ヘッダー ファイル\client\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\FieldPlayer.hpp">
+      <Filter>ヘッダー ファイル\client\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\gameloop.hpp">
+      <Filter>ヘッダー ファイル\client\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\MotionPlayer.hpp">
+      <Filter>ヘッダー ファイル\client\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\PlayerCharacter.hpp">
+      <Filter>ヘッダー ファイル\client\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\PMDLoader.hpp">
+      <Filter>ヘッダー ファイル\client\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\Stage.hpp">
+      <Filter>ヘッダー ファイル\client\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="3d\Timer.hpp">
+      <Filter>ヘッダー ファイル\client\3d</Filter>
+    </ClInclude>
+    <ClInclude Include="AccountManager.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="Card.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="CardManager.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="Client.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandManager.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigManager.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="Core.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="GenerateJSON.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="InputManager.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="Language.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="Lobby.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="ManagerAccessor.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="ManagerHeader.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="MiniMap.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="Music.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerManager.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptEnvironment.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerLauncher.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="SocketServerManager.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="tlsf.h">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="tlsfbits.h">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="version.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowManager.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldManager.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+    <ClInclude Include="buildversion.hpp">
+      <Filter>ヘッダー ファイル\client</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
