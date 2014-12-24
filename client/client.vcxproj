@@ -62,40 +62,37 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>$(ProjectName)_b77388e_beta19_d</TargetName>
+    <TargetName>$(ProjectName)_wss-mod_beta20_d</TargetName>
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)</OutDir>
     <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>$(ProjectName)_b77388e_beta19_64d</TargetName>
+    <TargetName>$(ProjectName)_wss-mod_beta20_64d</TargetName>
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)</OutDir>
     <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>$(ProjectName)_b77388e_beta19</TargetName>
+    <TargetName>$(ProjectName)_wss-mod_beta20</TargetName>
     <OutDir>$(SolutionDir)</OutDir>
     <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>$(ProjectName)_b77388e_beta19_64</TargetName>
+    <TargetName>$(ProjectName)_wss-mod_beta20_64</TargetName>
     <OutDir>$(SolutionDir)</OutDir>
     <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>\src\boost_1_57_0;\src\cryptopp562;\src\DxLibMake_3_13;\src\v8_3_13_$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>\src\boost_1_57_0;\src\cryptopp562;\src\DxLibMakeTest_3_13c_1223;\src\v8_3_18_$(Platform)\include</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
       <ForcedUsingFiles>
       </ForcedUsingFiles>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <WarningLevel>Level3</WarningLevel>
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
-      <MinimalRebuild>true</MinimalRebuild>
-      <FunctionLevelLinking>
-      </FunctionLevelLinking>
+      <WarningLevel>Level4</WarningLevel>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -103,7 +100,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_57_0\$(Platform)\stage\lib;\src\DxLibMake_3_13\lib;\src\v8_3_13_$(Platform)\build\$(Configuration)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_57_0\$(Platform)\stage\lib;F:\src\DxLibMakeTest_3_13c_1223\lib;F:\src\DxLibVCTest_3_13c_1223;\src\v8_3_18_$(Platform)\build\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ShowProgress>
       </ShowProgress>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -114,7 +111,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>\src\boost_1_57_0;\src\cryptopp562;\src\DxLibMake_3_13;\src\v8_3_13_$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>\src\boost_1_57_0;\src\cryptopp562;\src\DxLibMakeTest_3_13c_1223;\src\v8_3_18_$(Platform)\include</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
       <ForcedUsingFiles>
@@ -122,8 +119,6 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <MultiProcessorCompilation>false</MultiProcessorCompilation>
-      <FunctionLevelLinking>
-      </FunctionLevelLinking>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -131,7 +126,7 @@
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_57_0\$(Platform)\stage\lib;\src\DxLibMake_3_13\lib;\src\v8_3_13_$(Platform)\build\$(Configuration)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_57_0\$(Platform)\stage\lib;F:\src\DxLibMakeTest_3_13c_1223\lib;F:\src\DxLibVCTest_3_13c_1223;\src\v8_3_18_$(Platform)\build\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ShowProgress>
       </ShowProgress>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -143,7 +138,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <AdditionalIncludeDirectories>\src\boost_1_57_0;\src\cryptopp562;\src\DxLibMake_3_13;\src\v8_3_15_$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>\src\boost_1_57_0;\src\cryptopp562;\src\DxLibMakeTest_3_13c_1223;\src\v8_3_18_$(Platform)\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Full</Optimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -161,7 +156,7 @@
     </ClCompile>
     <Link>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_57_0\$(Platform)\stage\lib;\src\DxLibMake_3_13\lib;\src\v8_3_15_$(Platform)\build\$(Configuration)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_57_0\$(Platform)\stage\lib;F:\src\DxLibMakeTest_3_13c_1223\lib;F:\src\DxLibVCTest_3_13c_1223;\src\v8_3_18_$(Platform)\build\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <ShowProgress>
       </ShowProgress>
@@ -175,7 +170,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <AdditionalIncludeDirectories>\src\boost_1_57_0;\src\cryptopp562;\src\DxLibMake_3_13;\src\v8_3_15_$(Platform)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>\src\boost_1_57_0;\src\cryptopp562;\src\DxLibMakeTest_3_13c_1223;\src\v8_3_18_$(Platform)\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Full</Optimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -192,7 +187,7 @@
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_57_0\$(Platform)\stage\lib;\src\DxLibMake_3_13\lib;\src\v8_3_15_$(Platform)\build\$(Configuration)\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_57_0\$(Platform)\stage\lib;F:\src\DxLibMakeTest_3_13c_1223\lib;F:\src\DxLibVCTest_3_13c_1223;\src\v8_3_18_$(Platform)\build\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ShowProgress>

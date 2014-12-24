@@ -39,7 +39,8 @@ Handle<Value> UIList::Function_addItem(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIList>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 
@@ -47,7 +48,8 @@ Handle<Value> UIList::Function_addItem(const Arguments& args)
         auto child = args[0]->ToObject();
 
         if (args.This() != child) {
-            UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
+//          UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
+			UIBasePtr child_ptr = *static_cast<UIBasePtr*>(Local<External>::Cast(child->GetInternalField(0))->Value());
             child_ptr->set_parent(args.This());
             self->items_.push_back(child_ptr);
         }
@@ -59,7 +61,8 @@ Handle<Value> UIList::Function_removeItem(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIList>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 
@@ -78,7 +81,8 @@ Handle<Value> UIList::Function_clearItems(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIList>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 
@@ -95,7 +99,8 @@ Handle<Value> UIList::Property_scroll_y(Local<String> property, const AccessorIn
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIList>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
 
@@ -106,7 +111,8 @@ void UIList::Property_set_scroll_y(Local<String> property, Local<Value> value, c
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIList>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
 

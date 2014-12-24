@@ -43,7 +43,8 @@ class ScriptEnvironment {
         void ParseJSON(const std::string& json,
                 const V8ValueCallBack& callback);
 
-        void With(const V8Block& block);
+//      void With(const V8Block& block);
+        void With(const V8Block& block) const;
         void TimedWith(const V8Block& block);
 
         std::string GetInfo();

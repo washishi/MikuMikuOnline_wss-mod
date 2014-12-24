@@ -269,22 +269,25 @@ Player::~Player()
 Handle<Value> Player::Function_Player_id(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
-    auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
-    assert(self);
+//	auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+	auto self = *static_cast<PlayerPtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value());
+	assert(self);
     return Integer::NewFromUnsigned(self->id_);
 }
 
 Handle<Value> Player::Function_Player_name(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
-    auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
-    assert(self);
+//  auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+	auto self = *static_cast<PlayerPtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value());
+	assert(self);
     return String::New(self->name_.c_str());
 }
 Handle<Value> Player::Function_Player_trip(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
-    auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+//  auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+	auto self = *static_cast<PlayerPtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value());
     assert(self);
     auto value = self->trip_;
     if (value.size() == 0) {
@@ -297,7 +300,8 @@ Handle<Value> Player::Function_Player_trip(const Arguments& args)
 Handle<Value> Player::Function_Player_login(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
-    auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+//  auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+	auto self = *static_cast<PlayerPtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value());
     assert(self);
     return Boolean::New(self->login_);
 }
@@ -305,7 +309,8 @@ Handle<Value> Player::Function_Player_login(const Arguments& args)
 Handle<Value> Player::Function_Player_channel(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
-    auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+//  auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+	auto self = *static_cast<PlayerPtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value());
     assert(self);
     return Integer::New(self->channel_);
 }
@@ -315,7 +320,8 @@ Handle<Value> Player::Function_Player_setBalloonContent(const Arguments& args)
 
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<Player>(
-            *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<PlayerPtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 
@@ -323,7 +329,8 @@ Handle<Value> Player::Function_Player_setBalloonContent(const Arguments& args)
         auto child = args[0]->ToObject();
 
         if (args.This() != child) {
-            UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
+//          UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
+			UIBasePtr child_ptr = *static_cast<UIBasePtr*>(Local<External>::Cast(child->GetInternalField(0))->Value());
             self->ballon_content_ = child_ptr;
         }
     } else {
@@ -331,7 +338,8 @@ Handle<Value> Player::Function_Player_setBalloonContent(const Arguments& args)
     }
 
  /*   assert(args.This()->InternalFieldCount() > 0);
-    auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+//  auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+	auto self = *static_cast<PlayerPtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value());
     assert(self);
     if (args.Length() > 0) {
         self->ballon_content_ = Persistent<Value>::New(args[0]->);
@@ -340,7 +348,8 @@ Handle<Value> Player::Function_Player_setBalloonContent(const Arguments& args)
             auto obj = self->ballon_content_->ToObject();
             assert(obj->InternalFieldCount() > 0);
 
-            auto content_ptr = *static_cast<UIBasePtr*>(obj->GetPointerFromInternalField(0));
+//          auto content_ptr = *static_cast<UIBasePtr*>(obj->GetPointerFromInternalField(0));
+			auto content_ptr = *static_cast<UIBasePtr*>(Local<External>::Cast(obj->GetInternalField(0))->Value());
             content_ptr->Update();
         }
     }*/
@@ -350,8 +359,9 @@ Handle<Value> Player::Function_Player_setBalloonContent(const Arguments& args)
 Handle<Value> Player::Function_Player_position(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
-    auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
-    assert(self);
+//  auto self = *static_cast<PlayerPtr*>(args.This()->GetPointerFromInternalField(0));
+	auto self = *static_cast<PlayerPtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value());
+	assert(self);
 
 	const auto pos = self->position();
 

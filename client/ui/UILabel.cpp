@@ -88,7 +88,8 @@ UIBase::Color UILabel::bgcolor() const
  {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UILabel>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     return String::New(unicode::ToString(self->text()).c_str());
@@ -98,7 +99,8 @@ UIBase::Color UILabel::bgcolor() const
  {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UILabel>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
 
@@ -109,7 +111,8 @@ UIBase::Color UILabel::bgcolor() const
  {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UILabel>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     return String::New(self->bgcolor().ToString().c_str());
@@ -119,7 +122,8 @@ UIBase::Color UILabel::bgcolor() const
  {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UILabel>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
 
@@ -130,7 +134,8 @@ UIBase::Color UILabel::bgcolor() const
  {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UILabel>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     return String::New(self->textcolor().ToString().c_str());
@@ -140,7 +145,8 @@ UIBase::Color UILabel::bgcolor() const
  {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UILabel>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
 
@@ -223,7 +229,8 @@ void UILabel::UpdatePosition()
         parent_y = 0;
         GetScreenState(&parent_width, &parent_height, nullptr);
     } else {
-        UIBasePtr parent_ptr = *static_cast<UIBasePtr*>(parent_->GetPointerFromInternalField(0));
+//      UIBasePtr parent_ptr = *static_cast<UIBasePtr*>(parent_->GetPointerFromInternalField(0));
+		UIBasePtr parent_ptr = *static_cast<UIBasePtr*>(Local<External>::Cast(parent_->GetInternalField(0))->Value());
         parent_x = parent_ptr->absolute_x();
         parent_y = parent_ptr->absolute_y();
         parent_width = parent_ptr->absolute_width();

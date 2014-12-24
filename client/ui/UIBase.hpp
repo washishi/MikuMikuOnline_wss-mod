@@ -126,7 +126,8 @@ class UIBase : public UISuper {
 
 };
 
-inline void Destruct(Persistent<Value> handle, void* parameter) {
+//inline void Destruct(Persistent<Value> handle, void* parameter) {
+inline void Destruct(Isolate* isolate,Persistent<Value> handle, void* parameter) {
     auto instance = static_cast<UIBasePtr*>(parameter);
     delete instance;
     handle.Dispose();
@@ -139,7 +140,8 @@ Handle<Value> Construct(const Arguments& args) {
     assert(thisObject->InternalFieldCount() > 0);
 	thisObject->SetInternalField(0, External::New(instance));
     Persistent<v8::Object> holder = Persistent<v8::Object>::New(thisObject);
-    holder.MakeWeak(instance, Destruct);
+//  holder.MakeWeak(instance, Destruct);
+	holder.MakeWeak(Isolate::GetCurrent(),instance, Destruct); // ※ V8のバージョンを上げるために変更
     return thisObject;
 }
 

@@ -10,10 +10,16 @@
 
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "winmm.lib")
-#pragma comment(lib, "v8_base.lib")
+// ※ ここから  V8のバージョンを上げるために変更
+//#pragma comment(lib, "v8_base.lib")
+#ifdef _WIN64
+#pragma comment(lib, "v8_base.x64.lib")
+#else
+#pragma comment(lib, "v8_base.ia32.lib")
+#endif
 #pragma comment(lib, "v8_snapshot.lib")
-#pragma comment(lib, "preparser_lib.lib")
-
+//#pragma comment(lib, "preparser_lib.lib")
+// ※ ここまで
 unsigned int ScriptEnvironment::max_execution_time = 5000;
 char ScriptEnvironment::SCRIPT_PATH[] = "system/js";
 std::mt19937 ScriptEnvironment::random_engine(static_cast<unsigned long>(GetNowCount()));
@@ -26,7 +32,8 @@ ScriptEnvironment::ScriptEnvironment() :
         Locker locker(isolate_);
         Isolate::Scope isolate_scope(isolate_);
 
-        HandleScope handle;
+      HandleScope handle;
+
         Handle<ObjectTemplate> global_template = ObjectTemplate::New();
 
         context_ = Persistent<Context>::New(
@@ -40,7 +47,8 @@ ScriptEnvironment::ScriptEnvironment() :
         Handle<ObjectTemplate> script_template = ObjectTemplate::New();
         script_template->SetInternalFieldCount(1);
         auto script_object = script_template->NewInstance();
-        script_object->SetPointerInInternalField(0, this);
+//      script_object->SetPointerInInternalField(0, this);
+		script_object->SetInternalField(0, External::New(this));
         context->Global()->Set(String::New("Script"), script_object);
     });
 
@@ -48,7 +56,10 @@ ScriptEnvironment::ScriptEnvironment() :
     SetBuiltins();
 
     // ライブラリをロード
-    Load("sugar-1.3.5.min.js");
+//	#define SUGAR_VER "1.3.5"
+	#define SUGAR_VER "1.4.1"
+//  Load("sugar-1.3.5.min.js");
+    Load("sugar-" SUGAR_VER ".min.js");
 
     timer_events_thread_ = boost::thread([&](){
         while(1) {
@@ -169,13 +180,15 @@ Handle<Value> ScriptEnvironment::Function_Script_print(const Arguments& args)
 
 Handle<Value> ScriptEnvironment::Function_Script_info(const Arguments& args)
 {
-    auto self = static_cast<ScriptEnvironment*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<ScriptEnvironment*>(args.Holder()->GetPointerFromInternalField(0));
+	auto self = static_cast<ScriptEnvironment*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
     return String::New(self->GetInfo().c_str());
 }
 
 Handle<Value> ScriptEnvironment::Function_Script_setTimeout(const Arguments& args)
 {
-    auto self = static_cast<ScriptEnvironment*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<ScriptEnvironment*>(args.Holder()->GetPointerFromInternalField(0));
+	auto self = static_cast<ScriptEnvironment*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     if (args.Length() >= 2 && args[0]->IsFunction()) {
         auto event = std::make_shared<TimerEvent>();
@@ -200,7 +213,8 @@ Handle<Value> ScriptEnvironment::Function_Script_setTimeout(const Arguments& arg
 
 Handle<Value> ScriptEnvironment::Function_Script_setInterval(const Arguments& args)
 {
-    auto self = static_cast<ScriptEnvironment*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<ScriptEnvironment*>(args.Holder()->GetPointerFromInternalField(0));
+	auto self = static_cast<ScriptEnvironment*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     if (args.Length() >= 2 && args[0]->IsFunction()) {
         auto event = std::make_shared<TimerEvent>();
@@ -225,7 +239,8 @@ Handle<Value> ScriptEnvironment::Function_Script_setInterval(const Arguments& ar
 
 Handle<Value> ScriptEnvironment::Function_Script_clearTimeout(const Arguments& args)
 {
-    auto self = static_cast<ScriptEnvironment*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<ScriptEnvironment*>(args.Holder()->GetPointerFromInternalField(0));
+	auto self = static_cast<ScriptEnvironment*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     if (args.Length() >= 1) {
         boost::mutex::scoped_lock lock(self->mutex_);
@@ -236,7 +251,8 @@ Handle<Value> ScriptEnvironment::Function_Script_clearTimeout(const Arguments& a
 
 Handle<Value> ScriptEnvironment::Function_Script_clearInterval(const Arguments& args)
 {
-    auto self = static_cast<ScriptEnvironment*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<ScriptEnvironment*>(args.Holder()->GetPointerFromInternalField(0));
+	auto self = static_cast<ScriptEnvironment*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     if (args.Length() >= 1) {
         boost::mutex::scoped_lock lock(self->mutex_);
@@ -352,7 +368,8 @@ void ScriptEnvironment::Execute(const std::string& script,
 
 }
 
-void ScriptEnvironment::With(const V8Block& block)
+//void ScriptEnvironment::With(const V8Block& block)
+void ScriptEnvironment::With(const V8Block& block) const
 {
     if (block) {
         Locker locker(isolate_);
@@ -458,7 +475,7 @@ std::string ScriptEnvironment::GetInfo()
 //          });
 //
 //  info += "Sugar Library v1.2.5";
-    info += "Sugar Library v1.3.5";
+    info += "Sugar Library v" SUGAR_VER;
 // ここまで
 
     return info;

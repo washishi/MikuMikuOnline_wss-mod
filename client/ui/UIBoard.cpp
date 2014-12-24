@@ -36,7 +36,8 @@ Handle<Value> UIBoard::Property_max_width(Local<String> property, const Accessor
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIBoard>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     return Integer::New(self->max_width_);
@@ -46,7 +47,8 @@ void UIBoard::Property_set_max_width(Local<String> property, Local<Value> value,
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIBoard>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     self->max_width_ = value->ToInteger()->IntegerValue();
@@ -56,8 +58,9 @@ Handle<Value> UIBoard::Property_min_width(Local<String> property, const Accessor
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIBoard>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
-    );
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
+	);
     assert(self);
     return Integer::New(self->min_width_);
 }
@@ -66,7 +69,8 @@ void UIBoard::Property_set_min_width(Local<String> property, Local<Value> value,
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIBoard>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     self->min_width_ = value->ToInteger()->IntegerValue();
@@ -76,7 +80,8 @@ Handle<Value> UIBoard::Property_max_height(Local<String> property, const Accesso
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIBoard>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     return Integer::New(self->max_height_);
@@ -86,7 +91,8 @@ void UIBoard::Property_set_max_height(Local<String> property, Local<Value> value
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIBoard>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     self->max_height_ = value->ToInteger()->IntegerValue();
@@ -96,7 +102,8 @@ Handle<Value> UIBoard::Property_min_height(Local<String> property, const Accesso
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIBoard>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     return Integer::New(self->min_height_);
@@ -106,7 +113,8 @@ void UIBoard::Property_set_min_height(Local<String> property, Local<Value> value
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UIBoard>(
-            *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     self->min_height_ = value->ToInteger()->IntegerValue();

@@ -75,7 +75,8 @@ Card::Card(
         Handle<ObjectTemplate> script_template = ObjectTemplate::New();
         script_template->SetInternalFieldCount(1);
         auto script_object = script_template->NewInstance();
-        script_object->SetPointerInInternalField(0, this);
+//      script_object->SetPointerInInternalField(0, this);
+		script_object->SetInternalField(0, External::New(this));
 
         // デバッグ用にコンテキストに登録したポインタを記録
         ptr_set.insert(this);
@@ -112,8 +113,10 @@ Card::Card(
 					ui_board_obj_ = Persistent<Object>::New(value->ToObject());
 					assert(!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject());
 				});
-
-		ui_board_ = *static_cast<UISuperPtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+//		ui_board_ = *static_cast<UISuperPtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+		script_.With([&](const Handle<Context>& context){
+			ui_board_ = *static_cast<UISuperPtr*>(Local<External>::Cast(ui_board_obj_->GetInternalField(0))->Value());
+		});
 	}
 	
 	ui_board_->set_icon_image_handle(
@@ -133,14 +136,22 @@ Card::Card(
 	};
 
 
-	auto ui_board_tmp = *static_cast<UIBoardPtr*>(ui_board_obj_->GetPointerFromInternalField(0));
-	auto str_array = sprit(type,",");
-	BOOST_FOREACH(auto str,str_array)
-	{
-		if(str == "plugin")ui_board_tmp->set_boardvisible(false);
-		if(str == "uiplugin")ui_board_tmp->set_boardvisible(true);
-	}
-
+//	auto ui_board_tmp = *static_cast<UIBoardPtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+//	auto str_array = sprit(type,",");
+//	BOOST_FOREACH(auto str,str_array)
+//	{
+//		if(str == "plugin")ui_board_tmp->set_boardvisible(false);
+//		if(str == "uiplugin")ui_board_tmp->set_boardvisible(true);
+//	}
+	script_.With([&](const Handle<Context>& context){
+			auto ui_board_tmp = *static_cast<UIBoardPtr*>(Local<External>::Cast(ui_board_obj_->GetInternalField(0))->Value());
+			auto str_array = sprit(type,",");
+			BOOST_FOREACH(auto str,str_array)
+			{
+				if(str == "plugin")ui_board_tmp->set_boardvisible(false);
+				if(str == "uiplugin")ui_board_tmp->set_boardvisible(true);
+			}
+	});
 }
 
 Card::~Card()
@@ -167,10 +178,12 @@ Handle<Value> Card::Function_Network_online(const Arguments& args)
 
 Handle<Value> Card::Function_Network_sendJSONAll(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+	HandleScope handle;
+    auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
-    if (args.Length() > 0) {
-        HandleScope handle;
+	if (args.Length() > 0) {
+//      HandleScope handle;
         v8::String::Utf8Value utf8(args[0]);
 
         if (auto command_manager = self->manager_accessor_->command_manager().lock()) {
@@ -196,10 +209,11 @@ Handle<Value> Card::Function_Model_all(const Arguments& args)
 
 Handle<Value> Card::Function_Player_all(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
 
     HandleScope handle;
-    auto array = Array::New();
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
+	auto array = Array::New();
 
     if (auto player_manager = self->manager_accessor_->player_manager().lock()) {
         auto players = player_manager->GetAll();
@@ -215,7 +229,9 @@ Handle<Value> Card::Function_Player_all(const Arguments& args)
 
 Handle<Value> Card::Function_Player_getFromId(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     if (args.Length() > 0) {
         if (auto player_manager = self->manager_accessor_->player_manager().lock()) {
@@ -229,7 +245,9 @@ Handle<Value> Card::Function_Player_getFromId(const Arguments& args)
 
 Handle<Value> Card::Function_Player_escape(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
     auto world_manager = self->manager_accessor_->world_manager().lock();
     world_manager->myself()->RescuePosition();
     world_manager->ResetCameraPosition();
@@ -238,7 +256,9 @@ Handle<Value> Card::Function_Player_escape(const Arguments& args)
 
 Handle<Value> Card::Function_Player_playMotion(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     if (args.Length() >= 1 && args[0]->IsString()) {
         auto name = std::string(*String::Utf8Value(args[0]->ToString()));
@@ -253,7 +273,9 @@ Handle<Value> Card::Function_Player_playMotion(const Arguments& args)
 Handle<Value> Card::Function_Player_stopMotion(const Arguments& args)
 {
 
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
     auto world_manager = self->manager_accessor_->world_manager().lock();
     world_manager->myself()->ResetMotion();
 
@@ -263,7 +285,9 @@ Handle<Value> Card::Function_Player_stopMotion(const Arguments& args)
 // ※ 他プレイヤーのモーションを変更できるように追加(MODクライアント互換)
 Handle<Value> Card::Function_Player_playMotionId(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
 	if (args.Length() >= 2 && args[0]->IsUint32() && args[1]->IsString()) {
         auto name = std::string(*String::Utf8Value(args[1]->ToString()));
@@ -365,7 +389,9 @@ Handle<Value> Card::Function_Music_IsLoadingDone(const Arguments& args)
 
 Handle<Value> Card::Function_Plugin_Run(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
     if (auto card_manager = self->manager_accessor_->card_manager().lock()) {
 		if ( args[0]->IsString() ) {
 			auto name = std::string(*String::Utf8Value(args[0]->ToString()));
@@ -385,7 +411,9 @@ Handle<Value> Card::Function_Plugin_Run(const Arguments& args)
 
 Handle<Value> Card::Function_Account_id(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     if (auto command_manager = self->manager_accessor_->command_manager().lock()) {
         return Integer::NewFromUnsigned(command_manager->user_id());
@@ -396,7 +424,9 @@ Handle<Value> Card::Function_Account_id(const Arguments& args)
 
 Handle<Value> Card::Function_Account_name(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     int id = 0;
     if (auto command_manager = self->manager_accessor_->command_manager().lock()) {
@@ -413,7 +443,9 @@ Handle<Value> Card::Function_Account_name(const Arguments& args)
 
 Handle<Value> Card::Function_Account_updateName(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     if (args.Length() >= 1 && args[0]->IsString()) {
         auto command_manager = self->manager_accessor_->command_manager().lock();
@@ -428,7 +460,9 @@ Handle<Value> Card::Function_Account_updateName(const Arguments& args)
 
 Handle<Value> Card::Function_Account_modelName(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     if (auto world_manager = self->manager_accessor_->world_manager().lock()) {
         return String::New(world_manager->myself()->model_handle().name().c_str());
@@ -439,7 +473,9 @@ Handle<Value> Card::Function_Account_modelName(const Arguments& args)
 
 Handle<Value> Card::Function_Account_updateModelName(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     if (args.Length() >= 1 && args[0]->IsString()) {
         auto name = std::string(*String::Utf8Value(args[0]->ToString()));
@@ -478,7 +514,9 @@ Handle<Value> Card::Function_Account_updateModelName(const Arguments& args)
 
 Handle<Value> Card::Function_Account_trip(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     int id = 0;
     if (auto command_manager = self->manager_accessor_->command_manager().lock()) {
@@ -495,7 +533,9 @@ Handle<Value> Card::Function_Account_trip(const Arguments& args)
 
 Handle<Value> Card::Function_Account_updateTrip(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     if (args.Length() >= 1 &&
             args[0]->IsString()) {
@@ -516,7 +556,9 @@ Handle<Value> Card::Function_Account_updateTrip(const Arguments& args)
 
 Handle<Value> Card::Function_Account_channel(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     int id = 0;
     if (auto command_manager = self->manager_accessor_->command_manager().lock()) {
@@ -533,7 +575,9 @@ Handle<Value> Card::Function_Account_channel(const Arguments& args)
 
 Handle<Value> Card::Function_Account_updateChannel(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
 	if (args.Length() >= 1 && args[0]->IsNumber()) {
 
@@ -581,7 +625,9 @@ Handle<Value> Card::Function_Screen_mouse_y(const Arguments& args)
 
 Handle<Value> Card::Function_Screen_player_focus(const Arguments& args)
 {
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 
     if (auto card_manager = self->manager_accessor_->card_manager().lock()) {
         card_manager->FocusPlayer();
@@ -591,9 +637,11 @@ Handle<Value> Card::Function_Screen_player_focus(const Arguments& args)
 
 Handle<Value> Card::Function_Model_Rebuild(const Arguments& args)
 {
+    HandleScope handle;
 	JsonGen jsongen;
 	ResourceManager::BuildModelFileTree();
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 	// ※ 代替モデルを使っていた場合はモデルチェンジさせるためにカレントモデルを消す　ここから
     if (auto player_manager = self->manager_accessor_->player_manager().lock()) {
 		auto players = player_manager->GetAll();
@@ -618,7 +666,9 @@ Handle<Value> Card::Function_Music_Rebuild(const Arguments& args)
 {
 	ResourceManager::music()->Init();
 
-    auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
     if (auto card_manager = self->manager_accessor_->card_manager().lock()) {
 		card_manager->OnMusicReload();
     }
@@ -629,8 +679,10 @@ Handle<Value> Card::Function_Music_Rebuild(const Arguments& args)
 Handle<Value> Card::Function_Socket_reply(const Arguments& args)
 {
 	if (args.Length() > 0 && args[0]->IsString()) {
+	    HandleScope handle;
 		std::string str = *String::Utf8Value(args[0]->ToString());
-		auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//		auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+		auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 		if (self && self->on_socket_reply_) {
 // ※ ソケットへの書き込みが失敗した場合は以降処理しないように修正 ここから
 //			(*self->on_socket_reply_)(str);
@@ -653,7 +705,9 @@ Handle<Value> Card::Property_global(Local<String> property, const AccessorInfo &
 Handle<Value> Card::Property_onReceiveJSON(Local<String> property, const AccessorInfo &info)
 {
     assert(info.Holder()->InternalFieldCount() > 0);
-    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
     assert(ptr_set.find(self) != ptr_set.end());
 
     return self->network_on_receive_json_;
@@ -662,8 +716,10 @@ Handle<Value> Card::Property_onReceiveJSON(Local<String> property, const Accesso
 void Card::Property_set_onReceiveJSON(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     if (value->IsFunction()) {
-        assert(info.Holder()->InternalFieldCount() > 0);
-        auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+	    HandleScope handle;
+		assert(info.Holder()->InternalFieldCount() > 0);
+//      auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+		auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
         assert(ptr_set.find(self) != ptr_set.end());
 
         self->network_on_receive_json_ = Persistent<Function>::New(value.As<Function>());
@@ -673,7 +729,9 @@ void Card::Property_set_onReceiveJSON(Local<String> property, Local<Value> value
 Handle<Value> Card::Property_onLogin(Local<String> property, const AccessorInfo &info)
 {
     assert(info.Holder()->InternalFieldCount() > 0);
-    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
     return self->player.on_login_;
 }
 
@@ -681,7 +739,9 @@ void Card::Property_set_onLogin(Local<String> property, Local<Value> value, cons
 {
     if (value->IsFunction()) {
         assert(info.Holder()->InternalFieldCount() > 0);
-        auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//      auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+	    HandleScope handle;
+		auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
         self->player.on_login_ = Persistent<Function>::New(value.As<Function>());
     }
 }
@@ -689,7 +749,9 @@ void Card::Property_set_onLogin(Local<String> property, Local<Value> value, cons
 Handle<Value> Card::Property_onLogout(Local<String> property, const AccessorInfo &info)
 {
     assert(info.Holder()->InternalFieldCount() > 0);
-    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
     return self->player.on_logout_;
 }
 
@@ -697,7 +759,9 @@ void Card::Property_set_onLogout(Local<String> property, Local<Value> value, con
 {
     if (value->IsFunction()) {
         assert(info.Holder()->InternalFieldCount() > 0);
-        auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//      auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+	    HandleScope handle;
+		auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
         self->player.on_logout_ = Persistent<Function>::New(value.As<Function>());
     }
 }
@@ -705,7 +769,9 @@ void Card::Property_set_onLogout(Local<String> property, Local<Value> value, con
 Handle<Value> Card::Property_Card_board(Local<String> property, const AccessorInfo &info)
 {
     assert(info.Holder()->InternalFieldCount() > 0);
-    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
     assert(ptr_set.find(self) != ptr_set.end());
 
     return self->ui_board_obj_;
@@ -714,14 +780,18 @@ Handle<Value> Card::Property_Card_board(Local<String> property, const AccessorIn
 void Card::Property_set_Card_board(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     assert(info.Holder()->InternalFieldCount() > 0);
-    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
     assert(ptr_set.find(self) != ptr_set.end());
 }
 
 Handle<Value> Card::Property_InputBox_onEnter(Local<String> property, const AccessorInfo &info)
 {
     assert(info.Holder()->InternalFieldCount() > 0);
-    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
     return self->inputbox.on_enter_;
 }
 
@@ -729,7 +799,9 @@ void Card::Property_set_InputBox_onEnter(Local<String> property, Local<Value> va
 {
     if (value->IsFunction()) {
         assert(info.Holder()->InternalFieldCount() > 0);
-        auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//      auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+	    HandleScope handle;
+		auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
         self->inputbox.on_enter_ = Persistent<Function>::New(value.As<Function>());
     }
 }
@@ -737,35 +809,45 @@ void Card::Property_set_InputBox_onEnter(Local<String> property, Local<Value> va
 Handle<Value> Card::Property_InputBox_enable(Local<String> property, const AccessorInfo &info)
 {
     assert(info.Holder()->InternalFieldCount() > 0);
-    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
     return Boolean::New(self->inputbox.enable_);
 }
 
 void Card::Property_set_InputBox_enable(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     assert(info.Holder()->InternalFieldCount() > 0);
-    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
     self->inputbox.enable_ = value->ToBoolean()->BooleanValue();
 }
 
 Handle<Value> Card::Property_InputBox_message(Local<String> property, const AccessorInfo &info)
 {
     assert(info.Holder()->InternalFieldCount() > 0);
-    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
     return String::New(self->inputbox.message_.c_str());
 }
 
 void Card::Property_set_InputBox_message(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     assert(info.Holder()->InternalFieldCount() > 0);
-    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
     self->inputbox.message_ = *String::Utf8Value(value->ToString());
 }
 
 Handle<Value> Card::Property_Model_onReload(Local<String> property, const AccessorInfo &info)
 {
     assert(info.Holder()->InternalFieldCount() > 0);
-    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
 	return self->model.on_reload_;
 }
 
@@ -773,7 +855,9 @@ void Card::Property_set_Model_onReload(Local<String> property, Local<Value> valu
 {
     if (value->IsFunction()) {
         assert(info.Holder()->InternalFieldCount() > 0);
-        auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//      auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+	    HandleScope handle;
+		auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
         self->model.on_reload_ = Persistent<Function>::New(value.As<Function>());
     }
 }
@@ -781,7 +865,9 @@ void Card::Property_set_Model_onReload(Local<String> property, Local<Value> valu
 Handle<Value> Card::Property_Music_onReload(Local<String> property, const AccessorInfo &info)
 {
     assert(info.Holder()->InternalFieldCount() > 0);
-    auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//  auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    HandleScope handle;
+	auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
 	return self->music.on_reload_;
 }
 
@@ -789,7 +875,9 @@ void Card::Property_set_Music_onReload(Local<String> property, Local<Value> valu
 {
     if (value->IsFunction()) {
         assert(info.Holder()->InternalFieldCount() > 0);
-        auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+//      auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+	    HandleScope handle;
+		auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
         self->music.on_reload_ = Persistent<Function>::New(value.As<Function>());
     }
 }
@@ -831,8 +919,9 @@ void Card::SetFunctions()
     //script_.SetProperty("Card.localStorage",
     //        [](Local<String> property, const AccessorInfo &info) -> Handle<Value> {
     //            assert(info.Holder()->InternalFieldCount() > 0);
-    //            auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
-    //            assert(ptr_set.find(self) != ptr_set.end());
+    ////          auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+	//			  auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
+	//            assert(ptr_set.find(self) != ptr_set.end());
 
     //            if (self->local_storage_.IsEmpty()) {
     //                self->local_storage_ = Persistent<Object>::New(Object::New());
@@ -841,7 +930,8 @@ void Card::SetFunctions()
     //        },
     //        [](Local<String> property, Local<Value> value, const AccessorInfo& info) {
     //            assert(info.Holder()->InternalFieldCount() > 0);
-    //            auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+    ////          auto self = static_cast<Card*>(info.Holder()->GetPointerFromInternalField(0));
+	//			  auto self = static_cast<Card*>(Local<External>::Cast(info.Holder()->GetInternalField(0))->Value());
     //            assert(ptr_set.find(self) != ptr_set.end());
 
     //            self->local_storage_ = Persistent<Object>::New(value->ToObject());
@@ -1227,7 +1317,8 @@ void Card::SetFunctions()
 //     */
 //    script_.SetFunction("Screen.worldToScreen",
 //            [](const Arguments& args) -> Handle<Value> {
-//                auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+////              auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//				  auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 //
 //                return Undefined();
 //            });
@@ -1359,7 +1450,8 @@ void Card::SetFunctions()
                 UIBase::SetObjectTemplate<UIGroup>("Group", &object_template);
                 UIBase::SetObjectTemplate<UICustom>("Custom", &object_template);
                 auto script_object = object_template->NewInstance();
-                script_object->SetPointerInInternalField(0, this);
+//              script_object->SetPointerInInternalField(0, this);
+				script_object->SetInternalField(0, External::New(this));
                 context->Global()->Set(String::New("UI"), script_object);
             });
 
@@ -1407,7 +1499,8 @@ void Card::SetFunctions()
 //     */
 //    script_.SetFunction("UI.addChildren",
 //            [](const Arguments& args) -> Handle<Value> {
-//                auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+////              auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//				  auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 //
 //                if (args.Length() >= 1 && args[0]->IsObject()) {
 //                    v8::HandleScope handle;
@@ -1425,7 +1518,8 @@ void Card::SetFunctions()
 //    */
 //    script_.SetFunction("GUI.removeChildren",
 //            [](const Arguments& args) -> Handle<Value> {
-//                auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+////              auto self = static_cast<Card*>(args.Holder()->GetPointerFromInternalField(0));
+//				  auto self = static_cast<Card*>(Local<External>::Cast(args.Holder()->GetInternalField(0))->Value());
 //
 //                if (args.Length() >= 1 && args[0]->IsObject()) {
 //                    v8::HandleScope handle;
@@ -1490,11 +1584,20 @@ UISuperPtr Card::GetWindow() const
 		return ui_board_;
 	} else {
 	    if (ui_board_obj_->IsObject()) {
-		    auto ptr = *static_cast<UIBoardPtr*>(ui_board_obj_->GetPointerFromInternalField(0));
-			assert(ptr);
+//		    auto ptr = *static_cast<UIBoardPtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+//			assert(ptr);
+//		    if (ptr->children_size() > 0 && ptr->boardvisible()) {
+//				return ptr;
+//		    }
+			UIBoardPtr ptr;
+			script_.With([&](const Handle<Context>& context){
+				ptr = *static_cast<UIBoardPtr*>(Local<External>::Cast(ui_board_obj_->GetInternalField(0))->Value());
+				assert(ptr);
+
+			});
 		    if (ptr->children_size() > 0 && ptr->boardvisible()) {
 				return ptr;
-		    }
+			}
 	    }
 	}
 	return UISuperPtr();
@@ -1763,7 +1866,11 @@ std::string Card::input_message() const
 int Card::focus_index() const
 {
     if (!ui_board_obj_.IsEmpty() && ui_board_obj_->IsObject()) {
-        auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+//      auto ptr = *static_cast<UIBasePtr*>(ui_board_obj_->GetPointerFromInternalField(0));
+		UIBasePtr ptr;
+		script_.With([&](const Handle<Context>& context){
+		    ptr = *static_cast<UIBasePtr*>(Local<External>::Cast(ui_board_obj_->GetInternalField(0))->Value());
+		});
         return ptr->focus_index();
     }
     return -1;

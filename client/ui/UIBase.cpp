@@ -68,8 +68,9 @@ void UIBase::UpdatePosition()
         parent_y_ = 0;
         GetScreenState(&parent_width_, &parent_height_, nullptr);
     } else {
-        UIBasePtr parent_ptr = *static_cast<UIBasePtr*>(parent_->GetPointerFromInternalField(0));
-        parent_x_ = parent_ptr->absolute_x();
+//      UIBasePtr parent_ptr = *static_cast<UIBasePtr*>(parent_->GetPointerFromInternalField(0));
+	    UIBasePtr parent_ptr = *static_cast<UIBasePtr*>(Local<External>::Cast(parent_->GetInternalField(0))->Value());
+		parent_x_ = parent_ptr->absolute_x();
         parent_y_ = parent_ptr->absolute_y();
         parent_width_ = parent_ptr->absolute_width();
         parent_height_ = parent_ptr->absolute_height();
@@ -115,14 +116,16 @@ void UIBase::UpdatePosition()
 Handle<Value> UIBase::Function_addChild(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0));
-    assert(self);
+//  UIBasePtr self = *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value());
+	assert(self);
 
     if (args.Length() > 0 && args[0]->IsObject()) {
         auto child = args[0]->ToObject();
 
         if (args.This() != child) {
-            UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
+//          UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
+		    UIBasePtr child_ptr = *static_cast<UIBasePtr*>(Local<External>::Cast(child->GetInternalField(0))->Value());
             child_ptr->set_parent(args.This());
             self->children_.push_back(Persistent<Object>::New(child));
         }
@@ -133,15 +136,17 @@ Handle<Value> UIBase::Function_addChild(const Arguments& args)
 Handle<Value> UIBase::Function_removeChild(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0));
-    assert(self);
+//  UIBasePtr self = *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value());
+	assert(self);
 
     if (args.Length() > 0 && args[0]->IsObject()) {
         auto child = args[0]->ToObject();
         auto it = std::find(self->children_.begin(), self->children_.end(), child);
         if (it != self->children_.end()) {
-            UIBasePtr child_ptr = *static_cast<UIBasePtr*>((*it)->GetPointerFromInternalField(0));
-            child_ptr->set_parent(Handle<Object>());
+//          UIBasePtr child_ptr = *static_cast<UIBasePtr*>((*it)->GetPointerFromInternalField(0));
+		    UIBasePtr child_ptr = *static_cast<UIBasePtr*>(Local<External>::Cast((*it)->GetInternalField(0))->Value());
+			child_ptr->set_parent(Handle<Object>());
             self->children_.erase(it);
         }
     }
@@ -151,7 +156,8 @@ Handle<Value> UIBase::Function_removeChild(const Arguments& args)
 Handle<Value> UIBase::Function_parent(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0));
+//  UIBasePtr self = *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value());
     assert(self);
 
     if (!self->parent_.IsEmpty()) {
@@ -164,124 +170,142 @@ Handle<Value> UIBase::Function_parent(const Arguments& args)
 Handle<Value> UIBase::Property_visible(Local<String> property, const AccessorInfo &info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    return Boolean::New(self->visible_);
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	return Boolean::New(self->visible_);
 }
 
 void UIBase::Property_set_visible(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    self->visible_ = value->ToBoolean()->BooleanValue();
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	self->visible_ = value->ToBoolean()->BooleanValue();
 }
 
 Handle<Value> UIBase::Property_width(Local<String> property, const AccessorInfo &info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    return Integer::New(self->width_);
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	return Integer::New(self->width_);
 }
 void UIBase::Property_set_width(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    self->width_ = value->ToInteger()->IntegerValue();
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	self->width_ = value->ToInteger()->IntegerValue();
 }
 Handle<Value> UIBase::Property_height(Local<String> property, const AccessorInfo &info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    return Integer::New(self->height_);
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	return Integer::New(self->height_);
 }
 void UIBase::Property_set_height(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    self->height_ = value->ToInteger()->IntegerValue();
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	self->height_ = value->ToInteger()->IntegerValue();
 }
 
 Handle<Value> UIBase::Property_top(Local<String> property, const AccessorInfo &info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    return Integer::New(self->top_);
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	return Integer::New(self->top_);
 }
 
 void UIBase::Property_set_top(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    self->top_ = value->ToInteger()->IntegerValue();
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	self->top_ = value->ToInteger()->IntegerValue();
 }
 
 Handle<Value> UIBase::Property_left(Local<String> property, const AccessorInfo &info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    return Integer::New(self->left_);
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	return Integer::New(self->left_);
 }
 
 void UIBase::Property_set_left(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    self->left_ = value->ToInteger()->IntegerValue();
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	self->left_ = value->ToInteger()->IntegerValue();
 }
 
 Handle<Value> UIBase::Property_right(Local<String> property, const AccessorInfo &info)
 {
 
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    return Integer::New(self->right_);
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	return Integer::New(self->right_);
 }
 
 void UIBase::Property_set_right(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    self->right_ = value->ToInteger()->IntegerValue();
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	self->right_ = value->ToInteger()->IntegerValue();
 }
 
 Handle<Value> UIBase::Property_bottom(Local<String> property, const AccessorInfo &info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    return Integer::New(self->bottom_);
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	return Integer::New(self->bottom_);
 }
 
 void UIBase::Property_set_bottom(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    self->bottom_ = value->ToInteger()->IntegerValue();
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	self->bottom_ = value->ToInteger()->IntegerValue();
 }
 
 Handle<Value> UIBase::Property_docking(Local<String> property, const AccessorInfo &info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    return Integer::New(self->docking_);
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	return Integer::New(self->docking_);
 }
 
 void UIBase::Property_set_docking(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
-    self->docking_ = value->ToInteger()->IntegerValue();
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
+	self->docking_ = value->ToInteger()->IntegerValue();
 }
 
 Handle<Value> UIBase::Property_on_click(Local<String> property, const AccessorInfo &info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
 	return self->on_click_;
 }
 
 void UIBase::Property_set_on_click(Local<String> property, Local<Value> value, const AccessorInfo& info)
 {
     assert(info.This()->InternalFieldCount() > 0);
-    UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+//  UIBasePtr self = *static_cast<UIBasePtr*>(info.This()->GetPointerFromInternalField(0));
+    UIBasePtr self = *static_cast<UIBasePtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value());
 	if (value->IsFunction()) {
 		self->on_click_ = Persistent<Function>::New(value.As<Function>());
 	}
@@ -399,7 +423,8 @@ void UIBase::ProcessInputChildren(InputManager* input)
 {
     for (auto it = children_.begin(); it != children_.end(); ++it) {
         auto child = *it;
-        UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
+//      UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
+	    UIBasePtr child_ptr = *static_cast<UIBasePtr*>(Local<External>::Cast(child->GetInternalField(0))->Value());
         child_ptr->ProcessInput(input);
     }
 }
@@ -408,8 +433,9 @@ void UIBase::UpdateChildren()
 {
     for (auto it = children_.begin(); it != children_.end(); ++it) {
         auto child = *it;
-        UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
-        child_ptr->Update();
+//      UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
+	    UIBasePtr child_ptr = *static_cast<UIBasePtr*>(Local<External>::Cast(child->GetInternalField(0))->Value());
+		child_ptr->Update();
     }
 }
 
@@ -417,8 +443,9 @@ void UIBase::DrawChildren()
 {
     for (auto it = children_.begin(); it != children_.end(); ++it) {
         auto child = *it;
-        UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
-        child_ptr->Draw();
+//      UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
+	    UIBasePtr child_ptr = *static_cast<UIBasePtr*>(Local<External>::Cast(child->GetInternalField(0))->Value());
+		child_ptr->Draw();
     }
 }
 
@@ -426,8 +453,9 @@ void UIBase::AsyncUpdateChildren()
 {
     for (auto it = children_.begin(); it != children_.end(); ++it) {
         auto child = *it;
-        UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
-        child_ptr->AsyncUpdate();
+//      UIBasePtr child_ptr = *static_cast<UIBasePtr*>(child->GetPointerFromInternalField(0));
+	    UIBasePtr child_ptr = *static_cast<UIBasePtr*>(Local<External>::Cast(child->GetInternalField(0))->Value());
+		child_ptr->AsyncUpdate();
     }
 }
 
@@ -465,7 +493,8 @@ void UIBase::GetParam(const Handle<Object>& object, const std::string& name,
 void UIBase::Focus()
 {
     if (!parent_.IsEmpty()) {
-        UIBasePtr parent_ptr = *static_cast<UIBasePtr*>(parent_->GetPointerFromInternalField(0));
+//      UIBasePtr parent_ptr = *static_cast<UIBasePtr*>(parent_->GetPointerFromInternalField(0));
+	    UIBasePtr parent_ptr = *static_cast<UIBasePtr*>(Local<External>::Cast(parent_->GetInternalField(0))->Value());
         parent_ptr->Focus();
     }
     focus_index_ = ++max_focus_index;

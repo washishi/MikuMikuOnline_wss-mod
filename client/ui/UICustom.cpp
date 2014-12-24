@@ -34,7 +34,8 @@ Handle<Value> UICustom::Property_processinput(Local<String> property, const Acce
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UICustomPtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UICustomPtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UICustomPtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     return self->processinput_;
@@ -44,7 +45,8 @@ void UICustom::Property_set_processinput(Local<String> property, Local<Value> va
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UICustomPtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UICustomPtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UICustomPtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
 
@@ -55,7 +57,8 @@ Handle<Value> UICustom::Property_update(Local<String> property, const AccessorIn
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UICustomPtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UICustomPtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UICustomPtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     return self->update_;
@@ -65,7 +68,8 @@ void UICustom::Property_set_update(Local<String> property, Local<Value> value, c
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UICustomPtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UICustomPtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UICustomPtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
 
@@ -76,7 +80,8 @@ Handle<Value> UICustom::Property_draw(Local<String> property, const AccessorInfo
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UICustomPtr*>(info.This()->GetPointerFromInternalField(0))
+//          *static_cast<UICustomPtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UICustomPtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
     );
     assert(self);
     return self->draw_;
@@ -86,8 +91,9 @@ void UICustom::Property_set_draw(Local<String> property, Local<Value> value, con
 {
     assert(info.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UICustomPtr*>(info.This()->GetPointerFromInternalField(0))
-    );
+//          *static_cast<UICustomPtr*>(info.This()->GetPointerFromInternalField(0))
+			*static_cast<UICustomPtr*>(Local<External>::Cast(info.This()->GetInternalField(0))->Value())
+	);
     assert(self);
 
     self->draw_ = Persistent<Function>::New(value.As<Function>());
@@ -161,7 +167,8 @@ Handle<Value> UICustom::Function_DrawLine(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsInt32() &&
@@ -197,7 +204,8 @@ Handle<Value> UICustom::Function_DrawBox(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsInt32() &&
@@ -232,7 +240,8 @@ Handle<Value> UICustom::Function_DrawEdgeBox(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsInt32() &&
@@ -283,7 +292,8 @@ Handle<Value> UICustom::Function_DrawCircle(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsInt32() &&
@@ -316,7 +326,8 @@ Handle<Value> UICustom::Function_DrawOval(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsInt32() &&
@@ -352,7 +363,8 @@ Handle<Value> UICustom::Function_DrawTriangle(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsInt32() &&
@@ -392,7 +404,8 @@ Handle<Value> UICustom::Function_DrawQuadrangle(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsInt32() &&
@@ -434,7 +447,8 @@ Handle<Value> UICustom::Function_DrawPixel(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsInt32() &&
@@ -460,7 +474,8 @@ Handle<Value> UICustom::Function_Paint(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsInt32() &&
@@ -495,15 +510,16 @@ Handle<Value> UICustom::Function_DrawPixelSet(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsArray() )
 	{
 		auto array = Local<Array>::Cast(args[0]);
 		auto length = array->Length();
-		auto data = static_cast<POINTDATA*>(array->GetPointerFromInternalField(0));
-		
+//		auto data = static_cast<POINTDATA*>(array->GetPointerFromInternalField(0));
+		auto data = static_cast<POINTDATA*>(Local<External>::Cast(array->GetInternalField(0))->Value());
 		DrawPixelSet(data,length);
 	}
 
@@ -514,14 +530,16 @@ Handle<Value> UICustom::Function_DrawLineSet(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsArray() )
 	{
 		auto array = Local<Array>::Cast(args[0]);
 		auto length = array->Length();
-		auto data = static_cast<LINEDATA*>(array->GetPointerFromInternalField(0));
+//		auto data = static_cast<LINEDATA*>(array->GetPointerFromInternalField(0));
+		auto data = static_cast<LINEDATA*>(Local<External>::Cast(array->GetInternalField(0))->Value());
 		
 		DrawLineSet(data,length);
 	}
@@ -533,7 +551,8 @@ Handle<Value> UICustom::Function_DrawPixel3D(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsInt32() &&
@@ -561,7 +580,8 @@ Handle<Value> UICustom::Function_DrawLine3D(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsInt32() &&
@@ -595,8 +615,9 @@ Handle<Value> UICustom::Function_DrawCube3D(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
-    );
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
+	);
     assert(self);
 	if(	args[0]->IsInt32() &&
 		args[1]->IsInt32() &&
@@ -641,8 +662,9 @@ Handle<Value> UICustom::Function_DrawSphere3D(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
-    );
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
+	);
     assert(self);
 	if(	args[0]->IsInt32() &&
 		args[1]->IsInt32() &&
@@ -686,7 +708,8 @@ Handle<Value> UICustom::Function_LoadGraph(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(args[0]->IsString())
@@ -703,14 +726,16 @@ Handle<Value> UICustom::Function_DeleteGraph(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(args[0]->IsObject())
 	{
 		auto tmp = args[0]->ToObject();
 		assert(tmp->InternalFieldCount() > 0);
-		//auto obj = *static_cast<GraphicObjectPtr>(tmp->GetPointerFromInternalField(0));
+		////auto obj = *static_cast<GraphicObjectPtr>(tmp->GetPointerFromInternalField(0));
+		//auto obj = *static_cast<GraphicObjectPtr>(Local<External>::Cast(tmp->GetInternalField(0))->Value());
 		// ‚ß‚ñ‚Ç‚¢‚©‚çŒã‚Å
 		//auto it = std::find_if(graphics_handle_.begin(),graphics_handle_.end(),[&](GraphicObject src)->bool{return src == obj;});
 		//if(it != graphics_handle_.end())
@@ -727,7 +752,8 @@ Handle<Value> UICustom::Function_DrawText(const Arguments& args)
 {
     assert(args.This()->InternalFieldCount() > 0);
     auto self = std::dynamic_pointer_cast<UICustom>(
-            *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+//          *static_cast<UIBasePtr*>(args.This()->GetPointerFromInternalField(0))
+			*static_cast<UIBasePtr*>(Local<External>::Cast(args.This()->GetInternalField(0))->Value())
     );
     assert(self);
 	if(	args[0]->IsInt32() &&
