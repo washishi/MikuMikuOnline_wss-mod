@@ -70,11 +70,16 @@ class Input{
         int input_handle_, font_handle_, font_height_;
 
         std::vector<tstring> message_lines_;
-        std::vector<tstring> lines_;
-        std::vector<tstring> candidates_;
 
+// public に変更  ここから
+    public:     
+		std::vector<tstring> lines_;
+    private:
+// public に変更  ここまで
+		std::vector<tstring> candidates_;
         int candidate_x_, candidate_y_;
-        int selecting_candidate_, selecting_clause_;
+
+		int selecting_candidate_, selecting_clause_;
         int cursor_moveto_x_, cursor_moveto_y_;
         int prev_cursor_pos_, cursor_drag_count_;
         bool multiline_;

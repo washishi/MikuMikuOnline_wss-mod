@@ -10,6 +10,7 @@
 #include "../common/Logger.hpp"
 #include "../common/unicode.hpp"
 #include "Music.hpp"
+#include "version.hpp" // ※ モデルロード中にウインドウタイトルを変化さるため追加
 
 // ※ DXライブラリの仕様変更によりコメント(DXlib.hに定義が含まれている、またファイル名のデータ型が異なる)
 // MV1書き出し関数
@@ -184,6 +185,7 @@ void ResourceManager::BuildModelFileTree()
 // ※ ここから ファイル名にwstringを使いたかったのでストリームによる読み込みに変更(他国語OS対応)
 //							read_json(json_path.string(), pt_json);
 							std::ifstream json_stream(json_path.wstring(),std::ios::binary);
+							Logger::Debug(_T("Load %s"), json_path);
 							read_json(json_stream,pt_json);
 // ※ ここまで
 							MergePtree(&pt_json, GetDefaultInfoJSON());
@@ -536,6 +538,7 @@ ModelHandle ResourceManager::LoadModelFromName(const tstring& name, bool async) 
 				SetUseASyncLoadFlag(TRUE);
 			}
 // ※ ここまで
+			SetMainWindowText(unicode::ToTString(MMO_VERSION_TEXT_LOADING).c_str());
 			int handle = MV1LoadModelFromMem( FileImage.get(), FileSize, FileReadFunc, FileReleaseFunc, &(*funcdata));
 
 			auto material_num = MV1GetMaterialNum(handle);
@@ -560,6 +563,7 @@ ModelHandle ResourceManager::LoadModelFromName(const tstring& name, bool async) 
 			shared_model_data_[unicode::ToTString(filepath)] = shared_data;
 
 			Logger::Debug(_T("Model %d"), handle);
+			SetMainWindowText(unicode::ToTString(MMO_VERSION_TEXT).c_str());
 			return ModelHandle(shared_data);
 		}
 	} else {

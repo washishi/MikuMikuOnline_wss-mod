@@ -24,12 +24,12 @@ freely, subject to the following restrictions:
 
 === DX Library
 
-Copyright (c) 2001-2014 Takumi Yamada.
+Copyright (c) 2001-2021 Takumi Yamada.
 
 
 === libpng
 
-Copyright (c) 1995-2014 contributing authors.
+Copyright (c) 2004, 2006-2012 Glenn Randers-Pehrson.
 
 
 === zlib
@@ -39,7 +39,8 @@ Copyright (c) 1995-2012 Jean-loup Gailly and Mark Adler.
 
 === libjpeg
 
-Copyright (c) 1994-2010, Thomas G. Lane, Guido Vollbeding.
+Copyright (c) 1991-2013, Thomas G. Lane, Guido Vollbeding.
+this software is based in part on the work of the Independent JPEG Group
 
 
 === Bullet

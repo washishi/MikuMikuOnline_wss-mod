@@ -1,4 +1,4 @@
-﻿MikuMikuOnline 0.4.1 Build Rev.b77388e-Based WSS-Mod beta20  2014/12/24 by わしし
+﻿MikuMikuOnline 0.4.1 Build Rev.b77388e-Based WSS-Mod beta21  2021/10/03 by わしし
 
 MMO公式より公開されている最終のdevelop版ソースRev.b77388eを元に
 利用ライブラリを新しく＆個人的に変更したい点を一部改変したものになります
@@ -8,10 +8,12 @@ MMO公式より公開されている最終のdevelop版ソースRev.b77388eを�
 (64Bit版は当然64BitOSを利用していないと動きません あしからず)
 
 ・配布ファイル
-  client_wss-mod_beta20.exe    32Bit版
-  client_wss-mod_beta20_64.exe 64Bit版
+  client_wss-mod_beta21.exe    32Bit版
+  client_wss-mod_beta21_64.exe 64Bit版
+  config.json  クライアント設定ファイル(ロビーサーバの記述を変更)
   server.exe    自前ビルドのサーバ 32bit版
   server64.exe  自前ビルドのサーバ 64bit版
+  server/config.json  サーバ設定ファイル(ロビーサーバの記述を変更)
   system/languages/jp.json 設定メニューファイル(日本語)
   system/languages/en.json 設定メニューファイル(英語)
   system/languages/jp.json.org (変更前のオリジナルのファイルのバックアップ )
@@ -40,7 +42,7 @@ MMO公式より公開されている最終のdevelop版ソースRev.b77388eを�
       (心経P作成のMODクライアントとツール類、有志によるモデル等の同梱パッケージになります）
 
   ３、本アーカイブのファイルをMMOクライアントのフォルダに上書きコピーして
-      client_wss-mod_beta20.exe(32Bit版)またはclient_wss-mod_beta20_64.exe(64Bit版)
+      client_wss-mod_beta21.exe(32Bit版)またはclient_wss-mod_beta21_64.exe(64Bit版)
       を起動するようにする
       ※MMOTalk(Modクライアントパッケージに同梱)を利用する場合は「MMO Client選択」で上記exe
         ファイルのどちらかを選択してください
@@ -57,12 +59,17 @@ MMO公式より公開されている最終のdevelop版ソースRev.b77388eを�
 
 ・公式クライアントからの変更点
 
-NEW・Boostライブラリの変更 1.57.0 (最新)
+NEW・Windows10で日本語入力がうまく行えない場合がある件の対応(IMEの不具合ぽいけど・・・)
 
-NEW・DXライブラリの変更 3.13c 12/23版 (最新のテストリリース版)
-     (一部jpegファイルの読み込みに失敗していたのが解消)
+NEW・DXライブラリの変更 3.22e
 
-NEW・V8 JavaScript Engine の変更 3.18
+NEW・モデルロード中にウィンドウタイトルに "Loading..." の表示が出るように変更
+
+NEW・Boostライブラリの変更 1.58.0（クライアント、サーバは互換性問題が出るので1.51.0のまま)
+
+NEW・json生成時にモデルの読み込みに失敗した場合はjson生成等を行わないように修正(異常終了回避)
+
+   ・V8 JavaScript Engine の変更 3.18
 
    ・json生成時に通常では削除できないフォルダ(フォルダ名の最後が'.')が作成されてしまうことが
      あるので修正
@@ -161,23 +168,32 @@ NEW・V8 JavaScript Engine の変更 3.18
   http://sourceforge.jp/projects/mmo/scm/git/main/commits
 
 ・内包ライブラリのバージョンは以下の通り
-  ・DXライブラリ 3.13c 12/23版 (現時点でのテストリリース版の最新)
-    http://homepage2.nifty.com/natupaji/DxLib/
+  ・DXライブラリ 3.22e
+    https://dxlib.xsrv.jp/
 
-  ・V8 JavaScript Engine 3.18(できる限り最新のものに変更中w)
+  ・V8 JavaScript Engine 3.18
     https://code.google.com/p/v8/
     (http://v8.googlecode.com/svn/branches/3.18/)
 
-  ・boost C++ライブラリ 1.57.0(現時点での最新)
+  ・boost C++ライブラリ 1.58.0 (クライアント)
+    boost C++ライブラリ 1.51.0 (サーバ ※これ以降は互換性問題が出る)
     http://www.boost.org/
 
-  ・Crypto++ Library 5.6.2(現時点での最新)
+  ・Crypto++ Library 5.6.2
     http://www.cryptopp.com/
 
   ・Sugar Javascript library 1.4.1
     http://sugarjs.com/
 
+
 ・改版履歴
+
+  ・2021/10/03 beta21
+    ・Windows10 IMEでうまく動かない場合がある件対応
+    ・モデルロード中をウインドウタイトルに表示
+    ・DXライブラリの最新化 3.13c→3.22e
+    ・Boostライブラリの更新 1.57.0→1.58.0
+    ・設定ファイル config.json のロビーサーバの記述を変更
 
   ・2014/12/24 beta20
     ・DXライブラリの最新化 3.13→3.13c(12/23版)

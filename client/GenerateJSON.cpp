@@ -432,6 +432,9 @@ JsonGen::JsonGen()
 						_tcscpy_s(tmp_mv1_path,pmd_paths[i].c_str());
 
 						model_handle_ = MV1LoadModel( tmp_mv1_path );
+// ※ ここから モデルの読み込みに失敗している場合は処理しないように変更
+						if (model_handle_ == -1) continue;
+// ※ ここまで
 						int tex_num = MV1GetTextureNum( model_handle_ );
 						int frame_num = MV1GetFrameNum( model_handle_ );
 

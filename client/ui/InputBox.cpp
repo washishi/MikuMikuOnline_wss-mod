@@ -342,10 +342,12 @@ void InputBox::ProcessInput(InputManager* input)
     bool push_long_backspace = (input->GetKeyCount(KEY_INPUT_BACK) > 60 * 1.5);
 
     bool empty = input_.text().empty();
-    input_.ProcessInput(input);
+	input_.ProcessInput(input);
 
-    if (IsActive() && ((first_key_return && !push_key_shift && empty) || push_key_esc)) {
-        Inactivate();
+	//  IME変換途中で入力欄が非アクティブになってしまうため修正
+	//  if (IsActive() && ((first_key_return && !push_key_shift && empty) || push_key_esc)) {
+	if (IsActive() && input_.lines_[0].empty() && ((first_key_return && !push_key_shift && empty) || push_key_esc)) {
+		Inactivate();
     } else if (!IsActive() && first_key_return) {
         Activate();
     } else if (!IsActive() && push_key_v && push_key_ctrl) {

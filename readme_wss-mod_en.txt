@@ -1,4 +1,4 @@
-﻿MikuMikuOnline 0.4.1 Build Rev.b77388e based Modified Client(wss-mod) beta20  2014/12/24 by washishi
+﻿MikuMikuOnline 0.4.1 Build Rev.b77388e based Modified Client(wss-mod) beta21  2021/10/03 by washishi
 
 Based on source Rev.b77388e develop version of the final, which is published from MMO official
 It becomes a thing that was partially modified the point you want to change the individualism
@@ -6,10 +6,12 @@ and a new library use
 
 
 DistributionFiles
-  client_wss-mod_beta20.exe    Modified Client 32bit Version
-  client_wss-mod_beta20_64.exe Modified Client 64bit Version
+  client_wss-mod_beta21.exe    Modified Client 32bit Version
+  client_wss-mod_beta21_64.exe Modified Client 64bit Version
+  config.json                  client config file (Modefyed lobby server)
   server.exe                   server 32bit version
   server64.exe                 server 64bit version
+  server/config.json           server config file (Modefyed lobby server)
   system/languages/jp.json     Modified SetupMenuFile(Japanese)
   system/languages/en.json     Modified SetupMenuFile(English)
   system/languages/jp.json.org (Original backup)
@@ -32,7 +34,7 @@ How to Use
   3.overwrite all of the files and folders that are included in this archive to
     the folder that contains the client.exe where you unzipped the mmo-0.4.1_234.zip
 
-  4.run the client_wss-mod_beta19_64.exe or client_wss-mod_beta19.exe and enjoy!
+  4.run the client_wss-mod_beta21_64.exe or client_wss-mod_beta21.exe and enjoy!
     (Might take a little to create a cache of data stage model first start)
 
     Note:Original client.exe will not work

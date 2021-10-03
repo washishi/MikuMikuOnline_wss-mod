@@ -62,30 +62,32 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>$(ProjectName)_wss-mod_beta20_d</TargetName>
-    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_wss-mod_beta21_d</TargetName>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)</OutDir>
     <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>$(ProjectName)_wss-mod_beta20_64d</TargetName>
-    <LinkIncremental>true</LinkIncremental>
+    <TargetName>$(ProjectName)_wss-mod_beta21_64d</TargetName>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)</OutDir>
     <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <TargetName>$(ProjectName)_wss-mod_beta20</TargetName>
+    <TargetName>$(ProjectName)_wss-mod_beta21</TargetName>
     <OutDir>$(SolutionDir)</OutDir>
     <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>$(ProjectName)_wss-mod_beta20_64</TargetName>
+    <TargetName>$(ProjectName)_wss-mod_beta21_64</TargetName>
     <OutDir>$(SolutionDir)</OutDir>
     <IntDir>$(ProjectDir)$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>\src\boost_1_57_0;\src\cryptopp562;\src\DxLibMakeTest_3_13c_1223;\src\v8_3_18_$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>\src\boost_1_58_0;\src\cryptopp562;\src\DxLibMake3_22e;\src\v8_3_18_$(Platform)\include</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
       <ForcedUsingFiles>
@@ -94,58 +96,62 @@
       <WarningLevel>Level4</WarningLevel>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-D_WIN32_WINNT=0x0501 -Zm200 %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>StdAfx.h</ForcedIncludeFiles>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_57_0\$(Platform)\stage\lib;F:\src\DxLibMakeTest_3_13c_1223\lib;F:\src\DxLibVCTest_3_13c_1223;\src\v8_3_18_$(Platform)\build\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_58_0\$(Platform)\stage\lib;\src\DxLibMake3_22e\$(Platform)\$(Configuration);\src\DxLibNoneSoftDrawCode_VC_3_22e;\src\v8_3_18_$(Platform)\build\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ShowProgress>
       </ShowProgress>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <ResourceCompile>
-      <Culture>0x0409</Culture>
+      <Culture>0x0411</Culture>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>\src\boost_1_57_0;\src\cryptopp562;\src\DxLibMakeTest_3_13c_1223;\src\v8_3_18_$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>\src\boost_1_58_0;\src\cryptopp562;\src\DxLibMake3_22e;\src\v8_3_18_$(Platform)\include</AdditionalIncludeDirectories>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
       <ForcedUsingFiles>
       </ForcedUsingFiles>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
-      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-D_WIN32_WINNT=0x0501 -Zm200 %(AdditionalOptions)</AdditionalOptions>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>StdAfx.h</ForcedIncludeFiles>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_57_0\$(Platform)\stage\lib;F:\src\DxLibMakeTest_3_13c_1223\lib;F:\src\DxLibVCTest_3_13c_1223;\src\v8_3_18_$(Platform)\build\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_58_0\$(Platform)\stage\lib;\src\DxLibMake3_22e\$(Platform)\$(Configuration);\src\DxLibNoneSoftDrawCode_VC_3_22e;\src\v8_3_18_$(Platform)\build\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ShowProgress>
       </ShowProgress>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <ResourceCompile>
-      <Culture>0x0409</Culture>
+      <Culture>0x0411</Culture>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <AdditionalIncludeDirectories>\src\boost_1_57_0;\src\cryptopp562;\src\DxLibMakeTest_3_13c_1223;\src\v8_3_18_$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>\src\boost_1_58_0;\src\cryptopp562;\src\DxLibMake3_22e;\src\v8_3_18_$(Platform)\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Full</Optimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <WarningLevel>Level3</WarningLevel>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
-      <AdditionalOptions>-Zm200 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-D_WIN32_WINNT=0x0501 -Zm200 %(AdditionalOptions)</AdditionalOptions>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
@@ -153,24 +159,25 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <ForcedIncludeFiles>StdAfx.h</ForcedIncludeFiles>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
     </ClCompile>
     <Link>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_57_0\$(Platform)\stage\lib;F:\src\DxLibMakeTest_3_13c_1223\lib;F:\src\DxLibVCTest_3_13c_1223;\src\v8_3_18_$(Platform)\build\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_58_0\$(Platform)\stage\lib;\src\DxLibMake3_22e\$(Platform)\$(Configuration);\src\DxLibNoneSoftDrawCode_VC_3_22e;\src\v8_3_18_$(Platform)\build\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <ShowProgress>
       </ShowProgress>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <ResourceCompile>
-      <Culture>0x0409</Culture>
+      <Culture>0x0411</Culture>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <AdditionalIncludeDirectories>\src\boost_1_57_0;\src\cryptopp562;\src\DxLibMakeTest_3_13c_1223;\src\v8_3_18_$(Platform)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>\src\boost_1_58_0;\src\cryptopp562;\src\DxLibMake3_22e;\src\v8_3_18_$(Platform)\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <Optimization>Full</Optimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -180,23 +187,24 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalOptions>-Zm165 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-D_WIN32_WINNT=0x0501 -Zm200 %(AdditionalOptions)</AdditionalOptions>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <ForcedIncludeFiles>StdAfx.h</ForcedIncludeFiles>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_57_0\$(Platform)\stage\lib;F:\src\DxLibMakeTest_3_13c_1223\lib;F:\src\DxLibVCTest_3_13c_1223;\src\v8_3_18_$(Platform)\build\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>\src\cryptopp562\$(Platform)\Output\$(Configuration);\src\boost_1_58_0\$(Platform)\stage\lib;\src\DxLibMake3_22e\$(Platform)\$(Configuration);\src\DxLibNoneSoftDrawCode_VC_3_22e;\src\v8_3_18_$(Platform)\build\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <ShowProgress>
       </ShowProgress>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <ResourceCompile>
-      <Culture>0x0409</Culture>
+      <Culture>0x0411</Culture>
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
